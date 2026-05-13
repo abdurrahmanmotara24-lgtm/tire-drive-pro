@@ -17,6 +17,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -59,6 +60,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMediaRoute = AdminMediaRouteImport.update({
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHeroRoute = AdminHeroRouteImport.update({
   id: '/hero',
   path: '/hero',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/admin/hero'
+    | '/admin/media'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/admin/hero'
+    | '/admin/media'
     | '/admin'
   id:
     | '__root__'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/admin/hero'
+    | '/admin/media'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -201,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/media': {
+      id: '/admin/media'
+      path: '/media'
+      fullPath: '/admin/media'
+      preLoaderRoute: typeof AdminMediaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/hero': {
       id: '/admin/hero'
       path: '/hero'
@@ -213,11 +232,13 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminHeroRoute: typeof AdminHeroRoute
+  AdminMediaRoute: typeof AdminMediaRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminHeroRoute: AdminHeroRoute,
+  AdminMediaRoute: AdminMediaRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -235,3 +256,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
