@@ -36,7 +36,7 @@ export function SiteFooter() {
               <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" /><span>+1 (000) 000-0000</span></li>
               <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" /><span>hello@tiresnearyou.com</span></li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0" /><span>123 Main Street, City</span></li>
-              <li className="flex items-center gap-2"><Clock className="h-4 w-4 shrink-0" /><span>Mon–Sat 8:00–18:00</span></li>
+              <li className="flex items-center gap-2"><Clock className="h-4 w-4 shrink-0" /><span>Mon&ndash;Sat 8:00&ndash;18:00</span></li>
             </ul>
           </div>
         </div>
