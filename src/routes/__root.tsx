@@ -12,6 +12,8 @@ import appCss from "../styles.css?url";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MessageCircle } from "lucide-react";
+import { Toaster } from "@/components/ui/sonner";
+import { useLocation } from "@tanstack/react-router";
 
 function NotFoundComponent() {
   return (
