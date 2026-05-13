@@ -23,32 +23,35 @@ const branches = [
 function Locations() {
   return (
     <>
-      <section className="bg-hero-gradient py-16 text-primary-foreground">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-extrabold text-primary-foreground sm:text-5xl">Our Locations</h1>
-          <p className="mt-3 text-lg text-primary-foreground/90">Find your nearest fitment centre and drop in today.</p>
+      <section className="relative isolate overflow-hidden -mt-14 pt-14 bg-hero-gradient">
+        <div className="container-tny py-12 text-center text-primary-foreground lg:py-14">
+          <p className="text-xs font-semibold uppercase tracking-wider text-brand-red">Locations</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl lg:text-5xl">Our branches</h1>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-primary-foreground/85 sm:text-base">
+            Find your nearest fitment centre and drop in today.
+          </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl space-y-10 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="container-tny section space-y-6">
         {branches.map((b) => (
-          <div key={b.name} className="grid gap-6 overflow-hidden rounded-3xl border border-border bg-card shadow-sm lg:grid-cols-2">
-            <div className="p-8">
-              <h2 className="text-2xl font-extrabold">{b.name}</h2>
-              <ul className="mt-6 space-y-3 text-foreground">
-                <li className="flex items-start gap-3"><MapPin className="mt-0.5 h-5 w-5 text-brand-red" />{b.address}</li>
-                <li className="flex items-start gap-3"><Phone className="mt-0.5 h-5 w-5 text-brand-red" /><a href={`tel:${b.phone}`} className="hover:text-brand-red">{b.phone}</a></li>
-                <li className="flex items-start gap-3"><Clock className="mt-0.5 h-5 w-5 text-brand-red" />{b.hours}</li>
+          <div key={b.name} className="grid gap-0 overflow-hidden rounded-2xl border border-border bg-card shadow-soft lg:grid-cols-2">
+            <div className="p-6">
+              <h2 className="text-lg font-bold">{b.name}</h2>
+              <ul className="mt-4 space-y-2.5 text-sm text-foreground">
+                <li className="flex items-start gap-2.5"><MapPin className="mt-0.5 h-4 w-4 text-brand-red" />{b.address}</li>
+                <li className="flex items-start gap-2.5"><Phone className="mt-0.5 h-4 w-4 text-brand-red" /><a href={`tel:${b.phone}`} className="hover:text-brand-red">{b.phone}</a></li>
+                <li className="flex items-start gap-2.5"><Clock className="mt-0.5 h-4 w-4 text-brand-red" />{b.hours}</li>
               </ul>
-              <div className="mt-6 flex gap-3">
-                <a href={`https://www.google.com/maps?q=${b.mapQ}`} target="_blank" rel="noreferrer" className="inline-flex rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground">Get Directions</a>
-                <a href={`tel:${b.phone}`} className="inline-flex rounded-full bg-brand-red px-5 py-2.5 text-sm font-bold text-brand-red-foreground">Call Branch</a>
+              <div className="mt-5 flex flex-wrap gap-2.5">
+                <a href={`https://www.google.com/maps?q=${b.mapQ}`} target="_blank" rel="noreferrer" className="inline-flex rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-transform hover:scale-105">Get Directions</a>
+                <a href={`tel:${b.phone}`} className="inline-flex rounded-full bg-brand-red px-4 py-2 text-xs font-semibold text-brand-red-foreground shadow-red transition-transform hover:scale-105">Call Branch</a>
               </div>
             </div>
             <iframe
               title={b.name}
               src={`https://www.google.com/maps?q=${b.mapQ}&output=embed`}
-              className="h-[320px] w-full border-0 lg:h-full"
+              className="h-[260px] w-full border-0 lg:h-full"
               loading="lazy"
             />
           </div>
