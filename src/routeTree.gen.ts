@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminSectionsRouteImport } from './routes/admin.sections'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
+import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminContactRouteImport } from './routes/admin.contact'
 
@@ -72,6 +73,11 @@ const AdminMediaRoute = AdminMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLocationsRoute = AdminLocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHeroRoute = AdminHeroRouteImport.update({
   id: '/hero',
   path: '/hero',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/sections': typeof AdminSectionsRoute
   '/admin/': typeof AdminIndexRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/sections': typeof AdminSectionsRoute
   '/admin': typeof AdminIndexRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/sections': typeof AdminSectionsRoute
   '/admin/': typeof AdminIndexRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/locations'
     | '/admin/media'
     | '/admin/sections'
     | '/admin/'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/locations'
     | '/admin/media'
     | '/admin/sections'
     | '/admin'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/locations'
     | '/admin/media'
     | '/admin/sections'
     | '/admin/'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMediaRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/locations': {
+      id: '/admin/locations'
+      path: '/locations'
+      fullPath: '/admin/locations'
+      preLoaderRoute: typeof AdminLocationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/hero': {
       id: '/admin/hero'
       path: '/hero'
@@ -271,6 +290,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminContactRoute: typeof AdminContactRoute
   AdminHeroRoute: typeof AdminHeroRoute
+  AdminLocationsRoute: typeof AdminLocationsRoute
   AdminMediaRoute: typeof AdminMediaRoute
   AdminSectionsRoute: typeof AdminSectionsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -279,6 +299,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminContactRoute: AdminContactRoute,
   AdminHeroRoute: AdminHeroRoute,
+  AdminLocationsRoute: AdminLocationsRoute,
   AdminMediaRoute: AdminMediaRoute,
   AdminSectionsRoute: AdminSectionsRoute,
   AdminIndexRoute: AdminIndexRoute,
