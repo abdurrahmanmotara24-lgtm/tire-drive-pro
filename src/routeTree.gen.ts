@@ -17,6 +17,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSectionsRouteImport } from './routes/admin.sections'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminContactRouteImport } from './routes/admin.contact'
@@ -61,6 +62,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSectionsRoute = AdminSectionsRouteImport.update({
+  id: '/sections',
+  path: '/sections',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMediaRoute = AdminMediaRouteImport.update({
   id: '/media',
   path: '/media',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/sections': typeof AdminSectionsRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/sections': typeof AdminSectionsRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/sections': typeof AdminSectionsRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/admin/contact'
     | '/admin/hero'
     | '/admin/media'
+    | '/admin/sections'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/admin/contact'
     | '/admin/hero'
     | '/admin/media'
+    | '/admin/sections'
     | '/admin'
   id:
     | '__root__'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/admin/contact'
     | '/admin/hero'
     | '/admin/media'
+    | '/admin/sections'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -225,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/sections': {
+      id: '/admin/sections'
+      path: '/sections'
+      fullPath: '/admin/sections'
+      preLoaderRoute: typeof AdminSectionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/media': {
       id: '/admin/media'
       path: '/media'
@@ -253,6 +272,7 @@ interface AdminRouteChildren {
   AdminContactRoute: typeof AdminContactRoute
   AdminHeroRoute: typeof AdminHeroRoute
   AdminMediaRoute: typeof AdminMediaRoute
+  AdminSectionsRoute: typeof AdminSectionsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -260,6 +280,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminContactRoute: AdminContactRoute,
   AdminHeroRoute: AdminHeroRoute,
   AdminMediaRoute: AdminMediaRoute,
+  AdminSectionsRoute: AdminSectionsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
