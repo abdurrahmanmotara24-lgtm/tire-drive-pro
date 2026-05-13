@@ -76,23 +76,28 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+  const isChrome = !location.pathname.startsWith("/admin") && location.pathname !== "/login";
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col">
-        <SiteHeader />
+        {isChrome && <SiteHeader />}
         <main className="flex-1">
           <Outlet />
         </main>
-        <SiteFooter />
-        <a
-          href="https://wa.me/10000000000"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Chat on WhatsApp"
-          className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-elegant transition-transform hover:scale-110"
-        >
-          <MessageCircle className="h-7 w-7" />
-        </a>
+        {isChrome && <SiteFooter />}
+        {isChrome && (
+          <a
+            href="https://wa.me/10000000000"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Chat on WhatsApp"
+            className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-elegant transition-transform hover:scale-110"
+          >
+            <MessageCircle className="h-7 w-7" />
+          </a>
+        )}
+        <Toaster />
       </div>
     </QueryClientProvider>
   );
