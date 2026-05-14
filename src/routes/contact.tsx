@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Phone, Mail, Clock, MessageCircle, MapPin } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
+import { DEFAULTS, fetchContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -25,6 +27,16 @@ const schema = z.object({
 function Contact() {
   const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const { data: contact = DEFAULTS.contact } = useQuery({
+    queryKey: ["content", "contact"],
+    queryFn: () => fetchContent("contact"),
+    placeholderData: DEFAULTS.contact,
+  });
+
+  const telHref = `tel:${contact.phone.replace(/[^+\d]/g, "")}`;
+  const mailHref = `mailto:${contact.email}`;
+  const waHref = contact.whatsapp ? `https://wa.me/${contact.whatsapp.replace(/[^\d]/g, "")}` : "#";
+  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(contact.address || "tire shop")}&output=embed`;
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,6 +53,14 @@ function Contact() {
     e.currentTarget.reset();
   }
 
+  const cards = [
+    { icon: Phone, title: "Phone", value: contact.phone, href: telHref },
+    { icon: Mail, title: "Email", value: contact.email, href: mailHref },
+    { icon: MessageCircle, title: "WhatsApp", value: "Chat with us", href: waHref },
+    { icon: Clock, title: "Hours", value: contact.hours },
+    { icon: MapPin, title: "Address", value: contact.address },
+  ];
+
   return (
     <>
       <section className="relative isolate overflow-hidden -mt-14 pt-14 bg-hero-gradient">
@@ -56,13 +76,7 @@ function Contact() {
       <section className="container-tny section">
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-3 lg:col-span-1">
-            {[
-              { icon: Phone, title: "Phone", value: "+1 (000) 000-0000", href: "tel:+10000000000" },
-              { icon: Mail, title: "Email", value: "hello@tiresnearyou.com", href: "mailto:hello@tiresnearyou.com" },
-              { icon: MessageCircle, title: "WhatsApp", value: "Chat with us", href: "https://wa.me/10000000000" },
-              { icon: Clock, title: "Hours", value: "Mon–Sat: 8:00–18:00 · Sun: Closed" },
-              { icon: MapPin, title: "Address", value: "123 Main Street, Your City" },
-            ].map((c) => (
+            {cards.map((c) => (
               <a
                 key={c.title}
                 href={c.href}
@@ -110,7 +124,7 @@ function Contact() {
         <div className="overflow-hidden rounded-2xl ring-1 ring-border shadow-soft">
           <iframe
             title="Map"
-            src="https://www.google.com/maps?q=tire+shop&output=embed"
+            src={mapSrc}
             className="h-[320px] w-full border-0"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

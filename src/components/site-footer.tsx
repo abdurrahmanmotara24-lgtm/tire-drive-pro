@@ -1,7 +1,15 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { DEFAULTS, fetchContent } from "@/lib/site-content";
 
 export function SiteFooter() {
+  const { data: contact = DEFAULTS.contact } = useQuery({
+    queryKey: ["content", "contact"],
+    queryFn: () => fetchContent("contact"),
+    placeholderData: DEFAULTS.contact,
+  });
+
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-tny py-10">
@@ -33,10 +41,10 @@ export function SiteFooter() {
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider text-primary-foreground/90">Get in Touch</h4>
             <ul className="mt-3 space-y-2 text-sm text-primary-foreground/85">
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" /><span>+1 (000) 000-0000</span></li>
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" /><span>hello@tiresnearyou.com</span></li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0" /><span>123 Main Street, City</span></li>
-              <li className="flex items-center gap-2"><Clock className="h-4 w-4 shrink-0" /><span>Mon&ndash;Sat 8:00&ndash;18:00</span></li>
+              <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" /><span>{contact.phone}</span></li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" /><span>{contact.email}</span></li>
+              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0" /><span>{contact.address}</span></li>
+              <li className="flex items-center gap-2"><Clock className="h-4 w-4 shrink-0" /><span>{contact.hours}</span></li>
             </ul>
           </div>
         </div>
