@@ -1,6 +1,9 @@
 import { createFileRoute, Link, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth, signOut } from "@/hooks/use-auth";
+import { fetchLeads } from "@/lib/site-content";
+import { useLeadNotifications } from "@/hooks/use-lead-notifications";
 import {
   LayoutDashboard,
   Image as ImageIcon,
@@ -13,8 +16,15 @@ import {
   Eye,
   Palette,
   FolderOpen,
+  Wrench,
+  MessageSquare,
+  FileText,
+  Inbox,
+  Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Tires Near You" }, { name: "robots", content: "noindex" }] }),
@@ -25,7 +35,11 @@ const nav = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/hero", label: "Hero", icon: ImageIcon },
   { to: "/admin/sections", label: "Sections", icon: Sliders },
+  { to: "/admin/services", label: "Services", icon: Wrench },
+  { to: "/admin/testimonials", label: "Reviews", icon: MessageSquare },
+  { to: "/admin/about", label: "About", icon: FileText },
   { to: "/admin/contact", label: "Contact", icon: Phone },
+  { to: "/admin/leads", label: "Leads", icon: Inbox },
   { to: "/admin/locations", label: "Locations", icon: MapPin },
   { to: "/admin/media", label: "Media Library", icon: FolderOpen },
   { to: "/admin/theme", label: "Theme", icon: Palette },
@@ -33,10 +47,48 @@ const nav = [
   { to: "/admin/users", label: "Admin Users", icon: Users },
 ];
 
+function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+  const location = useLocation();
+  const { data: newLeads = 0 } = useQuery({
+    queryKey: ["leads", "new-count"],
+    queryFn: async () => (await fetchLeads("new")).length,
+    refetchInterval: 60_000,
+  });
+
+  return (
+    <>
+      {nav.map((item) => {
+        const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
+        const showBadge = item.to === "/admin/leads" && newLeads > 0;
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
+              active ? "bg-primary text-primary-foreground" : "hover:bg-secondary",
+            )}
+          >
+            <item.icon className="h-4 w-4 shrink-0" />
+            <span className="flex-1">{item.label}</span>
+            {showBadge && (
+              <span className="rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[10px] font-bold">
+                {newLeads}
+              </span>
+            )}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
 function AdminLayout() {
   const { user, isStaff, loading } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  useLeadNotifications(Boolean(isStaff && user && !loading));
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -65,27 +117,13 @@ function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-secondary/30">
+    <div className="admin-light flex min-h-screen bg-secondary/30">
       <aside className="hidden w-64 flex-col border-r border-border bg-background md:flex">
         <div className="flex h-14 items-center border-b border-border px-4">
           <Link to="/admin" className="text-base font-bold">Tires Admin</Link>
         </div>
         <nav className="flex-1 space-y-0.5 p-3">
-          {nav.map((item) => {
-            const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors ${
-                  active ? "bg-primary text-primary-foreground" : "hover:bg-secondary"
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
+          <NavLinks />
         </nav>
         <div className="border-t border-border p-3 space-y-1">
           <Link to="/" target="_blank" className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-secondary">
@@ -101,22 +139,47 @@ function AdminLayout() {
         </div>
       </aside>
 
-      {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-40 flex h-12 items-center justify-between border-b border-border bg-background px-3">
-        <Link to="/admin" className="text-sm font-bold">Tires Admin</Link>
-        <button onClick={async () => { await signOut(); navigate({ to: "/login" }); }} className="text-xs">Sign out</button>
+      <div className="fixed inset-x-0 top-0 z-40 flex h-12 items-center justify-between border-b border-border bg-background px-3 md:hidden">
+        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+          <SheetTrigger asChild>
+            <Button type="button" variant="ghost" size="icon" className="h-9 w-9" aria-label="Open menu">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-72 p-0">
+            <div className="flex h-14 items-center border-b border-border px-4 font-bold">Tires Admin</div>
+            <nav className="space-y-0.5 p-3">
+              <NavLinks onNavigate={() => setMenuOpen(false)} />
+            </nav>
+            <div className="space-y-1 border-t border-border p-3">
+              <Link
+                to="/"
+                target="_blank"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-secondary"
+                onClick={() => setMenuOpen(false)}
+              >
+                <Eye className="h-4 w-4" /> View Site
+              </Link>
+            </div>
+          </SheetContent>
+        </Sheet>
+        <Link to="/admin" className="text-sm font-bold">
+          Tires Admin
+        </Link>
+        <button
+          type="button"
+          onClick={async () => {
+            await signOut();
+            navigate({ to: "/login" });
+          }}
+          className="text-xs"
+        >
+          Sign out
+        </button>
       </div>
 
-      <main className="flex-1 md:ml-0 mt-12 md:mt-0">
-        {/* Mobile nav */}
-        <nav className="md:hidden flex gap-1 overflow-x-auto border-b border-border bg-background px-3 py-2 text-xs">
-          {nav.map((item) => (
-            <Link key={item.to} to={item.to} className="rounded-md px-2.5 py-1.5 hover:bg-secondary whitespace-nowrap">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="p-4 md:p-8 max-w-5xl mx-auto">
+      <main className="mt-12 flex-1 md:ml-0 md:mt-0">
+        <div className="mx-auto w-full max-w-[1600px] p-4 md:p-8">
           <Outlet />
         </div>
       </main>

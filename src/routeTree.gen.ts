@@ -17,14 +17,19 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as ApiNotifyLeadRouteImport } from './routes/api/notify-lead'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminThemeRouteImport } from './routes/admin.theme'
+import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
+import { Route as AdminServicesRouteImport } from './routes/admin.services'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminSectionsRouteImport } from './routes/admin.sections'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
+import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminContactRouteImport } from './routes/admin.contact'
+import { Route as AdminAboutRouteImport } from './routes/admin.about'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -66,6 +71,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiNotifyLeadRoute = ApiNotifyLeadRouteImport.update({
+  id: '/api/notify-lead',
+  path: '/api/notify-lead',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -74,6 +84,16 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
 const AdminThemeRoute = AdminThemeRouteImport.update({
   id: '/theme',
   path: '/theme',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTestimonialsRoute = AdminTestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminServicesRoute = AdminServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSeoRoute = AdminSeoRouteImport.update({
@@ -96,6 +116,11 @@ const AdminLocationsRoute = AdminLocationsRouteImport.update({
   path: '/locations',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHeroRoute = AdminHeroRouteImport.update({
   id: '/hero',
   path: '/hero',
@@ -104,6 +129,11 @@ const AdminHeroRoute = AdminHeroRouteImport.update({
 const AdminContactRoute = AdminContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAboutRoute = AdminAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -115,14 +145,19 @@ export interface FileRoutesByFullPath {
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/about': typeof AdminAboutRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/sections': typeof AdminSectionsRoute
   '/admin/seo': typeof AdminSeoRoute
+  '/admin/services': typeof AdminServicesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/theme': typeof AdminThemeRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/notify-lead': typeof ApiNotifyLeadRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -132,14 +167,19 @@ export interface FileRoutesByTo {
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/about': typeof AdminAboutRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/sections': typeof AdminSectionsRoute
   '/admin/seo': typeof AdminSeoRoute
+  '/admin/services': typeof AdminServicesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/theme': typeof AdminThemeRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/notify-lead': typeof ApiNotifyLeadRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -151,14 +191,19 @@ export interface FileRoutesById {
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/about': typeof AdminAboutRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/sections': typeof AdminSectionsRoute
   '/admin/seo': typeof AdminSeoRoute
+  '/admin/services': typeof AdminServicesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/theme': typeof AdminThemeRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/notify-lead': typeof ApiNotifyLeadRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -171,14 +216,19 @@ export interface FileRouteTypes {
     | '/locations'
     | '/login'
     | '/sitemap.xml'
+    | '/admin/about'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/leads'
     | '/admin/locations'
     | '/admin/media'
     | '/admin/sections'
     | '/admin/seo'
+    | '/admin/services'
+    | '/admin/testimonials'
     | '/admin/theme'
     | '/admin/users'
+    | '/api/notify-lead'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -188,14 +238,19 @@ export interface FileRouteTypes {
     | '/locations'
     | '/login'
     | '/sitemap.xml'
+    | '/admin/about'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/leads'
     | '/admin/locations'
     | '/admin/media'
     | '/admin/sections'
     | '/admin/seo'
+    | '/admin/services'
+    | '/admin/testimonials'
     | '/admin/theme'
     | '/admin/users'
+    | '/api/notify-lead'
     | '/admin'
   id:
     | '__root__'
@@ -206,14 +261,19 @@ export interface FileRouteTypes {
     | '/locations'
     | '/login'
     | '/sitemap.xml'
+    | '/admin/about'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/leads'
     | '/admin/locations'
     | '/admin/media'
     | '/admin/sections'
     | '/admin/seo'
+    | '/admin/services'
+    | '/admin/testimonials'
     | '/admin/theme'
     | '/admin/users'
+    | '/api/notify-lead'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -225,6 +285,7 @@ export interface RootRouteChildren {
   LocationsRoute: typeof LocationsRoute
   LoginRoute: typeof LoginRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiNotifyLeadRoute: typeof ApiNotifyLeadRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -285,6 +346,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/notify-lead': {
+      id: '/api/notify-lead'
+      path: '/api/notify-lead'
+      fullPath: '/api/notify-lead'
+      preLoaderRoute: typeof ApiNotifyLeadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -297,6 +365,20 @@ declare module '@tanstack/react-router' {
       path: '/theme'
       fullPath: '/admin/theme'
       preLoaderRoute: typeof AdminThemeRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/testimonials': {
+      id: '/admin/testimonials'
+      path: '/testimonials'
+      fullPath: '/admin/testimonials'
+      preLoaderRoute: typeof AdminTestimonialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/services': {
+      id: '/admin/services'
+      path: '/services'
+      fullPath: '/admin/services'
+      preLoaderRoute: typeof AdminServicesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/seo': {
@@ -327,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLocationsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/hero': {
       id: '/admin/hero'
       path: '/hero'
@@ -341,28 +430,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContactRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/about': {
+      id: '/admin/about'
+      path: '/about'
+      fullPath: '/admin/about'
+      preLoaderRoute: typeof AdminAboutRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAboutRoute: typeof AdminAboutRoute
   AdminContactRoute: typeof AdminContactRoute
   AdminHeroRoute: typeof AdminHeroRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
   AdminMediaRoute: typeof AdminMediaRoute
   AdminSectionsRoute: typeof AdminSectionsRoute
   AdminSeoRoute: typeof AdminSeoRoute
+  AdminServicesRoute: typeof AdminServicesRoute
+  AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminThemeRoute: typeof AdminThemeRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAboutRoute: AdminAboutRoute,
   AdminContactRoute: AdminContactRoute,
   AdminHeroRoute: AdminHeroRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
   AdminLocationsRoute: AdminLocationsRoute,
   AdminMediaRoute: AdminMediaRoute,
   AdminSectionsRoute: AdminSectionsRoute,
   AdminSeoRoute: AdminSeoRoute,
+  AdminServicesRoute: AdminServicesRoute,
+  AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminThemeRoute: AdminThemeRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -378,7 +482,18 @@ const rootRouteChildren: RootRouteChildren = {
   LocationsRoute: LocationsRoute,
   LoginRoute: LoginRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiNotifyLeadRoute: ApiNotifyLeadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

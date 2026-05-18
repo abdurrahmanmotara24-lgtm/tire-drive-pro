@@ -1,56 +1,111 @@
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
-import { DEFAULTS, fetchContent } from "@/lib/site-content";
+import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter } from "lucide-react";
+import { useContactContent } from "@/hooks/use-contact-content";
+import { cn } from "@/lib/utils";
 
-export function SiteFooter() {
-  const { data: contact = DEFAULTS.contact } = useQuery({
-    queryKey: ["content", "contact"],
-    queryFn: () => fetchContent("contact"),
-    placeholderData: DEFAULTS.contact,
-  });
+export function SiteFooter({ className }: { className?: string }) {
+  const { contact, telHref, mailHref } = useContactContent();
+
+  const socials = [
+    { icon: Facebook, href: contact.facebook, label: "Facebook" },
+    { icon: Instagram, href: contact.instagram, label: "Instagram" },
+    { icon: Twitter, href: contact.twitter, label: "Twitter" },
+  ].filter((s) => s.href);
 
   return (
-    <footer className="bg-primary text-primary-foreground">
-      <div className="container-tny py-10">
-        <div className="grid gap-8 md:grid-cols-4">
+    <footer className={cn("border-t border-border bg-card", className)}>
+      <div className="container-tny py-8 md:py-10">
+        <div
+          className={cn(
+            "grid gap-8",
+            socials.length > 0 ? "grid-cols-2 md:grid-cols-3 md:gap-10" : "grid-cols-2 md:gap-10",
+          )}
+        >
           <div>
-            <h3 className="text-lg font-bold text-primary-foreground">Tires Near You</h3>
-            <p className="mt-2 text-sm leading-relaxed text-primary-foreground/75">
-              Premium tires, expert fitment, unbeatable service.
-            </p>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-primary-foreground/90">Quick Links</h4>
-            <ul className="mt-3 space-y-1.5 text-sm">
-              <li><Link to="/" className="text-primary-foreground/80 transition-colors hover:text-brand-red">Home</Link></li>
-              <li><Link to="/about" className="text-primary-foreground/80 transition-colors hover:text-brand-red">About</Link></li>
-              <li><Link to="/locations" className="text-primary-foreground/80 transition-colors hover:text-brand-red">Locations</Link></li>
-              <li><Link to="/contact" className="text-primary-foreground/80 transition-colors hover:text-brand-red">Contact</Link></li>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Navigate</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              <li>
+                <Link to="/" className="hover-link">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover-link">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link to="/locations" className="hover-link">
+                  Locations
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover-link">
+                  Contact
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-primary-foreground/90">Services</h4>
-            <ul className="mt-3 space-y-1.5 text-sm text-primary-foreground/80">
-              <li>New Tire Sales</li>
-              <li>Wheel Alignment</li>
-              <li>Wheel Balancing</li>
-              <li>Puncture Repair</li>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
+            <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
+              {contact.phone && (
+                <li className="flex gap-2">
+                  <Phone className="h-4 w-4 shrink-0 text-primary" />
+                  {telHref ? (
+                    <a href={telHref} className="hover-link">
+                      {contact.phone}
+                    </a>
+                  ) : (
+                    contact.phone
+                  )}
+                </li>
+              )}
+              {contact.email && (
+                <li className="flex gap-2">
+                  <Mail className="h-4 w-4 shrink-0 text-primary" />
+                  <a href={mailHref} className="hover-link">
+                    {contact.email}
+                  </a>
+                </li>
+              )}
+              {contact.address && (
+                <li className="flex gap-2">
+                  <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                  {contact.address}
+                </li>
+              )}
+              {contact.hours && (
+                <li className="flex gap-2">
+                  <Clock className="h-4 w-4 shrink-0 text-primary" />
+                  {contact.hours}
+                </li>
+              )}
             </ul>
           </div>
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-primary-foreground/90">Get in Touch</h4>
-            <ul className="mt-3 space-y-2 text-sm text-primary-foreground/85">
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" /><span>{contact.phone}</span></li>
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" /><span>{contact.email}</span></li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0" /><span>{contact.address}</span></li>
-              <li className="flex items-center gap-2"><Clock className="h-4 w-4 shrink-0" /><span>{contact.hours}</span></li>
-            </ul>
-          </div>
+          {socials.length > 0 && (
+            <div className="col-span-2 md:col-span-1 md:col-start-3 md:row-start-1">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Follow</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {socials.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={s.label}
+                    className="hover-social touch-target flex h-11 w-11 items-center justify-center rounded-sm border border-border text-muted-foreground"
+                  >
+                    <s.icon className="h-4 w-4" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        <div className="mt-8 border-t border-primary-foreground/15 pt-4 text-center text-xs text-primary-foreground/65">
+        <p className="mt-6 border-t border-border pt-5 text-center text-xs text-muted-foreground md:mt-8">
           © {new Date().getFullYear()} Tires Near You. All rights reserved.
-        </div>
+        </p>
       </div>
     </footer>
   );

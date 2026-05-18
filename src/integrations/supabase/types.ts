@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      leads: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          message: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          status: Database["public"]["Enums"]["lead_status"]
+          tire_size: string | null
+          type: Database["public"]["Enums"]["lead_type"]
+          vehicle: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          tire_size?: string | null
+          type: Database["public"]["Enums"]["lead_type"]
+          vehicle?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          tire_size?: string | null
+          type?: Database["public"]["Enums"]["lead_type"]
+          vehicle?: string | null
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           address: string | null
@@ -114,6 +156,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor"
+      lead_status: "new" | "contacted" | "booked" | "lost" | "archived"
+      lead_type: "quote" | "contact"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -242,6 +286,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor"],
+      lead_status: ["new", "contacted", "booked", "lost", "archived"],
+      lead_type: ["quote", "contact"],
     },
   },
 } as const

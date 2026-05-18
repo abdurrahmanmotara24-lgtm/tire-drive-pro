@@ -1,50 +1,64 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { ExternalLink } from "lucide-react";
 import { fetchContent, saveContent, type SectionsContent } from "@/lib/site-content";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { AdminSaveBar } from "@/components/admin/admin-save-bar";
+import { useAdminForm } from "@/hooks/use-admin-form";
 
 export const Route = createFileRoute("/admin/sections")({ component: SectionsAdmin });
 
 const labels: Record<keyof SectionsContent, string> = {
-  promos_enabled: "Promotions",
   brands_enabled: "Brand Showcase",
-  why_us_enabled: "Why Choose Us",
+  why_us_enabled: "Services",
+  process_enabled: "How It Works",
   testimonials_enabled: "Testimonials",
   quote_enabled: "Quote / Lead Form",
   final_cta_enabled: "Final CTA Bar",
 };
 
-function SectionsAdmin() {
-  const qc = useQueryClient();
-  const { data } = useQuery({ queryKey: ["content", "sections"], queryFn: () => fetchContent("sections") });
-  const [form, setForm] = useState<SectionsContent | null>(null);
-  const [busy, setBusy] = useState(false);
-  useEffect(() => { if (data && !form) setForm(data); }, [data, form]);
-  if (!form) return <div className="text-sm text-muted-foreground">Loading…</div>;
+const previews: Record<keyof SectionsContent, string> = {
+  brands_enabled: "/#brands",
+  why_us_enabled: "/#services",
+  process_enabled: "/#process",
+  testimonials_enabled: "/#testimonials",
+  quote_enabled: "/#quote",
+  final_cta_enabled: "/#final-cta",
+};
 
-  const submit = async () => {
-    setBusy(true);
-    try { await saveContent("sections", form); qc.invalidateQueries({ queryKey: ["content", "sections"] }); toast.success("Saved"); }
-    catch (e) { toast.error((e as Error).message); }
-    finally { setBusy(false); }
-  };
+function SectionsAdmin() {
+  const { data } = useQuery({ queryKey: ["content", "sections"], queryFn: () => fetchContent("sections") });
+  const { form, setForm, busy, isDirty, submit, ready } = useAdminForm({
+    data,
+    queryKey: ["content", "sections"],
+    onSave: (v) => saveContent("sections", v),
+  });
+
+  if (!ready || !form) return <div className="text-sm text-muted-foreground">Loading…</div>;
 
   return (
     <div>
       <h1 className="text-2xl font-bold">Homepage Sections</h1>
       <p className="text-sm text-muted-foreground">Show or hide sections on the homepage.</p>
-      <Card className="mt-6 p-6 space-y-3">
+      <Card className="mt-6 space-y-3 p-6">
         {(Object.keys(labels) as (keyof SectionsContent)[]).map((k) => (
-          <div key={k} className="flex items-center justify-between rounded-md border border-border p-3">
-            <span className="text-sm font-medium">{labels[k]}</span>
+          <div key={k} className="flex items-center justify-between gap-3 rounded-md border border-border p-3">
+            <div className="min-w-0">
+              <span className="text-sm font-medium">{labels[k]}</span>
+              <Link
+                to="/"
+                hash={previews[k].slice(2)}
+                target="_blank"
+                className="mt-0.5 flex items-center gap-1 text-xs text-primary hover:underline"
+              >
+                Preview <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
             <Switch checked={form[k]} onCheckedChange={(v) => setForm({ ...form, [k]: v })} />
           </div>
         ))}
-        <div className="flex justify-end pt-2"><Button onClick={submit} disabled={busy}>{busy ? "Saving…" : "Save changes"}</Button></div>
+        <AdminSaveBar busy={busy} isDirty={isDirty} onSave={submit} />
       </Card>
     </div>
   );

@@ -1,4 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DEFAULT_HOURS_SCHEDULE,
+  formatHoursSummary,
+  normalizeHoursSchedule,
+  type HoursSchedule,
+} from "@/lib/hours-schedule";
 
 export type HeroContent = {
   badge: string;
@@ -11,6 +17,8 @@ export type HeroContent = {
   cta_secondary_link: string;
   background_image: string;
   overlay_opacity: number;
+  focal_x?: number;
+  focal_y?: number;
   stats: { value: string; label: string }[];
 };
 
@@ -20,26 +28,55 @@ export type ContactContent = {
   whatsapp: string;
   address: string;
   hours: string;
+  hours_schedule?: HoursSchedule;
+  lead_notify_email?: string;
   facebook: string;
   instagram: string;
   twitter: string;
 };
 
 export type SectionsContent = {
-  promos_enabled: boolean;
   brands_enabled: boolean;
   why_us_enabled: boolean;
+  process_enabled: boolean;
   testimonials_enabled: boolean;
   quote_enabled: boolean;
   final_cta_enabled: boolean;
 };
 
+export type ServiceItem = { icon: string; title: string; desc: string };
+export type TestimonialItem = { name: string; text: string; rating: number };
+export type AboutValue = { title: string; text: string };
+export type AboutContent = {
+  headline: string;
+  intro: string;
+  story: string;
+  values: AboutValue[];
+};
+export type ProcessStep = { step: string; title: string; desc: string };
+
 export type ThemeContent = {
   primary: string;
+  brand_green?: string;
+  brand_red_accent?: string;
   brand_red: string;
   radius: string;
   font: string;
+  palette_version?: number;
 };
+
+export const THEME_PALETTE_VERSION = 5;
+
+const LEGACY_VERSIONS = new Set([1, 2]);
+
+export function resolveTheme(stored: Partial<ThemeContent> | null | undefined): ThemeContent {
+  const merged: ThemeContent = { ...DEFAULTS.theme, ...stored };
+  const version = merged.palette_version ?? 1;
+  if (LEGACY_VERSIONS.has(version) || version < THEME_PALETTE_VERSION) {
+    return { ...merged, ...DEFAULTS.theme, palette_version: THEME_PALETTE_VERSION };
+  }
+  return merged;
+}
 
 export type SeoContent = {
   title: string;
@@ -49,51 +86,87 @@ export type SeoContent = {
 
 export const DEFAULTS = {
   hero: {
-    badge: "#1 Local Fitment Centre",
-    title_line1: "Premium Tires.",
-    title_line2: "Unbeatable Prices.",
+    badge: "Premium Fitment Centre",
+    title_line1: "Drive",
+    title_line2: "Performance.",
     subtitle:
-      "Top brand tires, expert fitment, and same-day service. Drive safer, save more — with the team your neighbours trust.",
+      "Top-tier tires, precision fitment, and same-day service from technicians who treat every vehicle like their own.",
     cta_primary_text: "Get a Free Quote",
     cta_primary_link: "#quote",
     cta_secondary_text: "Call Now",
-    cta_secondary_link: "tel:+10000000000",
+    cta_secondary_link: "",
     background_image: "",
-    overlay_opacity: 85,
+    overlay_opacity: 62,
+    focal_x: 36,
+    focal_y: 46,
     stats: [
-      { value: "10K+", label: "Happy drivers" },
-      { value: "20+", label: "Top brands" },
-      { value: "4.9★", label: "Customer rating" },
+      { value: "10K+", label: "Vehicles serviced" },
+      { value: "20+", label: "Premium brands" },
+      { value: "15+", label: "Years experience" },
     ],
   } as HeroContent,
   contact: {
-    phone: "+1 (000) 000-0000",
+    phone: "",
     email: "hello@tiresnearyou.com",
-    whatsapp: "10000000000",
+    whatsapp: "",
     address: "123 Main Street, City",
-    hours: "Mon–Sat 8:00–18:00",
+    hours: formatHoursSummary(DEFAULT_HOURS_SCHEDULE),
+    hours_schedule: DEFAULT_HOURS_SCHEDULE,
+    lead_notify_email: "",
     facebook: "",
     instagram: "",
     twitter: "",
   } as ContactContent,
   sections: {
-    promos_enabled: true,
     brands_enabled: true,
     why_us_enabled: true,
+    process_enabled: true,
     testimonials_enabled: true,
     quote_enabled: true,
     final_cta_enabled: true,
   } as SectionsContent,
+  services: [
+    { icon: "Wrench", title: "Expert Fitment", desc: "Factory-spec torque and premium equipment on every wheel." },
+    { icon: "Gauge", title: "Laser Alignment", desc: "Precision geometry for grip, wear, and confident handling." },
+    { icon: "ShieldCheck", title: "Genuine Warranty", desc: "Authorized brands with full manufacturer backing." },
+    { icon: "Truck", title: "Fleet & SUV", desc: "Commercial and heavy-duty setups done right." },
+  ] as ServiceItem[],
+  testimonials: [
+    { name: "Marcus T.", text: "Flawless fitment and zero upsell. The shop my crew trusts.", rating: 5 },
+    { name: "Elena R.", text: "Booked online, in and out in under an hour. Premium experience.", rating: 5 },
+    { name: "David K.", text: "Best alignment I've had — car tracks straight at highway speed.", rating: 5 },
+  ] as TestimonialItem[],
+  brands: ["Michelin", "Bridgestone", "Pirelli", "Continental", "Goodyear", "Dunlop", "Hankook", "Yokohama"],
+  about: {
+    headline: "Built for drivers who demand more",
+    intro: "Precision, transparency, and craft — that's the standard at Tires Near You.",
+    story:
+      "We started as a single-bay fitment shop with one promise: treat every customer like family and every vehicle like a flagship. Today we stock the world's leading tire brands, run state-of-the-art alignment bays, and back every job with a full safety inspection — included.",
+    values: [
+      { title: "Craft", text: "Certified technicians. No shortcuts." },
+      { title: "Honesty", text: "Clear options. Fair pricing. No pressure." },
+      { title: "Speed", text: "Same-day service when you need it." },
+      { title: "Care", text: "Every fitment ends with a safety check." },
+    ],
+  } as AboutContent,
+  process: [
+    { step: "01", title: "Book or walk in", desc: "Tell us your vehicle and tire goals." },
+    { step: "02", title: "We recommend", desc: "Honest options matched to your driving." },
+    { step: "03", title: "Precision fit", desc: "Mount, balance, align, inspect." },
+    { step: "04", title: "Drive confident", desc: "Leave with warranty-backed peace of mind." },
+  ] as ProcessStep[],
   theme: {
-    primary: "oklch(0.45 0.18 145)",
-    brand_red: "oklch(0.58 0.22 27)",
-    radius: "0.625rem",
-    font: "Inter",
+    primary: "oklch(0.48 0.2 27)",
+    brand_red_accent: "oklch(0.48 0.2 27)",
+    brand_red: "oklch(0.82 0.01 0)",
+    radius: "0.5rem",
+    font: "Source Sans 3",
+    palette_version: THEME_PALETTE_VERSION,
   } as ThemeContent,
   seo: {
-    title: "Tires Near You — Premium Tires & Fitment Centre",
+    title: "Tires Near You — Premium Tires & Performance Fitment",
     description:
-      "Quality tires, professional fitment, wheel alignment and balancing.",
+      "Premium tires, precision fitment, laser alignment and balancing. Performance service for drivers who expect more.",
     og_image: "",
   } as SeoContent,
 };
@@ -102,6 +175,11 @@ export type ContentMap = {
   hero: HeroContent;
   contact: ContactContent;
   sections: SectionsContent;
+  services: ServiceItem[];
+  testimonials: TestimonialItem[];
+  brands: string[];
+  about: AboutContent;
+  process: ProcessStep[];
   theme: ThemeContent;
   seo: SeoContent;
 };
@@ -109,12 +187,51 @@ export type ContentMap = {
 export async function fetchContent<K extends keyof ContentMap>(
   key: K,
 ): Promise<ContentMap[K]> {
-  const { data } = await supabase
-    .from("site_content")
-    .select("value")
-    .eq("key", key)
-    .maybeSingle();
-  return { ...DEFAULTS[key], ...(data?.value as object | null ?? {}) } as ContentMap[K];
+  const defaultVal = DEFAULTS[key];
+
+  try {
+    const { data, error } = await supabase
+      .from("site_content")
+      .select("value")
+      .eq("key", key)
+      .maybeSingle();
+
+    if (error) {
+      console.warn(`[site-content] ${key}:`, error.message);
+      return defaultVal;
+    }
+
+    const stored = data?.value;
+
+    if (Array.isArray(defaultVal)) {
+      const arr = Array.isArray(stored) && stored.length > 0 ? stored : defaultVal;
+      return arr as ContentMap[K];
+    }
+
+    const merged = { ...defaultVal, ...(stored as object | null ?? {}) } as ContentMap[K];
+    if (key === "theme") return resolveTheme(merged as ThemeContent) as ContentMap[K];
+    if (key === "contact") {
+      const c = merged as ContactContent;
+      const schedule = normalizeHoursSchedule(c.hours_schedule);
+      return {
+        ...c,
+        hours_schedule: schedule,
+        hours: c.hours?.trim() ? c.hours : formatHoursSummary(schedule),
+      } as ContentMap[K];
+    }
+    if (key === "hero") {
+      const h = merged as HeroContent;
+      return {
+        ...h,
+        focal_x: h.focal_x ?? DEFAULTS.hero.focal_x,
+        focal_y: h.focal_y ?? DEFAULTS.hero.focal_y,
+      } as ContentMap[K];
+    }
+    return merged;
+  } catch (e) {
+    console.warn(`[site-content] ${key}:`, e);
+    return defaultVal;
+  }
 }
 
 export async function saveContent<K extends keyof ContentMap>(
@@ -139,10 +256,105 @@ export type LocationRow = {
   is_active: boolean;
 };
 
-export async function fetchLocations(includeInactive = false): Promise<LocationRow[]> {
-  let q = supabase.from("locations").select("*").order("sort_order");
-  if (!includeInactive) q = q.eq("is_active", true);
+export type LeadType = "quote" | "contact";
+export type LeadStatus = "new" | "contacted" | "booked" | "lost" | "archived";
+
+export type LeadRow = {
+  id: string;
+  type: LeadType;
+  status: LeadStatus;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  vehicle: string | null;
+  tire_size: string | null;
+  message: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+export async function fetchContentMeta(): Promise<Record<string, string | undefined>> {
+  try {
+    const { data, error } = await supabase.from("site_content").select("key, updated_at");
+    if (error) {
+      console.warn("[site-content] meta:", error.message);
+      return {};
+    }
+    return Object.fromEntries((data ?? []).map((r) => [r.key, r.updated_at]));
+  } catch (e) {
+    console.warn("[site-content] meta:", e);
+    return {};
+  }
+}
+
+export type LeadInsert = {
+  type: LeadType;
+  name: string;
+  phone?: string;
+  email?: string;
+  vehicle?: string;
+  tire_size?: string;
+  message?: string;
+};
+
+export async function submitLead(payload: LeadInsert): Promise<void> {
+  const { error } = await supabase.from("leads").insert({
+    type: payload.type,
+    name: payload.name,
+    phone: payload.phone ?? null,
+    email: payload.email ?? null,
+    vehicle: payload.vehicle ?? null,
+    tire_size: payload.tire_size ?? null,
+    message: payload.message ?? null,
+  });
+  if (error) throw error;
+
+  try {
+    const contact = await fetchContent("contact");
+    const notifyEmail = contact.lead_notify_email?.trim();
+    await fetch("/api/notify-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...payload, notifyEmail }),
+    });
+  } catch {
+    /* notification is best-effort */
+  }
+}
+
+export async function fetchLeads(status?: LeadStatus | "all"): Promise<LeadRow[]> {
+  let q = supabase.from("leads").select("*").order("created_at", { ascending: false });
+  if (status && status !== "all") q = q.eq("status", status);
   const { data, error } = await q;
   if (error) throw error;
   return data ?? [];
+}
+
+export async function updateLeadStatus(id: string, status: LeadStatus): Promise<void> {
+  const { error } = await supabase.from("leads").update({ status }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateLead(
+  id: string,
+  patch: Partial<Pick<LeadRow, "status" | "notes">>,
+): Promise<void> {
+  const { error } = await supabase.from("leads").update(patch).eq("id", id);
+  if (error) throw error;
+}
+
+export async function fetchLocations(includeInactive = false): Promise<LocationRow[]> {
+  try {
+    let q = supabase.from("locations").select("*").order("sort_order");
+    if (!includeInactive) q = q.eq("is_active", true);
+    const { data, error } = await q;
+    if (error) {
+      console.warn("[locations]:", error.message);
+      return [];
+    }
+    return data ?? [];
+  } catch (e) {
+    console.warn("[locations]:", e);
+    return [];
+  }
 }

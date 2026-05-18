@@ -1,93 +1,131 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { fetchContent, saveContent, type HeroContent } from "@/lib/site-content";
+import { useQuery } from "@tanstack/react-query";
+import { DEFAULTS, fetchContent, saveContent, type HeroContent } from "@/lib/site-content";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { AdminSaveBar } from "@/components/admin/admin-save-bar";
+import { AdminPreviewLayout, AdminPreviewMobileLink } from "@/components/admin/admin-preview-layout";
+import { HeroPreviewPanel } from "@/components/admin/hero-preview-panel";
+import { ResetDefaultsButton } from "@/components/admin/reset-defaults-button";
+import { useAdminForm } from "@/hooks/use-admin-form";
 
 export const Route = createFileRoute("/admin/hero")({
   component: HeroAdmin,
 });
 
 function HeroAdmin() {
-  const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["content", "hero"], queryFn: () => fetchContent("hero") });
-  const [form, setForm] = useState<HeroContent | null>(null);
-  const [busy, setBusy] = useState(false);
+  const { form, setForm, busy, isDirty, submit, ready } = useAdminForm({
+    data,
+    queryKey: ["content", "hero"],
+    onSave: (v) => saveContent("hero", v),
+    successMessage: "Hero saved",
+  });
 
-  useEffect(() => { if (data && !form) setForm(data); }, [data, form]);
-  if (!form) return <div className="text-sm text-muted-foreground">Loading…</div>;
+  if (!ready || !form) return <div className="text-sm text-muted-foreground">Loading…</div>;
 
   const update = <K extends keyof HeroContent>(k: K, v: HeroContent[K]) => setForm({ ...form, [k]: v });
 
-  const submit = async () => {
-    setBusy(true);
-    try {
-      await saveContent("hero", form);
-      qc.invalidateQueries({ queryKey: ["content", "hero"] });
-      toast.success("Hero saved");
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setBusy(false); }
-  };
+  const formPanel = (
+    <Card className="space-y-5 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <HeroPreviewPanel form={form} className="w-full lg:hidden" />
+        <ResetDefaultsButton onReset={() => setForm({ ...DEFAULTS.hero })} />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Badge text" value={form.badge} onChange={(v) => update("badge", v)} />
+        <Field label="Headline line 1" value={form.title_line1} onChange={(v) => update("title_line1", v)} />
+        <Field label="Headline line 2 (highlighted)" value={form.title_line2} onChange={(v) => update("title_line2", v)} />
+      </div>
+      <div>
+        <Label>Subtitle</Label>
+        <Textarea rows={3} value={form.subtitle} onChange={(e) => update("subtitle", e.target.value)} />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Primary CTA text" value={form.cta_primary_text} onChange={(v) => update("cta_primary_text", v)} />
+        <Field label="Primary CTA link" value={form.cta_primary_link} onChange={(v) => update("cta_primary_link", v)} />
+        <Field label="Secondary CTA text" value={form.cta_secondary_text} onChange={(v) => update("cta_secondary_text", v)} />
+        <Field label="Secondary CTA link" value={form.cta_secondary_link} onChange={(v) => update("cta_secondary_link", v)} />
+      </div>
+
+      <div>
+        <Label>Background image or video</Label>
+        <p className="mb-2 text-xs text-muted-foreground">
+          Leave empty to use the default warehouse photo. Upload a cinematic photo or short looped MP4/WebM.
+        </p>
+        <MediaPicker value={form.background_image} onChange={(url) => update("background_image", url)} />
+        <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => update("background_image", "")}>
+          Reset to default warehouse image
+        </Button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <Label>Image focus X ({form.focal_x ?? 36}%)</Label>
+          <Slider value={[form.focal_x ?? 36]} min={0} max={100} step={1} onValueChange={(v) => update("focal_x", v[0])} />
+        </div>
+        <div>
+          <Label>Image focus Y ({form.focal_y ?? 46}%)</Label>
+          <Slider value={[form.focal_y ?? 46]} min={0} max={100} step={1} onValueChange={(v) => update("focal_y", v[0])} />
+        </div>
+      </div>
+
+      <div>
+        <Label>Overlay darkness ({form.overlay_opacity}%)</Label>
+        <Slider value={[form.overlay_opacity]} min={0} max={100} step={5} onValueChange={(v) => update("overlay_opacity", v[0])} />
+      </div>
+
+      <div>
+        <Label>Stats (3 items)</Label>
+        <div className="mt-2 grid gap-3 sm:grid-cols-3">
+          {form.stats.map((s, i) => (
+            <div key={i} className="space-y-2 rounded-md border border-border p-3">
+              <Input
+                placeholder="Value"
+                value={s.value}
+                onChange={(e) => {
+                  const stats = [...form.stats];
+                  stats[i] = { ...s, value: e.target.value };
+                  update("stats", stats);
+                }}
+              />
+              <Input
+                placeholder="Label"
+                value={s.label}
+                onChange={(e) => {
+                  const stats = [...form.stats];
+                  stats[i] = { ...s, label: e.target.value };
+                  update("stats", stats);
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <AdminSaveBar busy={busy} isDirty={isDirty} onSave={submit} />
+    </Card>
+  );
 
   return (
     <div>
       <h1 className="text-2xl font-bold">Hero Section</h1>
-      <p className="text-sm text-muted-foreground">Headline, CTAs and background image at the top of the homepage.</p>
-
-      <Card className="mt-6 p-6 space-y-5">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Badge text" value={form.badge} onChange={(v) => update("badge", v)} />
-          <Field label="Headline line 1" value={form.title_line1} onChange={(v) => update("title_line1", v)} />
-          <Field label="Headline line 2 (highlighted)" value={form.title_line2} onChange={(v) => update("title_line2", v)} />
-        </div>
-        <div>
-          <Label>Subtitle</Label>
-          <Textarea rows={3} value={form.subtitle} onChange={(e) => update("subtitle", e.target.value)} />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Primary CTA text" value={form.cta_primary_text} onChange={(v) => update("cta_primary_text", v)} />
-          <Field label="Primary CTA link" value={form.cta_primary_link} onChange={(v) => update("cta_primary_link", v)} />
-          <Field label="Secondary CTA text" value={form.cta_secondary_text} onChange={(v) => update("cta_secondary_text", v)} />
-          <Field label="Secondary CTA link" value={form.cta_secondary_link} onChange={(v) => update("cta_secondary_link", v)} />
-        </div>
-
-        <div>
-          <Label>Background image</Label>
-          <MediaPicker value={form.background_image} onChange={(url) => update("background_image", url)} />
-        </div>
-
-        <div>
-          <Label>Overlay darkness ({form.overlay_opacity}%)</Label>
-          <Slider value={[form.overlay_opacity]} min={0} max={100} step={5} onValueChange={(v) => update("overlay_opacity", v[0])} />
-        </div>
-
-        <div>
-          <Label>Stats (3 items)</Label>
-          <div className="mt-2 grid gap-3 sm:grid-cols-3">
-            {form.stats.map((s, i) => (
-              <div key={i} className="space-y-2 rounded-md border border-border p-3">
-                <Input placeholder="Value" value={s.value} onChange={(e) => {
-                  const stats = [...form.stats]; stats[i] = { ...s, value: e.target.value }; update("stats", stats);
-                }} />
-                <Input placeholder="Label" value={s.label} onChange={(e) => {
-                  const stats = [...form.stats]; stats[i] = { ...s, label: e.target.value }; update("stats", stats);
-                }} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <Button onClick={submit} disabled={busy}>{busy ? "Saving…" : "Save changes"}</Button>
-        </div>
-      </Card>
+      <p className="text-sm text-muted-foreground">
+        Headline, CTAs, background image, focal point, and overlay for the homepage hero.
+      </p>
+      <AdminPreviewMobileLink previewPath="/" />
+      <div className="hidden lg:block">
+        <AdminPreviewLayout previewPath="/">
+          <HeroPreviewPanel form={form} className="mb-4" />
+          {formPanel}
+        </AdminPreviewLayout>
+      </div>
+      <div className="mt-6 lg:hidden">{formPanel}</div>
     </div>
   );
 }

@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Trash2 } from "lucide-react";
+import { Copy, Plus, Trash2 } from "lucide-react";
+import { ReorderButtons } from "@/components/admin/reorder-buttons";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/locations")({ component: LocationsAdmin });
@@ -19,6 +20,12 @@ function LocationsAdmin() {
   const { data: locs } = useQuery({ queryKey: ["locations", "all"], queryFn: () => fetchLocations(true) });
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["locations"] });
+
+  const reorder = async (id: string, sort_order: number) => {
+    const { error } = await supabase.from("locations").update({ sort_order }).eq("id", id);
+    if (error) toast.error(error.message);
+    else refresh();
+  };
 
   const create = async () => {
     const { error } = await supabase.from("locations").insert({ name: "New Branch", sort_order: (locs?.length ?? 0) + 1 });
@@ -37,13 +44,34 @@ function LocationsAdmin() {
 
       <div className="mt-6 space-y-4">
         {locs?.length === 0 && <Card className="p-6 text-center text-sm text-muted-foreground">No branches yet.</Card>}
-        {locs?.map((l) => <LocationCard key={l.id} loc={l} onChange={refresh} />)}
+        {locs?.map((l, i) => (
+          <LocationCard
+            key={l.id}
+            loc={l}
+            index={i}
+            total={locs.length}
+            onChange={refresh}
+            onReorder={reorder}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-function LocationCard({ loc, onChange }: { loc: LocationRow; onChange: () => void }) {
+function LocationCard({
+  loc,
+  index,
+  total,
+  onChange,
+  onReorder,
+}: {
+  loc: LocationRow;
+  index: number;
+  total: number;
+  onChange: () => void;
+  onReorder: (id: string, sort_order: number) => void;
+}) {
   const [form, setForm] = useState<LocationRow>(loc);
   const [busy, setBusy] = useState(false);
 
@@ -69,13 +97,41 @@ function LocationCard({ loc, onChange }: { loc: LocationRow; onChange: () => voi
     </div>
   );
 
+  const duplicate = async () => {
+    setBusy(true);
+    const { error } = await supabase.from("locations").insert({
+      name: `${form.name} (copy)`,
+      address: form.address,
+      phone: form.phone,
+      email: form.email,
+      hours: form.hours,
+      map_embed_url: form.map_embed_url,
+      sort_order: form.sort_order + 1,
+      is_active: false,
+    });
+    setBusy(false);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Duplicated");
+      onChange();
+    }
+  };
+
   return (
     <Card className="p-5 space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="flex gap-2">
+        <ReorderButtons
+          disableUp={index === 0}
+          disableDown={index >= total - 1}
+          onMoveUp={() => onReorder(loc.id, Math.max(0, loc.sort_order - 1))}
+          onMoveDown={() => onReorder(loc.id, loc.sort_order + 1)}
+        />
+        <div className="grid flex-1 gap-3 sm:grid-cols-2">
         {f("name", "Branch name")}
         {f("phone", "Phone")}
         {f("email", "Email")}
         {f("hours", "Hours")}
+        </div>
       </div>
       <div>
         <Label>Address</Label>
@@ -95,6 +151,9 @@ function LocationCard({ loc, onChange }: { loc: LocationRow; onChange: () => voi
           <Input type="number" className="w-20" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} />
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={duplicate} disabled={busy} title="Duplicate branch">
+            <Copy className="h-4 w-4" />
+          </Button>
           <Button variant="outline" size="sm" onClick={remove}><Trash2 className="h-4 w-4" /></Button>
           <Button size="sm" onClick={save} disabled={busy}>{busy ? "…" : "Save"}</Button>
         </div>
