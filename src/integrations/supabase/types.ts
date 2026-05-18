@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      leads: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          message: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          status: string
+          tire_size: string | null
+          type: string
+          updated_at: string
+          vehicle: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          tire_size?: string | null
+          type?: string
+          updated_at?: string
+          vehicle?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          tire_size?: string | null
+          type?: string
+          updated_at?: string
+          vehicle?: string | null
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           address: string | null
