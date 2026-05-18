@@ -119,15 +119,20 @@ function WhatsAppFab() {
   );
 }
 
+function RealtimeBridge() {
+  useContentRealtime();
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const location = useLocation();
   const isChrome = !location.pathname.startsWith("/admin") && location.pathname !== "/login";
   const isHome = location.pathname === "/";
-  useContentRealtime();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <RealtimeBridge />
       <ThemeApplier />
       <a
         href="#main"
