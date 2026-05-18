@@ -124,6 +124,7 @@ function RootComponent() {
   const location = useLocation();
   const isChrome = !location.pathname.startsWith("/admin") && location.pathname !== "/login";
   const isHome = location.pathname === "/";
+  useContentRealtime();
 
   return (
     <QueryClientProvider client={queryClient}>
