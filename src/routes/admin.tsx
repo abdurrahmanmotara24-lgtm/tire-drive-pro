@@ -94,8 +94,24 @@ function AdminLayout() {
     if (!loading && !user) navigate({ to: "/login" });
   }, [loading, user, navigate]);
 
+  // Force light theme for the admin shell regardless of the public site's color mode
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const html = document.documentElement;
+    const prevDark = html.classList.contains("dark");
+    html.classList.remove("dark");
+    html.classList.add("light");
+    const prevScheme = html.style.colorScheme;
+    html.style.colorScheme = "light";
+    return () => {
+      html.classList.remove("light");
+      if (prevDark) html.classList.add("dark");
+      html.style.colorScheme = prevScheme;
+    };
+  }, []);
+
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">Loading…</div>;
+    return <div className="admin-light flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">Loading…</div>;
   }
   if (!user) return null;
 
