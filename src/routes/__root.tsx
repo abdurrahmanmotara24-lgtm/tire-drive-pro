@@ -20,6 +20,7 @@ import { useContactContent } from "@/hooks/use-contact-content";
 import { DEFAULTS } from "@/lib/site-content";
 import { colorModeScript } from "@/components/color-mode-script";
 import { MobileContactBar } from "@/components/mobile-contact-bar";
+import { useContentRealtime } from "@/hooks/use-content-realtime";
 
 function NotFoundComponent() {
   return (
