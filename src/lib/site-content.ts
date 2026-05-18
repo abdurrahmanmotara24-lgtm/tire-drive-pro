@@ -327,7 +327,7 @@ export async function fetchLeads(status?: LeadStatus | "all"): Promise<LeadRow[]
   if (status && status !== "all") q = q.eq("status", status);
   const { data, error } = await q;
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as LeadRow[];
 }
 
 export async function updateLeadStatus(id: string, status: LeadStatus): Promise<void> {
