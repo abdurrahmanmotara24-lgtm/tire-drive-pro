@@ -19,7 +19,7 @@ export function MobileIconNav() {
 
   return (
     <nav
-      className="mobile-icon-nav flex min-w-0 shrink-0 items-center justify-center gap-0.5 max-[380px]:gap-0 md:hidden"
+      className="mobile-icon-nav flex min-w-0 shrink-0 items-center justify-end gap-1.5 max-[380px]:gap-1 md:hidden"
       aria-label="Mobile quick navigation"
     >
       {routes.map((item) => {
