@@ -701,9 +701,12 @@
   .reveal.is-visible .stagger-children > * {
     animation: fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
-  .reveal:not(.is-visible) .stagger-children > * {
+  .js .reveal:not(.is-visible) .stagger-children > * {
     animation: none;
     opacity: 0;
+  }
+  .reveal.is-visible .stagger-children > * {
+    opacity: 1;
   }
   .stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
   .stagger-children > *:nth-child(2) { animation-delay: 0.1s; }

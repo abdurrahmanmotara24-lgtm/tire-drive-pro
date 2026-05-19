@@ -44,6 +44,41 @@ export type SectionsContent = {
   final_cta_enabled: boolean;
 };
 
+/** Coerce CMS / JSON values to booleans (handles "false", 0, null, etc.). */
+export function toBool(value: unknown, fallback: boolean): boolean {
+  if (value === true || value === 1) return true;
+  if (value === false || value === 0 || value === null) return false;
+  if (typeof value === "string") {
+    const v = value.trim().toLowerCase();
+    if (v === "true" || v === "1" || v === "yes" || v === "on") return true;
+    if (v === "false" || v === "0" || v === "no" || v === "off" || v === "") return false;
+  }
+  return fallback;
+}
+
+export function resolveSections(stored: Partial<SectionsContent> | null | undefined): SectionsContent {
+  const d = DEFAULTS.sections;
+  return {
+    brands_enabled: toBool(stored?.brands_enabled, d.brands_enabled),
+    why_us_enabled: toBool(stored?.why_us_enabled, d.why_us_enabled),
+    process_enabled: toBool(stored?.process_enabled, d.process_enabled),
+    testimonials_enabled: toBool(stored?.testimonials_enabled, d.testimonials_enabled),
+    quote_enabled: toBool(stored?.quote_enabled, d.quote_enabled),
+    final_cta_enabled: toBool(stored?.final_cta_enabled, d.final_cta_enabled),
+  };
+}
+
+export function resolveHomepage(stored: Partial<HomepageContent> | null | undefined): HomepageContent {
+  const d = DEFAULTS.homepage;
+  return {
+    about_story_image: typeof stored?.about_story_image === "string" ? stored.about_story_image : d.about_story_image,
+    about_banner_image:
+      typeof stored?.about_banner_image === "string" ? stored.about_banner_image : d.about_banner_image,
+    technician_band: { ...d.technician_band, ...(stored?.technician_band ?? {}) },
+    inventory_band: { ...d.inventory_band, ...(stored?.inventory_band ?? {}) },
+  };
+}
+
 export type ImageBandContent = {
   image: string;
   eyebrow: string;
@@ -257,6 +292,12 @@ export async function fetchContent<K extends keyof ContentMap>(
         focal_x: h.focal_x ?? DEFAULTS.hero.focal_x,
         focal_y: h.focal_y ?? DEFAULTS.hero.focal_y,
       } as ContentMap[K];
+    }
+    if (key === "sections") {
+      return resolveSections(stored as Partial<SectionsContent> | null) as ContentMap[K];
+    }
+    if (key === "homepage") {
+      return resolveHomepage(stored as Partial<HomepageContent> | null) as ContentMap[K];
     }
     return merged;
   } catch (e) {

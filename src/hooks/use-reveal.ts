@@ -1,43 +1,56 @@
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+
+function isEmbeddedPreview() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.self !== window.top;
+  } catch {
+    // Cross-origin iframe — treat as embedded preview
+    return true;
+  }
+}
 
 export function useReveal<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    document.documentElement.classList.add("js");
+
+    const show = () => setVisible(true);
 
     if (
       typeof window === "undefined" ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      isEmbeddedPreview()
     ) {
-      setVisible(true);
+      show();
       return;
     }
 
-    // If element is already within (or close to) the viewport on mount, reveal immediately.
+    document.documentElement.classList.add("js");
+
     const rect = el.getBoundingClientRect();
     const vh = window.innerHeight || document.documentElement.clientHeight;
-    if (rect.top < vh + 200 && rect.bottom > -200) {
-      setVisible(true);
+    // Generous margin so sections below a full-viewport hero still reveal in editor previews
+    if (rect.top < vh + 400 && rect.bottom > -400) {
+      show();
       return;
     }
 
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true);
+          show();
           io.disconnect();
         }
       },
-      { threshold: 0.01, rootMargin: "0px 0px 10% 0px" },
+      { threshold: 0, rootMargin: "0px 0px 25% 0px" },
     );
     io.observe(el);
 
-    // Safety net — never let content stay hidden.
-    const fallback = window.setTimeout(() => setVisible(true), 900);
+    const fallback = window.setTimeout(show, 400);
     return () => {
       window.clearTimeout(fallback);
       io.disconnect();

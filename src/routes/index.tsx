@@ -97,7 +97,17 @@ function Index() {
             subtitle={homepage.technician_band.subtitle}
           />
         )}
-        {sections.brands_enabled && sections.process_enabled && (
+        {sections.process_enabled && <ProcessSteps steps={process} />}
+        {sections.why_us_enabled &&
+          !sections.process_enabled &&
+          (sections.process_enabled || sections.brands_enabled) && (
+            <div
+              className="section border-y border-border bg-card py-10 md:py-12"
+              role="presentation"
+              aria-hidden
+            />
+          )}
+        {(sections.process_enabled || sections.brands_enabled) && (
           <ImageBand
             src={resolveSiteImage(homepage.inventory_band.image, FALLBACK_IMAGES.inventory)}
             eyebrow={homepage.inventory_band.eyebrow}
@@ -106,7 +116,6 @@ function Index() {
             align="right"
           />
         )}
-        {sections.process_enabled && <ProcessSteps steps={process} />}
         {sections.testimonials_enabled && <TestimonialCarousel testimonials={testimonials} />}
         {sections.quote_enabled && <QuotePanel />}
         {sections.final_cta_enabled && <FinalCta callHref={callHref} hours={contact.hours} />}
