@@ -1,7 +1,9 @@
 import type { CSSProperties } from "react";
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronDown, Phone, Truck, ShieldCheck, BadgeCheck } from "lucide-react";
 import type { HeroContent } from "@/lib/site-content";
 import heroWarehouse from "@/assets/hero-warehouse.png";
+import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import { HeroBackground } from "./hero-background";
 
@@ -48,17 +50,51 @@ export function CinematicHero({ hero, callHref, fallbackImage = heroWarehouse, b
         className={cn(
           "hero-cinematic-inner container-tny relative z-10 w-full pb-20 md:pb-16 md:pt-28 lg:pb-24 lg:pt-32 max-md:pb-24",
           bleedUnderHeader ? "max-md:pt-0" : "pt-24",
+          bleedUnderHeader && "flex flex-col items-center text-center max-md:justify-end",
         )}
       >
+        {bleedUnderHeader ? (
+          <Link
+            to="/"
+            className="hero-brand-logo hover-logo animate-in-view mb-5 sm:mb-6 md:mb-8"
+            aria-label="Tires Near You — Home"
+          >
+            <img
+              src={logo}
+              alt="Tires Near You"
+              width={480}
+              height={144}
+              className="hero-brand-logo__img h-auto w-[min(88vw,18rem)] sm:w-[min(80vw,22rem)] md:w-[min(62vw,28rem)] lg:w-[min(48vw,32rem)]"
+              fetchPriority="high"
+            />
+          </Link>
+        ) : null}
         <p className="hero-badge animate-in-view text-xs font-semibold uppercase tracking-[0.2em]">
           {hero.badge}
         </p>
-        <h1 className="animate-in-view font-display mt-6 max-w-4xl text-balance text-[clamp(2.75rem,8vw,5.25rem)] leading-[0.92] tracking-tight">
+        <h1
+          className={cn(
+            "animate-in-view font-display text-balance text-[clamp(2.75rem,8vw,5.25rem)] leading-[0.92] tracking-tight",
+            bleedUnderHeader ? "mt-4 max-w-4xl sm:mt-6" : "mt-6 max-w-4xl",
+          )}
+        >
           {hero.title_line1}
           <span className="hero-title-glow block text-primary">{hero.title_line2}</span>
         </h1>
-        <p className="hero-subtitle animate-in-view mt-5 max-w-xl text-lg sm:text-xl">{hero.subtitle}</p>
-        <div className="animate-in-view mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <p
+          className={cn(
+            "hero-subtitle animate-in-view mt-5 text-lg sm:text-xl",
+            bleedUnderHeader ? "max-w-2xl" : "max-w-xl",
+          )}
+        >
+          {hero.subtitle}
+        </p>
+        <div
+          className={cn(
+            "animate-in-view mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap",
+            bleedUnderHeader && "w-full justify-center",
+          )}
+        >
           <a
             href={hero.cta_primary_link || "#quote"}
             className="hover-btn-primary hover-icon-bump inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm bg-primary px-6 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-glow sm:w-auto"
@@ -74,7 +110,12 @@ export function CinematicHero({ hero, callHref, fallbackImage = heroWarehouse, b
             </a>
           )}
         </div>
-        <div className="animate-in-view mt-8 flex flex-wrap gap-2">
+        <div
+          className={cn(
+            "animate-in-view mt-8 flex flex-wrap gap-2",
+            bleedUnderHeader && "justify-center",
+          )}
+        >
           {trustPills.map((p) => (
             <span
               key={p.label}

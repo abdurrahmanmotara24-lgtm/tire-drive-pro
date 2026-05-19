@@ -1,9 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
-import mechanic from "@/assets/mechanic.jpg";
-import tireStack from "@/assets/tire-stack.jpg";
 import { DEFAULTS, fetchContent } from "@/lib/site-content";
+import { FALLBACK_IMAGES, resolveSiteImage } from "@/lib/site-images";
 import { PageIntro } from "@/components/marketing/page-intro";
 import { SeoMeta } from "@/components/seo-meta";
 import { useReveal } from "@/hooks/use-reveal";
@@ -25,6 +24,20 @@ function About() {
     queryFn: () => fetchContent("about"),
     placeholderData: DEFAULTS.about,
   });
+  const { data: homepage = DEFAULTS.homepage } = useQuery({
+    queryKey: ["content", "homepage"],
+    queryFn: () => fetchContent("homepage"),
+    placeholderData: DEFAULTS.homepage,
+  });
+
+  const storyImage = resolveSiteImage(
+    homepage.about_story_image || homepage.technician_band.image,
+    FALLBACK_IMAGES.technician,
+  );
+  const bannerImage = resolveSiteImage(
+    homepage.about_banner_image || homepage.inventory_band.image,
+    FALLBACK_IMAGES.inventory,
+  );
   const reveal = useReveal<HTMLElement>();
 
   return (
@@ -35,7 +48,7 @@ function About() {
         <div className="container-tny grid items-center gap-12 lg:grid-cols-2">
           <div className="hover-img-zoom rounded-sm">
             <img
-              src={mechanic}
+              src={storyImage}
               alt="Technician at work"
               width={1200}
               height={900}
@@ -59,7 +72,7 @@ function About() {
         <div className="container-tny">
           <div className="hover-img-zoom mb-12 rounded-sm">
             <img
-              src={tireStack}
+              src={bannerImage}
               alt="Premium tires"
               width={1200}
               height={500}

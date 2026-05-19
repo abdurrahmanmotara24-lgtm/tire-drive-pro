@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { DEFAULTS, fetchContent, saveContent, type HeroContent } from "@/lib/site-content";
 import { Card } from "@/components/ui/card";
@@ -6,8 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
-import { MediaPicker } from "@/components/admin/media-picker";
 import { AdminSaveBar } from "@/components/admin/admin-save-bar";
 import { AdminPreviewLayout, AdminPreviewMobileLink } from "@/components/admin/admin-preview-layout";
 import { HeroPreviewPanel } from "@/components/admin/hero-preview-panel";
@@ -54,28 +52,6 @@ function HeroAdmin() {
       </div>
 
       <div>
-        <Label>Background image or video</Label>
-        <p className="mb-2 text-xs text-muted-foreground">
-          Leave empty to use the default warehouse photo. Upload a cinematic photo or short looped MP4/WebM.
-        </p>
-        <MediaPicker value={form.background_image} onChange={(url) => update("background_image", url)} />
-        <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => update("background_image", "")}>
-          Reset to default warehouse image
-        </Button>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <Label>Image focus X ({form.focal_x ?? 36}%)</Label>
-          <Slider value={[form.focal_x ?? 36]} min={0} max={100} step={1} onValueChange={(v) => update("focal_x", v[0])} />
-        </div>
-        <div>
-          <Label>Image focus Y ({form.focal_y ?? 46}%)</Label>
-          <Slider value={[form.focal_y ?? 46]} min={0} max={100} step={1} onValueChange={(v) => update("focal_y", v[0])} />
-        </div>
-      </div>
-
-      <div>
         <Label>Overlay darkness ({form.overlay_opacity}%)</Label>
         <Slider value={[form.overlay_opacity]} min={0} max={100} step={5} onValueChange={(v) => update("overlay_opacity", v[0])} />
       </div>
@@ -116,7 +92,11 @@ function HeroAdmin() {
     <div>
       <h1 className="text-2xl font-bold">Hero Section</h1>
       <p className="text-sm text-muted-foreground">
-        Headline, CTAs, background image, focal point, and overlay for the homepage hero.
+        Headline, CTAs, and overlay for the homepage hero. Change the background photo on{" "}
+        <Link to="/admin/images" className="text-primary hover:underline">
+          Site Images
+        </Link>
+        .
       </p>
       <AdminPreviewMobileLink previewPath="/" />
       <div className="hidden lg:block">

@@ -7,6 +7,7 @@ import { useLeadNotifications } from "@/hooks/use-lead-notifications";
 import {
   LayoutDashboard,
   Image as ImageIcon,
+  Images,
   Phone,
   MapPin,
   Sliders,
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/admin")({
 const nav = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/hero", label: "Hero", icon: ImageIcon },
+  { to: "/admin/images", label: "Images", icon: Images },
   { to: "/admin/sections", label: "Sections", icon: Sliders },
   { to: "/admin/services", label: "Services", icon: Wrench },
   { to: "/admin/testimonials", label: "Reviews", icon: MessageSquare },

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { SectionHeading } from "./section-heading";
 
-type Props = { brands: string[] };
+type Props = { brands: string[]; priority?: boolean };
 
-export function BrandMarquee({ brands }: Props) {
+export function BrandMarquee({ brands, priority }: Props) {
   const [reducedMotion, setReducedMotion] = useState(false);
   useEffect(() => {
     setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -12,9 +13,14 @@ export function BrandMarquee({ brands }: Props) {
   const row1 = [...brands, ...brands];
   const row2 = [...[...brands].reverse(), ...[...brands].reverse()];
 
+  const sectionClass = cn(
+    "section-dark border-y border-border",
+    priority ? "border-t-0 py-12" : "py-14",
+  );
+
   if (reducedMotion) {
     return (
-      <section id="brands" className="section-dark border-y border-border py-14">
+      <section id="brands" className={sectionClass}>
         <div className="container-tny mb-10">
           <SectionHeading
             eyebrow="Partners"
@@ -35,7 +41,7 @@ export function BrandMarquee({ brands }: Props) {
   }
 
   return (
-    <section id="brands" className="section-dark overflow-hidden border-y border-border py-14">
+    <section id="brands" className={cn(sectionClass, "overflow-hidden")}>
       <div className="container-tny mb-10">
         <SectionHeading
           eyebrow="Partners"

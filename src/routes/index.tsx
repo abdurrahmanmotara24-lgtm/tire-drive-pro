@@ -14,8 +14,7 @@ import { QuotePanel } from "@/components/marketing/quote-panel";
 import { FinalCta } from "@/components/marketing/final-cta";
 import { TrustBar } from "@/components/marketing/trust-bar";
 import { ImageBand } from "@/components/marketing/image-band";
-import mechanic from "@/assets/mechanic.jpg";
-import tireStack from "@/assets/tire-stack.jpg";
+import { FALLBACK_IMAGES, resolveSiteImage } from "@/lib/site-images";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -66,6 +65,11 @@ function Index() {
     queryFn: () => fetchContent("testimonials"),
     placeholderData: DEFAULTS.testimonials,
   });
+  const { data: homepage = DEFAULTS.homepage } = useQuery({
+    queryKey: ["content", "homepage"],
+    queryFn: () => fetchContent("homepage"),
+    placeholderData: DEFAULTS.homepage,
+  });
 
   if (heroQuery.isPending && !heroQuery.data) {
     return (
@@ -81,24 +85,24 @@ function Index() {
       <SeoMeta />
       <CinematicHero hero={hero} callHref={callHref} bleedUnderHeader />
       <div id="content">
-        <StatStrip stats={hero.stats} />
+        {sections.brands_enabled && <BrandMarquee brands={brands} priority />}
         <TrustBar />
+        <StatStrip stats={hero.stats} variant="compact" />
         {sections.why_us_enabled && <ServiceGrid services={services} />}
         {sections.why_us_enabled && (
           <ImageBand
-            src={mechanic}
-            eyebrow="Craft"
-            title="Technicians who care"
-            subtitle="Factory-spec torque, laser alignment, and a full safety check on every job."
+            src={resolveSiteImage(homepage.technician_band.image, FALLBACK_IMAGES.technician)}
+            eyebrow={homepage.technician_band.eyebrow}
+            title={homepage.technician_band.title}
+            subtitle={homepage.technician_band.subtitle}
           />
         )}
-        {sections.brands_enabled && <BrandMarquee brands={brands} />}
         {sections.brands_enabled && sections.process_enabled && (
           <ImageBand
-            src={tireStack}
-            eyebrow="Inventory"
-            title="Premium brands in stock"
-            subtitle="From daily commuters to performance builds — honest recommendations, no pressure."
+            src={resolveSiteImage(homepage.inventory_band.image, FALLBACK_IMAGES.inventory)}
+            eyebrow={homepage.inventory_band.eyebrow}
+            title={homepage.inventory_band.title}
+            subtitle={homepage.inventory_band.subtitle}
             align="right"
           />
         )}

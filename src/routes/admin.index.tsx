@@ -15,6 +15,7 @@ import { getSiteHealthChecks, formatRelativeUpdated, CONTENT_LABELS } from "@/li
 import {
   ArrowRight,
   Image as ImageIcon,
+  ImagePlus,
   MapPin,
   Phone,
   Sliders,
@@ -56,6 +57,7 @@ function Dashboard() {
 
   const cards = [
     { to: "/admin/hero", title: "Hero Section", desc: "Headline, subtitle, CTAs, background.", icon: ImageIcon },
+    { to: "/admin/images", title: "Site Images", desc: "Hero background, feature bands, and about photos.", icon: ImagePlus },
     { to: "/admin/sections", title: "Homepage Sections", desc: "Toggle and preview homepage blocks.", icon: Sliders },
     { to: "/admin/services", title: "Services & Brands", desc: "Service cards and brand marquee.", icon: Wrench },
     { to: "/admin/testimonials", title: "Reviews", desc: "Customer testimonials carousel.", icon: MessageSquare },
@@ -67,7 +69,7 @@ function Dashboard() {
     { to: "/admin/seo", title: "SEO", desc: "Meta tags and Open Graph image.", icon: Search },
   ];
 
-  const contentKeys = ["hero", "contact", "sections", "services", "testimonials", "about", "theme", "seo"] as const;
+  const contentKeys = ["hero", "homepage", "contact", "sections", "services", "testimonials", "about", "theme", "seo"] as const;
 
   return (
     <div>

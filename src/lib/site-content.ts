@@ -44,6 +44,20 @@ export type SectionsContent = {
   final_cta_enabled: boolean;
 };
 
+export type ImageBandContent = {
+  image: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+};
+
+export type HomepageContent = {
+  technician_band: ImageBandContent;
+  inventory_band: ImageBandContent;
+  about_story_image: string;
+  about_banner_image: string;
+};
+
 export type ServiceItem = { icon: string; title: string; desc: string };
 export type TestimonialItem = { name: string; text: string; rating: number };
 export type AboutValue = { title: string; text: string };
@@ -125,6 +139,22 @@ export const DEFAULTS = {
     quote_enabled: true,
     final_cta_enabled: true,
   } as SectionsContent,
+  homepage: {
+    technician_band: {
+      image: "",
+      eyebrow: "Craft",
+      title: "Technicians who care",
+      subtitle: "Factory-spec torque, laser alignment, and a full safety check on every job.",
+    },
+    inventory_band: {
+      image: "",
+      eyebrow: "Inventory",
+      title: "Premium brands in stock",
+      subtitle: "From daily commuters to performance builds — honest recommendations, no pressure.",
+    },
+    about_story_image: "",
+    about_banner_image: "",
+  } as HomepageContent,
   services: [
     { icon: "Wrench", title: "Expert Fitment", desc: "Factory-spec torque and premium equipment on every wheel." },
     { icon: "Gauge", title: "Laser Alignment", desc: "Precision geometry for grip, wear, and confident handling." },
@@ -173,6 +203,7 @@ export const DEFAULTS = {
 
 export type ContentMap = {
   hero: HeroContent;
+  homepage: HomepageContent;
   contact: ContactContent;
   sections: SectionsContent;
   services: ServiceItem[];

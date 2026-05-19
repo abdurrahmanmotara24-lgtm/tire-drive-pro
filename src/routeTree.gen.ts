@@ -28,6 +28,7 @@ import { Route as AdminSectionsRouteImport } from './routes/admin.sections'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminImagesRouteImport } from './routes/admin.images'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminContactRouteImport } from './routes/admin.contact'
 import { Route as AdminAboutRouteImport } from './routes/admin.about'
@@ -127,6 +128,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminImagesRoute = AdminImagesRouteImport.update({
+  id: '/images',
+  path: '/images',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHeroRoute = AdminHeroRouteImport.update({
   id: '/hero',
   path: '/hero',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/admin/about': typeof AdminAboutRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/images': typeof AdminImagesRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/admin/about': typeof AdminAboutRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/images': typeof AdminImagesRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/admin/about': typeof AdminAboutRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
+  '/admin/images': typeof AdminImagesRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/admin/about'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/images'
     | '/admin/leads'
     | '/admin/locations'
     | '/admin/media'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/admin/about'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/images'
     | '/admin/leads'
     | '/admin/locations'
     | '/admin/media'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/admin/about'
     | '/admin/contact'
     | '/admin/hero'
+    | '/admin/images'
     | '/admin/leads'
     | '/admin/locations'
     | '/admin/media'
@@ -436,6 +448,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/images': {
+      id: '/admin/images'
+      path: '/images'
+      fullPath: '/admin/images'
+      preLoaderRoute: typeof AdminImagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/hero': {
       id: '/admin/hero'
       path: '/hero'
@@ -464,6 +483,7 @@ interface AdminRouteChildren {
   AdminAboutRoute: typeof AdminAboutRoute
   AdminContactRoute: typeof AdminContactRoute
   AdminHeroRoute: typeof AdminHeroRoute
+  AdminImagesRoute: typeof AdminImagesRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
   AdminMediaRoute: typeof AdminMediaRoute
@@ -480,6 +500,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAboutRoute: AdminAboutRoute,
   AdminContactRoute: AdminContactRoute,
   AdminHeroRoute: AdminHeroRoute,
+  AdminImagesRoute: AdminImagesRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminLocationsRoute: AdminLocationsRoute,
   AdminMediaRoute: AdminMediaRoute,
@@ -508,3 +529,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

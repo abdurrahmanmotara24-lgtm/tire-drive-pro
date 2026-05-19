@@ -39,6 +39,7 @@ export function getSiteHealthChecks(input: {
 
 export const CONTENT_LABELS: Record<string, string> = {
   hero: "Hero",
+  homepage: "Images",
   contact: "Contact",
   sections: "Sections",
   services: "Services",
