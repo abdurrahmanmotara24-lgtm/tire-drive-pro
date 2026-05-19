@@ -100,7 +100,7 @@ function Index() {
         {sections.process_enabled && <ProcessSteps steps={process} />}
         {sections.why_us_enabled &&
           !sections.process_enabled &&
-          (sections.process_enabled || sections.brands_enabled) && (
+          sections.brands_enabled && (
             <div
               className="section border-y border-border bg-card py-10 md:py-12"
               role="presentation"

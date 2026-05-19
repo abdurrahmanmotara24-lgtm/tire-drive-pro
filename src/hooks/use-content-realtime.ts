@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 
 /**
  * Subscribes to changes on site_content and locations so the public site
@@ -10,6 +10,8 @@ export function useContentRealtime() {
   const qc = useQueryClient();
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+
     const channel = supabase
       .channel("public-content")
       .on(
