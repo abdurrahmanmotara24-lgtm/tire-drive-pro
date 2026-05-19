@@ -1,11 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Info, Phone, MapPin } from "lucide-react";
+import { Home, Info, Phone, MapPin, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const routes = [
   { to: "/", label: "Home", icon: Home, exact: true },
   { to: "/about", label: "About", icon: Info, exact: false },
   { to: "/locations", label: "Locations", icon: MapPin, exact: false },
+  { to: "/hours", label: "Hours", icon: Clock, exact: false },
   { to: "/contact", label: "Contact", icon: Phone, exact: false },
 ] as const;
 
