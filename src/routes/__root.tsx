@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { DEFAULTS } from "@/lib/site-content";
 import { colorModeScript } from "@/components/color-mode-script";
-import { MobileContactBar } from "@/components/mobile-contact-bar";
+
 import { useContentRealtime } from "@/hooks/use-content-realtime";
 
 function NotFoundComponent() {
@@ -146,15 +146,14 @@ function RootComponent() {
           id="main"
           className={cn(
             "flex-1",
-            isChrome && "has-mobile-bottom-bar",
             isChrome && !isHome && "has-mobile-top-nav",
           )}
           tabIndex={-1}
         >
           <Outlet />
         </main>
-        {isChrome && <SiteFooter className="has-mobile-footer-pad" />}
-        {isChrome && <MobileContactBar />}
+        {isChrome && <SiteFooter />}
+        
         {isChrome && <WhatsAppFab />}
         <Toaster />
       </div>
