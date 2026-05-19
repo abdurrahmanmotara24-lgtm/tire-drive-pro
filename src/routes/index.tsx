@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { DEFAULTS, fetchContent } from "@/lib/site-content";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { SeoMeta } from "@/components/seo-meta";
-import { HomePageSkeleton } from "@/components/home-page-skeleton";
 import { CinematicHero } from "@/components/marketing/cinematic-hero";
 import { StatStrip } from "@/components/marketing/stat-strip";
 import { ServiceGrid } from "@/components/marketing/service-grid";
@@ -71,17 +70,8 @@ function Index() {
     placeholderData: DEFAULTS.homepage,
   });
 
-  if (heroQuery.isPending && !heroQuery.data) {
-    return (
-      <>
-        <SeoMeta />
-        <HomePageSkeleton />
-      </>
-    );
-  }
-
   return (
-  <>
+    <>
       <SeoMeta />
       <CinematicHero hero={hero} callHref={callHref} bleedUnderHeader />
       <div id="content">

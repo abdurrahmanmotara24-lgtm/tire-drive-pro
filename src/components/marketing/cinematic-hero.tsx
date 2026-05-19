@@ -57,14 +57,14 @@ export function CinematicHero({ hero, callHref, fallbackImage = heroWarehouse, b
           <Link
             to="/"
             className="hero-brand-logo hover-logo animate-in-view mb-5 sm:mb-6 md:mb-8"
-            aria-label="Tires Near You — Home"
+            aria-label="Tyres Near Me — Home"
           >
             <img
               src={logo}
-              alt="Tires Near You"
-              width={480}
-              height={144}
-              className="hero-brand-logo__img h-auto w-[min(88vw,18rem)] sm:w-[min(80vw,22rem)] md:w-[min(62vw,28rem)] lg:w-[min(48vw,32rem)]"
+              alt="Tyres Near Me"
+              width={1024}
+              height={512}
+              className="hero-brand-logo__img h-auto w-[min(92vw,24rem)] bg-white sm:w-[min(88vw,28rem)] md:w-[min(80vw,34rem)] lg:w-[min(70vw,40rem)]"
               fetchPriority="high"
             />
           </Link>

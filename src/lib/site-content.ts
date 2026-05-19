@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { isSupabasePublicEnvConfigured, readSupabasePublicEnv } from "@/lib/env";
 import {
   DEFAULT_HOURS_SCHEDULE,
   formatHoursSummary,
@@ -255,9 +256,7 @@ export async function fetchContent<K extends keyof ContentMap>(
 ): Promise<ContentMap[K]> {
   const defaultVal = DEFAULTS[key];
 
-  const url = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const key_ = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key_) {
+  if (!isSupabasePublicEnvConfigured()) {
     return defaultVal;
   }
 

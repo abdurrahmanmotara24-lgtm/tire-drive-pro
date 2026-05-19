@@ -1,18 +1,23 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
-function isEmbeddedPreview() {
+function isEmbeddedPreview(): boolean {
   if (typeof window === "undefined") return false;
   try {
     return window.self !== window.top;
   } catch {
-    // Cross-origin iframe — treat as embedded preview
     return true;
   }
 }
 
+function initialRevealVisible(): boolean {
+  if (typeof window === "undefined") return true;
+  if (document.documentElement.classList.contains("is-embedded-preview")) return true;
+  return isEmbeddedPreview();
+}
+
 export function useReveal<T extends HTMLElement>() {
   const ref = useRef<T>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(initialRevealVisible);
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -21,8 +26,8 @@ export function useReveal<T extends HTMLElement>() {
     const show = () => setVisible(true);
 
     if (
-      typeof window === "undefined" ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      document.documentElement.classList.contains("is-embedded-preview") ||
       isEmbeddedPreview()
     ) {
       show();
@@ -33,7 +38,6 @@ export function useReveal<T extends HTMLElement>() {
 
     const rect = el.getBoundingClientRect();
     const vh = window.innerHeight || document.documentElement.clientHeight;
-    // Generous margin so sections below a full-viewport hero still reveal in editor previews
     if (rect.top < vh + 400 && rect.bottom > -400) {
       show();
       return;

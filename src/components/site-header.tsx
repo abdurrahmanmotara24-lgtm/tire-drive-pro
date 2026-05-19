@@ -112,32 +112,19 @@ export function SiteHeader() {
             : "min-h-[3.25rem] grid-cols-[1fr_auto] lg:min-h-16 lg:grid-cols-[1fr_auto]",
         )}
       >
-        <div
-          className={cn(
-            "site-header-brand flex min-w-0 items-center justify-self-start",
-            !showHeaderLogo && "lg:hidden",
-          )}
-        >
-          {showHeaderLogo ? (
+        {showHeaderLogo ? (
+          <div className="site-header-brand flex min-w-0 items-center justify-self-start">
             <Link to="/" className="hover-logo block leading-none" onClick={closeMenu}>
               <img
                 src={logo}
-                alt="Tires Near You"
-                width={360}
-                height={108}
-                className="site-header-logo-img h-14 w-auto sm:h-16 lg:h-[4.5rem] xl:h-20"
+                alt="Tyres Near Me"
+                width={1024}
+                height={512}
+                className="site-header-logo-img h-10 w-auto max-w-[min(72vw,10rem)] bg-white sm:h-11 sm:max-w-[11rem] lg:h-12 lg:max-w-[12rem] xl:h-14 xl:max-w-[14rem]"
               />
             </Link>
-          ) : (
-            <Link
-              to="/"
-              onClick={closeMenu}
-              className="site-header-wordmark font-display text-base font-semibold tracking-tight text-foreground sm:text-lg lg:hidden"
-            >
-              Tires Near You
-            </Link>
-          )}
-        </div>
+          </div>
+        ) : null}
 
         <nav
           className={cn(
