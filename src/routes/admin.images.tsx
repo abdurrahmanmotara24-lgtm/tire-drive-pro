@@ -29,7 +29,7 @@ export const Route = createFileRoute("/admin/images")({
 });
 
 type FormState = {
-  hero: Pick<HeroContent, "background_image" | "focal_x" | "focal_y">;
+  hero: Pick<HeroContent, "background_image" | "background_image_light" | "focal_x" | "focal_y">;
   homepage: HomepageContent;
 };
 
@@ -49,6 +49,7 @@ function ImagesAdmin() {
     const initial: FormState = {
       hero: {
         background_image: heroData.background_image,
+        background_image_light: heroData.background_image_light ?? "",
         focal_x: heroData.focal_x ?? DEFAULTS.hero.focal_x,
         focal_y: heroData.focal_y ?? DEFAULTS.hero.focal_y,
       },
@@ -67,6 +68,7 @@ function ImagesAdmin() {
       await saveContent("hero", {
         ...heroData,
         background_image: form.hero.background_image,
+        background_image_light: form.hero.background_image_light,
         focal_x: form.hero.focal_x,
         focal_y: form.hero.focal_y,
       });
@@ -152,6 +154,21 @@ function ImagesAdmin() {
             value={form.hero.background_image}
             onChange={(url) => setForm({ ...form, hero: { ...form.hero, background_image: url } })}
           />
+
+          <div className="border-t border-border pt-4">
+            <h3 className="text-sm font-semibold">Light mode hero (optional)</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Brighter photo for showroom light theme. Falls back to the main hero image when empty.
+            </p>
+            <div className="mt-3">
+              <MediaPicker
+                value={form.hero.background_image_light ?? ""}
+                onChange={(url) =>
+                  setForm({ ...form, hero: { ...form.hero, background_image_light: url } })
+                }
+              />
+            </div>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>

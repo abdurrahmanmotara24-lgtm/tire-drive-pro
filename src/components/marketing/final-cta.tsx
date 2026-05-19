@@ -1,9 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Phone } from "lucide-react";
+import { ArrowRight, Clock, Phone } from "lucide-react";
+import { useContactContent } from "@/hooks/use-contact-content";
+import { getHoursStatusFromSchedule, normalizeHoursSchedule } from "@/lib/hours-schedule";
+import { cn } from "@/lib/utils";
 
 type Props = { callHref?: string; hours?: string };
 
 export function FinalCta({ callHref, hours }: Props) {
+  const { contact } = useContactContent();
+  const status = getHoursStatusFromSchedule(normalizeHoursSchedule(contact.hours_schedule));
+
   return (
     <section id="final-cta" className="bg-accent-gradient py-14">
       <div className="container-tny flex flex-col items-center justify-between gap-6 text-center md:flex-row md:text-left">
@@ -13,6 +19,19 @@ export function FinalCta({ callHref, hours }: Props) {
             {hours ? `${hours} · ` : ""}
             Call or visit your nearest branch.
           </p>
+          {status.open !== null && (
+            <p
+              className={cn(
+                "mt-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider",
+                status.open
+                  ? "border-emerald-300/50 bg-emerald-500/20 text-emerald-50"
+                  : "border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground/90",
+              )}
+            >
+              <Clock className="h-3.5 w-3.5" aria-hidden />
+              {status.label}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap justify-center gap-3">
           {callHref && (
@@ -28,6 +47,12 @@ export function FinalCta({ callHref, hours }: Props) {
             className="hover-btn-outline hover-icon-bump inline-flex items-center gap-2 rounded-sm border border-primary-foreground/30 px-6 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground"
           >
             Find a branch <ArrowRight className="icon-bump h-4 w-4" />
+          </Link>
+          <Link
+            to="/hours"
+            className="hover-btn-outline inline-flex items-center gap-2 rounded-sm border border-primary-foreground/20 px-4 py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground/90"
+          >
+            Hours
           </Link>
         </div>
       </div>

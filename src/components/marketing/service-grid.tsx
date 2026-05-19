@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import type { ServiceItem } from "@/lib/site-content";
 import { getIcon } from "@/lib/icons";
@@ -15,7 +16,7 @@ export function ServiceGrid({ services }: { services: ServiceItem[] }) {
           title="Precision for every drive"
           subtitle="From daily commuters to performance builds — fitted right, every time."
         />
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="stagger-children mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((s) => {
             const Icon = getIcon(s.icon);
             return (
@@ -28,9 +29,13 @@ export function ServiceGrid({ services }: { services: ServiceItem[] }) {
                 </div>
                 <h3 className="mt-4 font-display text-lg transition-colors group-hover:text-primary">{s.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-primary">
-                  Learn more <ArrowRight className="h-3.5 w-3.5" />
-                </span>
+                <Link
+                  to="/"
+                  hash="quote"
+                  className="mt-3 inline-flex min-h-11 items-center gap-1 text-xs font-bold uppercase tracking-wider text-primary"
+                >
+                  Get a quote <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
             );
           })}

@@ -13,7 +13,9 @@ import { QuotePanel } from "@/components/marketing/quote-panel";
 import { FinalCta } from "@/components/marketing/final-cta";
 import { TrustBar } from "@/components/marketing/trust-bar";
 import { ImageBand } from "@/components/marketing/image-band";
+import { useBrandSlideshow } from "@/hooks/use-brand-slideshow";
 import { FALLBACK_IMAGES, resolveSiteImage } from "@/lib/site-images";
+import { HomePageSkeleton } from "@/components/home-page-skeleton";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,6 +34,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { telHref, hasPhone, contact } = useContactContent();
   const callHref = hasPhone ? telHref : undefined;
+  const { data: brandSlideshow, isLoading: slideshowLoading } = useBrandSlideshow();
 
   const heroQuery = useQuery({
     queryKey: ["content", "hero"],
@@ -70,6 +73,17 @@ function Index() {
     placeholderData: DEFAULTS.homepage,
   });
 
+  const contentBootstrapping = !heroQuery.isFetched;
+
+  if (contentBootstrapping) {
+    return (
+      <>
+        <SeoMeta />
+        <HomePageSkeleton bleedUnderHeader />
+      </>
+    );
+  }
+
   return (
     <>
       <SeoMeta />
@@ -78,16 +92,26 @@ function Index() {
         {sections.brands_enabled && <BrandMarquee brands={brands} priority />}
         <TrustBar />
         <StatStrip stats={hero.stats} variant="compact" />
-        {sections.why_us_enabled && <ServiceGrid services={services} />}
         {sections.why_us_enabled && (
+          <div className="section-below-fold">
+            <ServiceGrid services={services} />
+          </div>
+        )}
+        {sections.why_us_enabled && (
+          <div className="section-below-fold">
           <ImageBand
             src={resolveSiteImage(homepage.technician_band.image, FALLBACK_IMAGES.technician)}
             eyebrow={homepage.technician_band.eyebrow}
             title={homepage.technician_band.title}
             subtitle={homepage.technician_band.subtitle}
           />
+          </div>
         )}
-        {sections.process_enabled && <ProcessSteps steps={process} />}
+        {sections.process_enabled && (
+          <div className="section-below-fold">
+            <ProcessSteps steps={process} />
+          </div>
+        )}
         {sections.why_us_enabled &&
           !sections.process_enabled &&
           sections.brands_enabled && (
@@ -98,15 +122,24 @@ function Index() {
             />
           )}
         {(sections.process_enabled || sections.brands_enabled) && (
+          <div id="inventory-band">
           <ImageBand
             src={resolveSiteImage(homepage.inventory_band.image, FALLBACK_IMAGES.inventory)}
+            slideshowSlides={brandSlideshow?.slides}
+            slideshowSettings={brandSlideshow?.settings}
+            slideshowLoading={slideshowLoading}
             eyebrow={homepage.inventory_band.eyebrow}
             title={homepage.inventory_band.title}
             subtitle={homepage.inventory_band.subtitle}
             align="right"
           />
+          </div>
         )}
-        {sections.testimonials_enabled && <TestimonialCarousel testimonials={testimonials} />}
+        {sections.testimonials_enabled && (
+          <div className="section-below-fold">
+            <TestimonialCarousel testimonials={testimonials} />
+          </div>
+        )}
         {sections.quote_enabled && <QuotePanel />}
         {sections.final_cta_enabled && <FinalCta callHref={callHref} hours={contact.hours} />}
       </div>

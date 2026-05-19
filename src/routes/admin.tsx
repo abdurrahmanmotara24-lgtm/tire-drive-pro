@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Image as ImageIcon,
   Images,
+  Presentation,
   Phone,
   MapPin,
   Sliders,
@@ -26,6 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { AdminKeyboardHelp } from "@/components/admin/admin-keyboard-help";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Tires Near You" }, { name: "robots", content: "noindex" }] }),
@@ -36,6 +38,7 @@ const nav = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/hero", label: "Hero", icon: ImageIcon },
   { to: "/admin/images", label: "Images", icon: Images },
+  { to: "/admin/brand-slideshow", label: "Brand Slideshow", icon: Presentation },
   { to: "/admin/sections", label: "Sections", icon: Sliders },
   { to: "/admin/services", label: "Services", icon: Wrench },
   { to: "/admin/testimonials", label: "Reviews", icon: MessageSquare },
@@ -201,6 +204,7 @@ function AdminLayout() {
           <Outlet />
         </div>
       </main>
+      <AdminKeyboardHelp />
     </div>
   );
 }

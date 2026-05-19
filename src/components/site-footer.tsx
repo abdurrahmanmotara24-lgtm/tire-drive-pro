@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter, MessageCircle } from "lucide-react";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { cn } from "@/lib/utils";
 
 export function SiteFooter({ className }: { className?: string }) {
-  const { contact, telHref, mailHref } = useContactContent();
+  const { contact, telHref, mailHref, waHref, hasPhone } = useContactContent();
 
   const socials = [
     { icon: Facebook, href: contact.facebook, label: "Facebook" },
@@ -18,7 +18,9 @@ export function SiteFooter({ className }: { className?: string }) {
         <div
           className={cn(
             "grid gap-8",
-            socials.length > 0 ? "grid-cols-2 md:grid-cols-3 md:gap-10" : "grid-cols-2 md:gap-10",
+            socials.length > 0
+              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:gap-10"
+              : "grid-cols-1 sm:grid-cols-2 md:gap-10",
           )}
         >
           <div>
@@ -84,7 +86,7 @@ export function SiteFooter({ className }: { className?: string }) {
             </ul>
           </div>
           {socials.length > 0 && (
-            <div className="col-span-2 md:col-span-1 md:col-start-3 md:row-start-1">
+            <div className="sm:col-span-2 md:col-span-1 md:col-start-3 md:row-start-1">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Follow</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {socials.map((s) => (
@@ -103,6 +105,28 @@ export function SiteFooter({ className }: { className?: string }) {
             </div>
           )}
         </div>
+        {(hasPhone || waHref) && (
+          <div className="mt-8 flex flex-col gap-2 border-t border-border pt-6 sm:hidden">
+            {hasPhone && telHref && (
+              <a
+                href={telHref}
+                className="hover-btn-primary flex min-h-11 items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground"
+              >
+                <Phone className="h-4 w-4" /> Call now
+              </a>
+            )}
+            {waHref && (
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noreferrer"
+                className="hover-btn-outline flex min-h-11 items-center justify-center gap-2 rounded-sm border border-border px-4 py-3 text-sm font-bold uppercase tracking-wider"
+              >
+                <MessageCircle className="h-4 w-4 text-primary" /> WhatsApp
+              </a>
+            )}
+          </div>
+        )}
         <p className="mt-6 border-t border-border pt-5 text-center text-xs text-muted-foreground md:mt-8">
           © {new Date().getFullYear()} Tires Near You. All rights reserved.
         </p>

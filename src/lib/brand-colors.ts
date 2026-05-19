@@ -30,13 +30,20 @@ export function coerceToBrandRed(color: string | undefined, fallback: string): s
 }
 
 export function resolveBrandPalette(
-  theme: Pick<ThemeContent, "primary" | "brand_green" | "brand_red_accent">,
+  theme: Pick<
+    ThemeContent,
+    "primary" | "primary_light" | "primary_dark" | "brand_green" | "brand_red_accent"
+  >,
   mode: "light" | "dark",
 ): BrandPalette {
   const fallback = mode === "light" ? BRAND_RED_LIGHT : BRAND_RED;
-  const primary = coerceToBrandRed(theme.primary, fallback);
+  const modePrimary =
+    mode === "light"
+      ? (theme.primary_light ?? theme.primary)
+      : (theme.primary_dark ?? theme.primary);
+  const primary = coerceToBrandRed(modePrimary, fallback);
   const brandRedAccent = coerceToBrandRed(
-    theme.brand_red_accent ?? theme.brand_green ?? theme.primary,
+    theme.brand_red_accent ?? theme.brand_green ?? modePrimary,
     primary,
   );
   return { primary, brandRedAccent };

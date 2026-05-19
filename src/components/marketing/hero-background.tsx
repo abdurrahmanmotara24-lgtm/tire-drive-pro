@@ -42,6 +42,8 @@ export function HeroBackground({ src, className = "", variant = "default", objec
       className={mediaClass}
       style={{ transform: `translate3d(0, ${parallax * -0.5}px, 0) scale(1.05)`, ...positionStyle }}
       fetchPriority="high"
+      sizes="100vw"
+      decoding="async"
     />
   );
 }

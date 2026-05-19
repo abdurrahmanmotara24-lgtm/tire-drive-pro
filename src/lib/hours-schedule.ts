@@ -114,3 +114,41 @@ export function getHoursStatusFromSchedule(schedule: HoursSchedule): { open: boo
     label: isOpen ? `Open now · until ${formatTime12h(day.close)}` : "Closed now",
   };
 }
+
+/** Human message for quote form success, based on today's hours. */
+export function getQuoteCallbackMessage(schedule: HoursSchedule): string {
+  const key = JS_DAY_TO_KEY[new Date().getDay()];
+  const day = schedule[key];
+
+  if (day.closed) {
+    return "We're closed today — we'll call on the next business day.";
+  }
+
+  const openH = parseTimeToHours(day.open);
+  const closeH = parseTimeToHours(day.close);
+  if (openH === null || closeH === null) {
+    return "We'll call you back during business hours.";
+  }
+
+  let end = closeH;
+  if (end <= openH) end += 12;
+
+  const now = new Date();
+  const hour = now.getHours() + now.getMinutes() / 60;
+  const isOpen = hour >= openH && hour < end;
+
+  if (isOpen) {
+    return `We'll call you back before ${formatTime12h(day.close)} today.`;
+  }
+
+  if (hour < openH) {
+    return `We're open from ${formatTime12h(day.open)} today — expect a call after we open.`;
+  }
+
+  return "We're closed for today — we'll call on the next business day.";
+}
+
+export function formatVehicleDescription(year: string, make: string, model: string): string {
+  const parts = [year.trim(), make.trim(), model.trim()].filter(Boolean);
+  return parts.join(" ");
+}

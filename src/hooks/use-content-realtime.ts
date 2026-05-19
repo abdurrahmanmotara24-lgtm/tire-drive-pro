@@ -20,8 +20,13 @@ export function useContentRealtime() {
         (payload) => {
           const key = (payload.new as { key?: string } | null)?.key
             ?? (payload.old as { key?: string } | null)?.key;
-          if (key) qc.invalidateQueries({ queryKey: ["content", key] });
-          else qc.invalidateQueries({ queryKey: ["content"] });
+          if (key) {
+            qc.invalidateQueries({ queryKey: ["content", key] });
+            if (key === "brand_slideshow") qc.invalidateQueries({ queryKey: ["brand_slideshow"] });
+          } else {
+            qc.invalidateQueries({ queryKey: ["content"] });
+            qc.invalidateQueries({ queryKey: ["brand_slideshow"] });
+          }
         },
       )
       .on(

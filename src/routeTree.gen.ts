@@ -31,6 +31,7 @@ import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminImagesRouteImport } from './routes/admin.images'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminContactRouteImport } from './routes/admin.contact'
+import { Route as AdminBrandSlideshowRouteImport } from './routes/admin.brand-slideshow'
 import { Route as AdminAboutRouteImport } from './routes/admin.about'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -143,6 +144,11 @@ const AdminContactRoute = AdminContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBrandSlideshowRoute = AdminBrandSlideshowRouteImport.update({
+  id: '/brand-slideshow',
+  path: '/brand-slideshow',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAboutRoute = AdminAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/about': typeof AdminAboutRoute
+  '/admin/brand-slideshow': typeof AdminBrandSlideshowRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/images': typeof AdminImagesRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/about': typeof AdminAboutRoute
+  '/admin/brand-slideshow': typeof AdminBrandSlideshowRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/images': typeof AdminImagesRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/about': typeof AdminAboutRoute
+  '/admin/brand-slideshow': typeof AdminBrandSlideshowRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/images': typeof AdminImagesRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/admin/about'
+    | '/admin/brand-slideshow'
     | '/admin/contact'
     | '/admin/hero'
     | '/admin/images'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/admin/about'
+    | '/admin/brand-slideshow'
     | '/admin/contact'
     | '/admin/hero'
     | '/admin/images'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/admin/about'
+    | '/admin/brand-slideshow'
     | '/admin/contact'
     | '/admin/hero'
     | '/admin/images'
@@ -469,6 +481,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContactRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/brand-slideshow': {
+      id: '/admin/brand-slideshow'
+      path: '/brand-slideshow'
+      fullPath: '/admin/brand-slideshow'
+      preLoaderRoute: typeof AdminBrandSlideshowRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/about': {
       id: '/admin/about'
       path: '/about'
@@ -481,6 +500,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAboutRoute: typeof AdminAboutRoute
+  AdminBrandSlideshowRoute: typeof AdminBrandSlideshowRoute
   AdminContactRoute: typeof AdminContactRoute
   AdminHeroRoute: typeof AdminHeroRoute
   AdminImagesRoute: typeof AdminImagesRoute
@@ -498,6 +518,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAboutRoute: AdminAboutRoute,
+  AdminBrandSlideshowRoute: AdminBrandSlideshowRoute,
   AdminContactRoute: AdminContactRoute,
   AdminHeroRoute: AdminHeroRoute,
   AdminImagesRoute: AdminImagesRoute,

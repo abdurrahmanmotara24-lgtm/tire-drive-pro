@@ -17,6 +17,8 @@ export type HeroContent = {
   cta_secondary_text: string;
   cta_secondary_link: string;
   background_image: string;
+  /** Optional hero photo tuned for light mode; falls back to background_image */
+  background_image_light?: string;
   overlay_opacity: number;
   focal_x?: number;
   focal_y?: number;
@@ -105,8 +107,22 @@ export type AboutContent = {
 };
 export type ProcessStep = { step: string; title: string; desc: string };
 
+export type {
+  BrandSlideshowContent,
+  BrandSlideshowSettings,
+  BrandSlideshowSlide,
+} from "@/lib/brand-slideshow";
+import {
+  DEFAULT_BRAND_SLIDESHOW,
+  resolveBrandSlideshow,
+  type BrandSlideshowContent,
+} from "@/lib/brand-slideshow";
+
 export type ThemeContent = {
   primary: string;
+  /** Optional separate primaries per resolved mode (falls back to primary) */
+  primary_light?: string;
+  primary_dark?: string;
   brand_green?: string;
   brand_red_accent?: string;
   brand_red: string;
@@ -223,12 +239,15 @@ export const DEFAULTS = {
   ] as ProcessStep[],
   theme: {
     primary: "oklch(0.48 0.2 27)",
+    primary_light: "oklch(0.48 0.2 27)",
+    primary_dark: "oklch(0.54 0.21 27)",
     brand_red_accent: "oklch(0.48 0.2 27)",
     brand_red: "oklch(0.82 0.01 0)",
     radius: "0.5rem",
     font: "Source Sans 3",
     palette_version: THEME_PALETTE_VERSION,
   } as ThemeContent,
+  brand_slideshow: DEFAULT_BRAND_SLIDESHOW,
   seo: {
     title: "Tires Near You — Premium Tires & Performance Fitment",
     description:
@@ -248,6 +267,7 @@ export type ContentMap = {
   about: AboutContent;
   process: ProcessStep[];
   theme: ThemeContent;
+  brand_slideshow: BrandSlideshowContent;
   seo: SeoContent;
 };
 
@@ -303,6 +323,9 @@ export async function fetchContent<K extends keyof ContentMap>(
     }
     if (key === "homepage") {
       return resolveHomepage(stored as Partial<HomepageContent> | null) as ContentMap[K];
+    }
+    if (key === "brand_slideshow") {
+      return resolveBrandSlideshow(stored as Partial<BrandSlideshowContent> | null) as ContentMap[K];
     }
     return merged;
   } catch (e) {

@@ -1,14 +1,11 @@
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { SectionHeading } from "./section-heading";
 
 type Props = { brands: string[]; priority?: boolean };
 
 export function BrandMarquee({ brands, priority }: Props) {
-  const [reducedMotion, setReducedMotion] = useState(false);
-  useEffect(() => {
-    setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
+  const reducedMotion = usePrefersReducedMotion();
 
   const row1 = [...brands, ...brands];
   const row2 = [...[...brands].reverse(), ...[...brands].reverse()];
@@ -29,9 +26,9 @@ export function BrandMarquee({ brands, priority }: Props) {
             align="center"
           />
         </div>
-        <ul className="container-tny flex flex-wrap justify-center gap-x-8 gap-y-4">
+        <ul className="container-tny flex flex-wrap justify-center gap-x-6 gap-y-3 sm:gap-x-8 sm:gap-y-4">
           {brands.map((b) => (
-            <li key={b} className="font-display text-xl tracking-[0.12em] text-muted-foreground">
+            <li key={b} className="font-display text-lg tracking-[0.12em] text-muted-foreground sm:text-xl">
               {b}
             </li>
           ))}
@@ -50,13 +47,13 @@ export function BrandMarquee({ brands, priority }: Props) {
           align="center"
         />
       </div>
-      <div className="marquee-fade space-y-4">
+      <div className="marquee-fade space-y-3 sm:space-y-4">
         <div className="overflow-hidden">
-          <div className="marquee-track gap-16 px-4">
+          <div className="marquee-track gap-10 px-4 sm:gap-16">
             {row1.map((b, i) => (
               <span
                 key={`a-${b}-${i}`}
-                className="hover-brand font-display shrink-0 text-2xl tracking-[0.12em] text-muted-foreground sm:text-3xl"
+                className="hover-brand font-display shrink-0 text-xl tracking-[0.12em] text-muted-foreground sm:text-2xl md:text-3xl"
               >
                 {b}
               </span>
@@ -64,11 +61,11 @@ export function BrandMarquee({ brands, priority }: Props) {
           </div>
         </div>
         <div className="overflow-hidden">
-          <div className="marquee-track marquee-track-reverse gap-16 px-4">
+          <div className="marquee-track marquee-track-reverse gap-10 px-4 sm:gap-16">
             {row2.map((b, i) => (
               <span
                 key={`b-${b}-${i}`}
-                className="hover-brand font-display shrink-0 text-xl tracking-[0.12em] text-muted-foreground/70 sm:text-2xl"
+                className="hover-brand font-display shrink-0 text-lg tracking-[0.12em] text-muted-foreground/70 sm:text-xl md:text-2xl"
               >
                 {b}
               </span>

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Upload, X } from "lucide-react";
+import { compressImageForUpload } from "@/lib/compress-image";
 import { toast } from "sonner";
 
 const BUCKET = "site-media";
@@ -29,10 +30,14 @@ export function useMediaList() {
 }
 
 export async function uploadFile(file: File): Promise<string> {
-  const ext = file.name.split(".").pop() ?? "bin";
-  const safe = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+  const prepared = await compressImageForUpload(file);
+  const ext = prepared.name.split(".").pop() ?? "bin";
+  const safe = prepared.name.replace(/[^a-zA-Z0-9.-]/g, "_");
   const path = `${Date.now()}-${safe.slice(0, 60)}`;
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: false, contentType: file.type });
+  const { error } = await supabase.storage.from(BUCKET).upload(path, prepared, {
+    upsert: false,
+    contentType: prepared.type,
+  });
   if (error) throw error;
   return publicUrl(path);
 }

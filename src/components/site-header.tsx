@@ -2,6 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Menu, Phone, X } from "lucide-react";
 import logo from "@/assets/logo.png";
+import logoWebp from "@/assets/logo.webp";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/theme-mode-toggle";
@@ -31,7 +32,7 @@ export function SiteHeader() {
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 80);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -96,10 +97,14 @@ export function SiteHeader() {
       ref={headerRef}
       data-over-hero={overHero ? "true" : undefined}
       data-menu-open={menuOpen ? "true" : undefined}
+      data-scrolled={scrolled ? "true" : undefined}
       className={cn(
-        "site-header fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,box-shadow] duration-300",
+        "site-header fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300",
         showSolidBg
-          ? "border-b border-border bg-background/95 shadow-sm backdrop-blur-md"
+          ? cn(
+              "border-b border-border bg-background/95 backdrop-blur-md",
+              scrolled ? "shadow-md" : "shadow-sm",
+            )
           : "border-b border-transparent max-lg:border-border/40 max-lg:bg-background/90 max-lg:backdrop-blur-md",
         overHero && "lg:border-transparent lg:bg-transparent lg:shadow-none lg:backdrop-blur-none",
       )}
@@ -115,13 +120,16 @@ export function SiteHeader() {
         {showHeaderLogo ? (
           <div className="site-header-brand flex min-w-0 items-center justify-self-start">
             <Link to="/" className="hover-logo block leading-none" onClick={closeMenu}>
-              <img
-                src={logo}
-                alt="Tyres Near Me"
-                width={1024}
-                height={512}
-                className="site-header-logo-img h-10 w-auto max-w-[min(72vw,10rem)] bg-white sm:h-11 sm:max-w-[11rem] lg:h-12 lg:max-w-[12rem] xl:h-14 xl:max-w-[14rem]"
-              />
+              <picture>
+                <source srcSet={logoWebp} type="image/webp" />
+                <img
+                  src={logo}
+                  alt="Tyres Near Me"
+                  width={1024}
+                  height={512}
+                  className="site-header-logo-img h-10 w-auto max-w-[min(72vw,10rem)] sm:h-11 sm:max-w-[11rem] lg:h-12 lg:max-w-[12rem] xl:h-14 xl:max-w-[14rem]"
+                />
+              </picture>
             </Link>
           </div>
         ) : null}
@@ -155,12 +163,21 @@ export function SiteHeader() {
           )}
         >
           {hasPhone && telHref && (
-            <a
-              href={telHref}
-              className="site-header-call hover-btn-outline hover-icon-bump hidden items-center gap-1.5 rounded-sm border border-border px-4 py-2 text-xs font-bold uppercase tracking-wider lg:inline-flex"
-            >
-              <Phone className="icon-bump h-3.5 w-3.5" /> Call
-            </a>
+            <>
+              <a
+                href={telHref}
+                className="site-header-call-mobile touch-target hover-btn-outline hover-icon-bump inline-flex items-center justify-center rounded-sm border border-border lg:hidden"
+                aria-label="Call us"
+              >
+                <Phone className="icon-bump h-4 w-4" />
+              </a>
+              <a
+                href={telHref}
+                className="site-header-call hover-btn-outline hover-icon-bump hidden items-center gap-1.5 rounded-sm border border-border px-4 py-2 text-xs font-bold uppercase tracking-wider lg:inline-flex"
+              >
+                <Phone className="icon-bump h-3.5 w-3.5" /> Call
+              </a>
+            </>
           )}
           <ThemeModeToggle />
           <button

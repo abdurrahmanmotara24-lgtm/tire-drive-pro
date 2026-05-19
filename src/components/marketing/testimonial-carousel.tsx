@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
@@ -24,6 +24,8 @@ export function TestimonialCarousel({ testimonials }: { testimonials: Testimonia
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [slideHeight, setSlideHeight] = useState<number | undefined>();
+  const viewportRef = useRef<HTMLDivElement | null>(null);
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
@@ -45,6 +47,32 @@ export function TestimonialCarousel({ testimonials }: { testimonials: Testimonia
       emblaApi.off("reInit", onSelect);
     };
   }, [emblaApi, onSelect]);
+
+  const setViewportRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      viewportRef.current = node;
+      emblaRef(node);
+    },
+    [emblaRef],
+  );
+
+  useLayoutEffect(() => {
+    if (!emblaApi) return;
+    const measure = () => {
+      const slide = emblaApi.slideNodes()[emblaApi.selectedScrollSnap()];
+      if (slide) setSlideHeight(slide.offsetHeight);
+    };
+    measure();
+    emblaApi.on("select", measure);
+    emblaApi.on("reInit", measure);
+    const ro = new ResizeObserver(measure);
+    if (viewportRef.current) ro.observe(viewportRef.current);
+    return () => {
+      emblaApi.off("select", measure);
+      emblaApi.off("reInit", measure);
+      ro.disconnect();
+    };
+  }, [emblaApi]);
 
   return (
     <section id="testimonials" ref={reveal.ref} className={`section ${reveal.className}`}>
@@ -72,7 +100,11 @@ export function TestimonialCarousel({ testimonials }: { testimonials: Testimonia
             </button>
           </div>
         </div>
-        <div className="mt-8 overflow-hidden" ref={emblaRef}>
+        <div
+          className="testimonial-carousel__viewport mt-8 overflow-hidden"
+          ref={setViewportRef}
+          style={slideHeight != null ? { height: slideHeight } : undefined}
+        >
           <div className="flex gap-4">
             {testimonials.map((t) => (
               <article

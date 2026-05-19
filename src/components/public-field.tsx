@@ -10,6 +10,7 @@ type PublicFieldProps = {
   error?: string;
   optional?: boolean;
   type?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   placeholder?: string;
   as?: "input" | "textarea";
   rows?: number;
@@ -23,6 +24,7 @@ export function PublicField({
   error,
   optional,
   type = "text",
+  inputMode,
   placeholder,
   as = "input",
   rows = 4,
@@ -56,6 +58,7 @@ export function PublicField({
           id={id}
           name={name}
           type={type}
+          inputMode={inputMode}
           placeholder={placeholder}
           disabled={disabled}
           aria-invalid={!!error}

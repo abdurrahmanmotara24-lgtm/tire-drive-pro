@@ -11,6 +11,8 @@ import {
 import appCss from "../styles.css?url";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { MobileContactBar } from "@/components/mobile-contact-bar";
+import { ScrollToTopButton } from "@/components/scroll-to-top-button";
 import { ThemeApplier } from "@/components/theme-applier";
 import { MessageCircle } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
@@ -65,6 +67,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#0c0c0c" },
       { title: DEFAULTS.seo.title },
       { name: "description", content: DEFAULTS.seo.description },
       { property: "og:title", content: DEFAULTS.seo.title },
@@ -147,14 +150,16 @@ function RootComponent() {
           className={cn(
             "flex-1",
             isChrome && !isHome && "has-mobile-top-nav",
+            isChrome && "has-mobile-bottom-bar",
           )}
           tabIndex={-1}
         >
           <Outlet />
         </main>
-        {isChrome && <SiteFooter />}
-        
+        {isChrome && <SiteFooter className="has-mobile-footer-pad" />}
+        {isChrome && <MobileContactBar />}
         {isChrome && <WhatsAppFab />}
+        {isChrome && <ScrollToTopButton />}
         <Toaster />
       </div>
     </QueryClientProvider>
