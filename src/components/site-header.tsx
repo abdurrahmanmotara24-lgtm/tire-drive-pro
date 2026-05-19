@@ -11,6 +11,7 @@ const nav = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/locations", label: "Locations" },
+  { to: "/hours", label: "Hours" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -55,21 +56,21 @@ export function SiteHeader() {
         scrolled ? "border-b border-border bg-background/95 backdrop-blur-md" : "md:bg-transparent",
       )}
     >
-      <div className="container-tny grid w-full min-h-[4.5rem] grid-cols-[1fr_auto_1fr] items-center gap-1.5 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] max-[380px]:gap-1 md:min-h-[7.875rem] md:grid-cols-[auto_1fr_auto] md:gap-x-6 md:py-3 lg:min-h-[8.625rem] lg:gap-x-10">
+      <div className="container-tny grid w-full min-h-[4.5rem] grid-cols-[auto_1fr] items-center gap-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] max-[380px]:gap-2 md:min-h-[7.875rem] md:grid-cols-[auto_1fr_auto] md:gap-x-6 md:py-3 lg:min-h-[8.625rem] lg:gap-x-10">
         <Link
           to="/"
-          className="hover-logo col-start-1 flex min-w-0 items-center justify-self-start max-[380px]:max-w-[72%] sm:max-w-none"
+          className="hover-logo col-start-1 flex min-w-0 items-center justify-self-start"
         >
           <img
             src={logo}
             alt="Tires Near You"
             width={360}
             height={108}
-            className="h-[4.5rem] w-auto sm:h-[4.875rem] md:h-24 lg:h-[6.75rem]"
+            className="h-20 w-auto sm:h-[5.25rem] md:h-24 lg:h-[6.75rem]"
           />
         </Link>
 
-        <div className="site-header-mobile-actions col-start-2 flex items-center justify-center gap-0.5 max-[380px]:gap-0 md:hidden">
+        <div className="site-header-mobile-actions col-start-2 flex items-center justify-end gap-1.5 justify-self-end max-[380px]:gap-1 md:hidden">
           <MobileIconNav />
           <ThemeModeToggle />
         </div>

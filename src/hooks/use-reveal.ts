@@ -8,10 +8,23 @@ export function useReveal<T extends HTMLElement>() {
     const el = ref.current;
     if (!el) return;
     document.documentElement.classList.add("js");
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       setVisible(true);
       return;
     }
+
+    // If element is already within (or close to) the viewport on mount, reveal immediately.
+    const rect = el.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    if (rect.top < vh + 200 && rect.bottom > -200) {
+      setVisible(true);
+      return;
+    }
+
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -19,10 +32,12 @@ export function useReveal<T extends HTMLElement>() {
           io.disconnect();
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+      { threshold: 0.01, rootMargin: "0px 0px 10% 0px" },
     );
     io.observe(el);
-    const fallback = window.setTimeout(() => setVisible(true), 2500);
+
+    // Safety net — never let content stay hidden.
+    const fallback = window.setTimeout(() => setVisible(true), 900);
     return () => {
       window.clearTimeout(fallback);
       io.disconnect();

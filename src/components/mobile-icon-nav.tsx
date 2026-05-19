@@ -1,11 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Info, Phone, MapPin } from "lucide-react";
+import { Home, Info, Phone, MapPin, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const routes = [
   { to: "/", label: "Home", icon: Home, exact: true },
   { to: "/about", label: "About", icon: Info, exact: false },
   { to: "/locations", label: "Locations", icon: MapPin, exact: false },
+  { to: "/hours", label: "Hours", icon: Clock, exact: false },
   { to: "/contact", label: "Contact", icon: Phone, exact: false },
 ] as const;
 
@@ -19,7 +20,7 @@ export function MobileIconNav() {
 
   return (
     <nav
-      className="mobile-icon-nav flex min-w-0 shrink-0 items-center justify-center gap-0.5 max-[380px]:gap-0 md:hidden"
+      className="mobile-icon-nav flex min-w-0 shrink-0 items-center justify-end gap-1.5 max-[380px]:gap-1 md:hidden"
       aria-label="Mobile quick navigation"
     >
       {routes.map((item) => {

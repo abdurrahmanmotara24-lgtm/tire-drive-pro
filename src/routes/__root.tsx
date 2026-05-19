@@ -19,7 +19,8 @@ import { cn } from "@/lib/utils";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { DEFAULTS } from "@/lib/site-content";
 import { colorModeScript } from "@/components/color-mode-script";
-import { MobileContactBar } from "@/components/mobile-contact-bar";
+
+import { useContentRealtime } from "@/hooks/use-content-realtime";
 
 function NotFoundComponent() {
   return (
@@ -89,12 +90,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: colorModeScript }} />
         <HeadContent />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {children}
         <Scripts />
       </body>
@@ -118,6 +119,11 @@ function WhatsAppFab() {
   );
 }
 
+function RealtimeBridge() {
+  useContentRealtime();
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const location = useLocation();
@@ -126,6 +132,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <RealtimeBridge />
       <ThemeApplier />
       <a
         href="#main"
@@ -139,15 +146,14 @@ function RootComponent() {
           id="main"
           className={cn(
             "flex-1",
-            isChrome && "has-mobile-bottom-bar",
             isChrome && !isHome && "has-mobile-top-nav",
           )}
           tabIndex={-1}
         >
           <Outlet />
         </main>
-        {isChrome && <SiteFooter className="has-mobile-footer-pad" />}
-        {isChrome && <MobileContactBar />}
+        {isChrome && <SiteFooter />}
+        
         {isChrome && <WhatsAppFab />}
         <Toaster />
       </div>
