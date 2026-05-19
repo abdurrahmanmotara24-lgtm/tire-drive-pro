@@ -146,14 +146,13 @@ function RootComponent() {
           id="main"
           className={cn(
             "flex-1",
-            isChrome && "has-mobile-bottom-bar",
             isChrome && !isHome && "has-mobile-top-nav",
           )}
           tabIndex={-1}
         >
           <Outlet />
         </main>
-        {isChrome && <SiteFooter className="has-mobile-footer-pad" />}
+        {isChrome && <SiteFooter />}
         
         {isChrome && <WhatsAppFab />}
         <Toaster />
