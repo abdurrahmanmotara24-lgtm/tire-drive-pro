@@ -13,6 +13,12 @@ export function isSupabaseConfigured(): boolean {
   return isSupabasePublicEnvConfigured();
 }
 
+export function requireSupabaseConfigured(): void {
+  if (!isSupabaseConfigured()) {
+    throw new Error(LOVABLE_CLOUD_CREDENTIALS_HINT);
+  }
+}
+
 function createSupabaseClient(): SupabaseClient | null {
   const { url, key } = readSupabasePublicEnv();
 

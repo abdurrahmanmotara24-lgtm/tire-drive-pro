@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
-import { ensureLovableCloudBackend, type CloudBackendStatus } from "@/lib/lovable-cloud-backend";
+import {
+  CLOUD_CREDENTIALS_READY_EVENT,
+  ensureLovableCloudBackend,
+  type CloudBackendStatus,
+} from "@/lib/lovable-cloud-backend";
 
 export function useLovableCloudBackend(): CloudBackendStatus {
   const [status, setStatus] = useState<CloudBackendStatus>(() =>
@@ -8,19 +12,27 @@ export function useLovableCloudBackend(): CloudBackendStatus {
   );
 
   useEffect(() => {
-    if (isSupabaseConfigured()) {
-      setStatus("ready");
-      return;
-    }
+    const sync = () => {
+      if (isSupabaseConfigured()) setStatus("ready");
+    };
+
+    sync();
+    if (isSupabaseConfigured()) return;
+
+    window.addEventListener(CLOUD_CREDENTIALS_READY_EVENT, sync);
+
+    const poll = window.setInterval(sync, 250);
 
     let cancelled = false;
     void ensureLovableCloudBackend().then((ok) => {
       if (cancelled) return;
-      setStatus(ok ? "ready" : "unavailable");
+      setStatus(ok || isSupabaseConfigured() ? "ready" : "unavailable");
     });
 
     return () => {
       cancelled = true;
+      window.removeEventListener(CLOUD_CREDENTIALS_READY_EVENT, sync);
+      window.clearInterval(poll);
     };
   }, []);
 

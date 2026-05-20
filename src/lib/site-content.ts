@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { requireSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { isSupabasePublicEnvConfigured, readSupabasePublicEnv } from "@/lib/env";
 import {
   DEFAULT_HOURS_SCHEDULE,
@@ -338,6 +338,7 @@ export async function saveContent<K extends keyof ContentMap>(
   key: K,
   value: ContentMap[K],
 ): Promise<void> {
+  requireSupabaseConfigured();
   const { error } = await supabase
     .from("site_content")
     .upsert({ key, value: value as never }, { onConflict: "key" });

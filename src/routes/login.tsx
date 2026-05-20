@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import { AdminCloudGate } from "@/components/admin/admin-cloud-gate";
 import { useLovableCloudBackend } from "@/hooks/use-lovable-cloud-backend";
-import { LOVABLE_CLOUD_CREDENTIALS_HINT } from "@/lib/lovable-cloud-backend";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Admin Login — Tires Near You" }] }),
@@ -15,8 +15,17 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const navigate = useNavigate();
   const cloudBackend = useLovableCloudBackend();
+
+  return (
+    <AdminCloudGate status={cloudBackend}>
+      <LoginForm />
+    </AdminCloudGate>
+  );
+}
+
+function LoginForm() {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -54,11 +63,6 @@ function LoginPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           {mode === "login" ? "Sign in to manage your website." : "Create an admin account."}
         </p>
-        {cloudBackend === "unavailable" && (
-          <p className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-950">
-            Cannot sign in yet — {LOVABLE_CLOUD_CREDENTIALS_HINT}
-          </p>
-        )}
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
             <Label htmlFor="email">Email</Label>
@@ -73,7 +77,7 @@ function LoginPage() {
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">
-          <button onClick={() => setMode(mode === "login" ? "signup" : "login")} className="text-primary hover:underline">
+          <button type="button" onClick={() => setMode(mode === "login" ? "signup" : "login")} className="text-primary hover:underline">
             {mode === "login" ? "Need an account? Sign up" : "Already have an account? Sign in"}
           </button>
         </div>

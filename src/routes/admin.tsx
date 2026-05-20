@@ -28,8 +28,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { AdminKeyboardHelp } from "@/components/admin/admin-keyboard-help";
+import { AdminCloudGate } from "@/components/admin/admin-cloud-gate";
 import { useLovableCloudBackend } from "@/hooks/use-lovable-cloud-backend";
-import { LOVABLE_CLOUD_CREDENTIALS_HINT } from "@/lib/lovable-cloud-backend";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Tires Near You" }, { name: "robots", content: "noindex" }] }),
@@ -118,6 +118,35 @@ function AdminLayout() {
     };
   }, []);
 
+  return (
+    <AdminCloudGate status={cloudBackend}>
+      <AdminLayoutBody
+        user={user}
+        isStaff={isStaff}
+        loading={loading}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        navigate={navigate}
+      />
+    </AdminCloudGate>
+  );
+}
+
+function AdminLayoutBody({
+  user,
+  isStaff,
+  loading,
+  menuOpen,
+  setMenuOpen,
+  navigate,
+}: {
+  user: ReturnType<typeof useAuth>["user"];
+  isStaff: boolean;
+  loading: boolean;
+  menuOpen: boolean;
+  setMenuOpen: (open: boolean) => void;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
   if (loading) {
     return <div className="admin-light flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">Loading…</div>;
   }
@@ -125,7 +154,7 @@ function AdminLayout() {
 
   if (!isStaff) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="admin-light flex min-h-screen items-center justify-center px-4">
         <div className="max-w-md text-center">
           <h1 className="text-2xl font-bold">Access pending</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -204,15 +233,6 @@ function AdminLayout() {
 
       <main className="mt-12 flex-1 md:ml-0 md:mt-0">
         <div className="mx-auto w-full max-w-[1600px] p-4 md:p-8">
-          {cloudBackend === "unavailable" && (
-            <div
-              role="alert"
-              className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950"
-            >
-              <p className="font-semibold">Cloud keys not loaded in this preview</p>
-              <p className="mt-1 text-xs">{LOVABLE_CLOUD_CREDENTIALS_HINT}</p>
-            </div>
-          )}
           <Outlet />
         </div>
       </main>
