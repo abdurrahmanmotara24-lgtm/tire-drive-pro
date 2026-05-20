@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
-import { SUPABASE_PUBLIC_ENV_HINT } from "@/lib/env";
+import { LOVABLE_CLOUD_BACKEND_HINT } from "@/lib/env";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Admin Login — Tires Near You" }] }),
@@ -55,7 +55,7 @@ function LoginPage() {
         </p>
         {!isSupabaseConfigured() && (
           <p className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-950">
-            Cannot sign in yet — {SUPABASE_PUBLIC_ENV_HINT}
+            Cannot sign in yet — {LOVABLE_CLOUD_BACKEND_HINT}
           </p>
         )}
         <form onSubmit={submit} className="mt-6 space-y-4">

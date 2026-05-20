@@ -8,6 +8,9 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
 // @cloudflare/vite-plugin builds from this — wrangler.jsonc main alone is insufficient.
+//
+// IMPORTANT: src/routeTree.gen.ts must end with the `declare module '@tanstack/react-start'`
+// Register block. If that block is removed, Lovable preview fails with "Worker bundle not found".
 export default defineConfig({
   tanstackStart: {
     server: { entry: "./src/server.ts" },

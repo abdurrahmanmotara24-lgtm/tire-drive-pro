@@ -1,8 +1,12 @@
+/**
+ * Lovable Cloud runs a managed Supabase backend and auto-injects public URL + key into the app.
+ * There is no separate "Connect Supabase" integration when Cloud is enabled on the project.
+ */
 type EnvBag = Record<string, string | undefined>;
 
 const SUPABASE_URL_KEYS = ["VITE_SUPABASE_URL", "SUPABASE_URL"] as const;
 
-/** Lovable Cloud / Supabase use both publishable and legacy anon key names. */
+/** Auto-injected by Lovable Cloud (publishable + legacy anon key names). */
 const SUPABASE_KEY_KEYS = [
   "VITE_SUPABASE_PUBLISHABLE_KEY",
   "VITE_SUPABASE_ANON_KEY",
@@ -31,61 +35,67 @@ function readFromEnvBag(env: EnvBag): { url?: string; key?: string } {
   return url && key ? { url, key } : {};
 }
 
-function readFromProcessEnv(): { url?: string; key?: string } {
-  if (typeof process === "undefined" || !process.env) return {};
-  return readFromEnvBag(process.env as EnvBag);
+/** Safe read — Lovable inlines process.env.* at build time; guard when process is missing in browser. */
+function readProcessEnv(key: string): string | undefined {
+  try {
+    if (typeof process !== "undefined" && process.env) {
+      const value = process.env[key];
+      if (typeof value === "string" && value.length > 0) return value;
+    }
+  } catch {
+    /* preview sandbox */
+  }
+  return undefined;
 }
 
 /**
- * Read Supabase public credentials without touching `process` in the browser bundle
- * (avoids ReferenceError in Lovable preview when process is undefined).
+ * Read Lovable Cloud public credentials for the browser bundle.
+ * Matches the pre-regression pattern (import.meta.env + process.env fallbacks) from when admin worked.
  */
 export function readSupabasePublicEnv(): { url?: string; key?: string } {
-  // Lovable Cloud injects these at build time (same as before admin worked).
-  const viteUrl = import.meta.env.VITE_SUPABASE_URL;
-  const viteKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  if (typeof viteUrl === "string" && viteUrl && typeof viteKey === "string" && viteKey) {
-    return { url: viteUrl, key: viteKey };
+  const url =
+    import.meta.env.VITE_SUPABASE_URL ||
+    readProcessEnv("SUPABASE_URL") ||
+    readProcessEnv("VITE_SUPABASE_URL");
+  const key =
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    readProcessEnv("SUPABASE_PUBLISHABLE_KEY") ||
+    readProcessEnv("VITE_SUPABASE_PUBLISHABLE_KEY");
+
+  if (typeof url === "string" && url && typeof key === "string" && key) {
+    return { url, key };
   }
 
   if (typeof window !== "undefined" && window.__TNY_SUPABASE_PUBLIC__) {
-    const { url, key } = window.__TNY_SUPABASE_PUBLIC__;
-    if (url && key) return { url, key };
+    const injected = window.__TNY_SUPABASE_PUBLIC__;
+    if (injected.url && injected.key) return injected;
   }
 
   const fromMeta = readFromEnvBag(import.meta.env as EnvBag);
   if (fromMeta.url && fromMeta.key) return fromMeta;
 
-  if (import.meta.env.SSR) {
-    return readFromProcessEnv();
-  }
-
   return {};
 }
 
-/**
- * Inline script for RootShell: copies Lovable Cloud server secrets into `window`
- * so the admin client can authenticate after hydration.
- */
-export function buildSupabaseRuntimeScript(): string | null {
-  if (typeof window !== "undefined") return null;
+/** Shown when Lovable Cloud credentials are not reaching the browser preview. */
+export const LOVABLE_CLOUD_BACKEND_HINT =
+  "Open the Cloud tab and confirm Cloud is enabled, then restart the preview. For local npm run dev, copy the auto-generated URL and publishable key from Cloud → Secrets into a .env file.";
 
-  const fromProcess = readFromProcessEnv();
-  const fromMeta = readFromEnvBag(import.meta.env as EnvBag);
-  const url = fromProcess.url ?? fromMeta.url;
-  const key = fromProcess.key ?? fromMeta.key;
-
-  if (!url || !key) return null;
-
-  const payload = JSON.stringify({ url, key });
-  return `(function(){try{window.__TNY_SUPABASE_PUBLIC__=${payload}}catch(e){}})();`;
-}
-
-/** Shown when auto-injected Lovable Cloud credentials are not reaching the browser. */
-export const SUPABASE_PUBLIC_ENV_HINT =
-  "Reconnect Supabase under Lovable → Integrations (credentials are injected automatically), then restart the preview.";
+/** @deprecated Use LOVABLE_CLOUD_BACKEND_HINT */
+export const SUPABASE_PUBLIC_ENV_HINT = LOVABLE_CLOUD_BACKEND_HINT;
 
 export function isSupabasePublicEnvConfigured(): boolean {
   const { url, key } = readSupabasePublicEnv();
   return Boolean(url && key);
+}
+
+/** Inline script for RootShell — must live in env.ts (not env.server) so __root does not import server-only modules. */
+export function buildSupabaseRuntimeScript(): string | null {
+  if (typeof window !== "undefined") return null;
+
+  const { url, key } = readSupabasePublicEnv();
+  if (!url || !key) return null;
+
+  const payload = JSON.stringify({ url, key });
+  return `(function(){try{window.__TNY_SUPABASE_PUBLIC__=${payload}}catch(e){}})();`;
 }
