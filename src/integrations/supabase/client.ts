@@ -102,18 +102,11 @@ function createStubClient(): SupabaseClient {
 
 let _supabase: SupabaseClient | null | undefined;
 
-export function resetSupabaseClientCache(): void {
-  _supabase = undefined;
-}
-
 function getClient(): SupabaseClient {
-  const live = createSupabaseClient();
-  if (live) {
-    _supabase = live;
-    return live;
+  if (_supabase === undefined) {
+    _supabase = createSupabaseClient();
   }
-  if (_supabase) return _supabase;
-  return createStubClient();
+  return _supabase ?? createStubClient();
 }
 
 // Import the supabase client like this:

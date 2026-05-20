@@ -19,7 +19,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ApiNotifyLeadRouteImport } from './routes/api/notify-lead'
-import { Route as ApiCloudPublicConfigRouteImport } from './routes/api/cloud-public-config'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminThemeRouteImport } from './routes/admin.theme'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
@@ -83,11 +82,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const ApiNotifyLeadRoute = ApiNotifyLeadRouteImport.update({
   id: '/api/notify-lead',
   path: '/api/notify-lead',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCloudPublicConfigRoute = ApiCloudPublicConfigRouteImport.update({
-  id: '/api/cloud-public-config',
-  path: '/api/cloud-public-config',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -184,7 +178,6 @@ export interface FileRoutesByFullPath {
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/theme': typeof AdminThemeRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/cloud-public-config': typeof ApiCloudPublicConfigRoute
   '/api/notify-lead': typeof ApiNotifyLeadRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -210,7 +203,6 @@ export interface FileRoutesByTo {
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/theme': typeof AdminThemeRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/cloud-public-config': typeof ApiCloudPublicConfigRoute
   '/api/notify-lead': typeof ApiNotifyLeadRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -238,7 +230,6 @@ export interface FileRoutesById {
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/theme': typeof AdminThemeRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/cloud-public-config': typeof ApiCloudPublicConfigRoute
   '/api/notify-lead': typeof ApiNotifyLeadRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -267,7 +258,6 @@ export interface FileRouteTypes {
     | '/admin/testimonials'
     | '/admin/theme'
     | '/admin/users'
-    | '/api/cloud-public-config'
     | '/api/notify-lead'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -293,7 +283,6 @@ export interface FileRouteTypes {
     | '/admin/testimonials'
     | '/admin/theme'
     | '/admin/users'
-    | '/api/cloud-public-config'
     | '/api/notify-lead'
     | '/admin'
   id:
@@ -320,7 +309,6 @@ export interface FileRouteTypes {
     | '/admin/testimonials'
     | '/admin/theme'
     | '/admin/users'
-    | '/api/cloud-public-config'
     | '/api/notify-lead'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -334,7 +322,6 @@ export interface RootRouteChildren {
   LocationsRoute: typeof LocationsRoute
   LoginRoute: typeof LoginRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ApiCloudPublicConfigRoute: typeof ApiCloudPublicConfigRoute
   ApiNotifyLeadRoute: typeof ApiNotifyLeadRoute
 }
 
@@ -408,13 +395,6 @@ declare module '@tanstack/react-router' {
       path: '/api/notify-lead'
       fullPath: '/api/notify-lead'
       preLoaderRoute: typeof ApiNotifyLeadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/cloud-public-config': {
-      id: '/api/cloud-public-config'
-      path: '/api/cloud-public-config'
-      fullPath: '/api/cloud-public-config'
-      preLoaderRoute: typeof ApiCloudPublicConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
@@ -565,7 +545,6 @@ const rootRouteChildren: RootRouteChildren = {
   LocationsRoute: LocationsRoute,
   LoginRoute: LoginRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  ApiCloudPublicConfigRoute: ApiCloudPublicConfigRoute,
   ApiNotifyLeadRoute: ApiNotifyLeadRoute,
 }
 export const routeTree = rootRouteImport
