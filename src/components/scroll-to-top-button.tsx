@@ -22,7 +22,7 @@ export function ScrollToTopButton({ className }: { className?: string }) {
 
   useEffect(() => {
     let observer: IntersectionObserver | null = null;
-    let pollId: ReturnType<typeof setInterval> | undefined;
+    let pollId: number | undefined;
 
     const attach = () => {
       const anchor = document.getElementById(SCROLL_ANCHOR_ID);
