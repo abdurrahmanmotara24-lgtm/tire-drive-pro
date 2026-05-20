@@ -52,7 +52,8 @@ function About() {
               alt="Technician at work"
               width={1200}
               height={900}
-              loading="lazy"
+              loading="eager"
+              decoding="async"
               className="aspect-[4/3] w-full rounded-sm object-cover"
             />
           </div>

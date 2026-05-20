@@ -50,7 +50,15 @@ export function ImageBand({
           <ImageBandSlideshowBg slides={slideshowSlides} settings={slideshowSettings} />
         </>
       ) : (
-        <img src={src} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+        <img
+          src={src}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+          decoding="async"
+          fetchPriority="low"
+        />
+
       )}
       <div
         className={cn(
