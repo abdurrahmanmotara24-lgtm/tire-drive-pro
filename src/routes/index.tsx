@@ -73,16 +73,9 @@ function Index() {
     placeholderData: DEFAULTS.homepage,
   });
 
-  const contentBootstrapping = !heroQuery.isFetched;
-
-  if (contentBootstrapping) {
-    return (
-      <>
-        <SeoMeta />
-        <HomePageSkeleton bleedUnderHeader />
-      </>
-    );
-  }
+  // Render immediately using placeholderData; avoid a dark-mode skeleton that
+  // looks like a blank page during the initial ~1s of content fetches.
+  void heroQuery;
 
   return (
     <>
