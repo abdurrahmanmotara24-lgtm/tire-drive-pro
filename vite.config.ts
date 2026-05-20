@@ -12,4 +12,8 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "./src/server.ts" },
   },
+  // Lovable Cloud injects SUPABASE_* secrets; expose them to the client alongside VITE_*.
+  vite: {
+    envPrefix: ["VITE_", "SUPABASE_"],
+  },
 });

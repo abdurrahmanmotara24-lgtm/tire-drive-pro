@@ -15,6 +15,7 @@ import { deleteFile, uploadFile } from "@/components/admin/media-picker";
 import { AdminUnsavedPill } from "@/components/admin/admin-unsaved-pill";
 import { useAdminForm } from "@/hooks/use-admin-form";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { SUPABASE_PUBLIC_ENV_HINT } from "@/lib/env";
 import {
   createEmptySlide,
   DEFAULT_BRAND_SLIDESHOW,
@@ -141,7 +142,9 @@ function BrandSlideshowAdmin() {
       </p>
       {!isSupabaseConfigured() && (
         <p className="mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-          Supabase is not connected — uploads save to your browser only until Cloud env vars are set.
+          Supabase is not connected — uploads save to your browser only until Lovable Cloud secrets are available.
+          {" "}
+          {SUPABASE_PUBLIC_ENV_HINT}
         </p>
       )}
       <AdminPreviewMobileLink previewPath="/" previewHash="inventory-band" />
