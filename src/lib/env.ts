@@ -10,6 +10,13 @@ const SUPABASE_KEY_KEYS = [
   "SUPABASE_ANON_KEY",
 ] as const;
 
+declare global {
+  interface Window {
+    /** Injected from SSR when Lovable Cloud secrets exist server-side only. */
+    __TNY_SUPABASE_PUBLIC__?: { url: string; key: string };
+  }
+}
+
 function pickEnv(env: EnvBag, keys: readonly string[]): string | undefined {
   for (const name of keys) {
     const value = env[name];
@@ -18,26 +25,53 @@ function pickEnv(env: EnvBag, keys: readonly string[]): string | undefined {
   return undefined;
 }
 
+function readFromEnvBag(env: EnvBag): { url?: string; key?: string } {
+  const url = pickEnv(env, SUPABASE_URL_KEYS);
+  const key = pickEnv(env, SUPABASE_KEY_KEYS);
+  return url && key ? { url, key } : {};
+}
+
+function readFromProcessEnv(): { url?: string; key?: string } {
+  if (typeof process === "undefined" || !process.env) return {};
+  return readFromEnvBag(process.env as EnvBag);
+}
+
 /**
  * Read Supabase public credentials without touching `process` in the browser bundle
  * (avoids ReferenceError in Lovable preview when process is undefined).
  */
 export function readSupabasePublicEnv(): { url?: string; key?: string } {
-  const meta = import.meta.env as EnvBag;
-  const url = pickEnv(meta, SUPABASE_URL_KEYS);
-  const key = pickEnv(meta, SUPABASE_KEY_KEYS);
+  if (typeof window !== "undefined" && window.__TNY_SUPABASE_PUBLIC__) {
+    const { url, key } = window.__TNY_SUPABASE_PUBLIC__;
+    if (url && key) return { url, key };
+  }
 
-  if (url && key) return { url, key };
+  const fromMeta = readFromEnvBag(import.meta.env as EnvBag);
+  if (fromMeta.url && fromMeta.key) return fromMeta;
 
-  if (import.meta.env.SSR && typeof process !== "undefined" && process.env) {
-    const proc = process.env as EnvBag;
-    return {
-      url: pickEnv(proc, SUPABASE_URL_KEYS),
-      key: pickEnv(proc, SUPABASE_KEY_KEYS),
-    };
+  if (import.meta.env.SSR) {
+    return readFromProcessEnv();
   }
 
   return {};
+}
+
+/**
+ * Inline script for RootShell: copies Lovable Cloud server secrets into `window`
+ * so the admin client can authenticate after hydration.
+ */
+export function buildSupabaseRuntimeScript(): string | null {
+  if (typeof window !== "undefined") return null;
+
+  const fromProcess = readFromProcessEnv();
+  const fromMeta = readFromEnvBag(import.meta.env as EnvBag);
+  const url = fromProcess.url ?? fromMeta.url;
+  const key = fromProcess.key ?? fromMeta.key;
+
+  if (!url || !key) return null;
+
+  const payload = JSON.stringify({ url, key });
+  return `(function(){try{window.__TNY_SUPABASE_PUBLIC__=${payload}}catch(e){}})();`;
 }
 
 export const SUPABASE_PUBLIC_ENV_HINT =

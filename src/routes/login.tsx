@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { SUPABASE_PUBLIC_ENV_HINT } from "@/lib/env";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Admin Login — Tires Near You" }] }),
@@ -51,6 +53,11 @@ function LoginPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           {mode === "login" ? "Sign in to manage your website." : "Create an admin account."}
         </p>
+        {!isSupabaseConfigured() && (
+          <p className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-950">
+            Cannot sign in yet — Supabase URL and public key are missing in this preview. {SUPABASE_PUBLIC_ENV_HINT}
+          </p>
+        )}
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
             <Label htmlFor="email">Email</Label>

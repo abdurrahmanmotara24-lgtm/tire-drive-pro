@@ -28,6 +28,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { AdminKeyboardHelp } from "@/components/admin/admin-keyboard-help";
+import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { SUPABASE_PUBLIC_ENV_HINT } from "@/lib/env";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Tires Near You" }, { name: "robots", content: "noindex" }] }),
@@ -201,6 +203,18 @@ function AdminLayout() {
 
       <main className="mt-12 flex-1 md:ml-0 md:mt-0">
         <div className="mx-auto w-full max-w-[1600px] p-4 md:p-8">
+          {!isSupabaseConfigured() && (
+            <div
+              role="alert"
+              className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950"
+            >
+              <p className="font-semibold">Supabase credentials are not reaching the browser</p>
+              <p className="mt-1 text-xs">
+                Lovable Cloud may be connected on the server, but the preview still needs public URL + key for login
+                and saves. {SUPABASE_PUBLIC_ENV_HINT} Then restart the preview.
+              </p>
+            </div>
+          )}
           <Outlet />
         </div>
       </main>

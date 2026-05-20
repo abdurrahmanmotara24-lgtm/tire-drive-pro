@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { DEFAULTS } from "@/lib/site-content";
 import { colorModeScript } from "@/components/color-mode-script";
+import { buildSupabaseRuntimeScript } from "@/lib/env";
 
 import { useContentRealtime } from "@/hooks/use-content-realtime";
 
@@ -92,10 +93,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  const supabaseRuntimeScript = buildSupabaseRuntimeScript();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: colorModeScript }} />
+        {supabaseRuntimeScript ? (
+          <script dangerouslySetInnerHTML={{ __html: supabaseRuntimeScript }} />
+        ) : null}
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
