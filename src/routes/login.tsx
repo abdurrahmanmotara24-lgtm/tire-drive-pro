@@ -55,7 +55,7 @@ function LoginPage() {
         </p>
         {!isSupabaseConfigured() && (
           <p className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-950">
-            Cannot sign in yet — Supabase URL and public key are missing in this preview. {SUPABASE_PUBLIC_ENV_HINT}
+            Cannot sign in yet — {SUPABASE_PUBLIC_ENV_HINT}
           </p>
         )}
         <form onSubmit={submit} className="mt-6 space-y-4">

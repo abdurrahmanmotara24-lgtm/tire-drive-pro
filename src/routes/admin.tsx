@@ -208,11 +208,8 @@ function AdminLayout() {
               role="alert"
               className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950"
             >
-              <p className="font-semibold">Supabase credentials are not reaching the browser</p>
-              <p className="mt-1 text-xs">
-                Lovable Cloud may be connected on the server, but the preview still needs public URL + key for login
-                and saves. {SUPABASE_PUBLIC_ENV_HINT} Then restart the preview.
-              </p>
+              <p className="font-semibold">Supabase is not available in this preview session</p>
+              <p className="mt-1 text-xs">{SUPABASE_PUBLIC_ENV_HINT}</p>
             </div>
           )}
           <Outlet />

@@ -142,9 +142,7 @@ function BrandSlideshowAdmin() {
       </p>
       {!isSupabaseConfigured() && (
         <p className="mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-          Supabase is not connected — uploads save to your browser only until Lovable Cloud secrets are available.
-          {" "}
-          {SUPABASE_PUBLIC_ENV_HINT}
+          Supabase is not connected in this preview — uploads save locally only. {SUPABASE_PUBLIC_ENV_HINT}
         </p>
       )}
       <AdminPreviewMobileLink previewPath="/" previewHash="inventory-band" />

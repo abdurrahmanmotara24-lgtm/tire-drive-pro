@@ -41,6 +41,13 @@ function readFromProcessEnv(): { url?: string; key?: string } {
  * (avoids ReferenceError in Lovable preview when process is undefined).
  */
 export function readSupabasePublicEnv(): { url?: string; key?: string } {
+  // Lovable Cloud injects these at build time (same as before admin worked).
+  const viteUrl = import.meta.env.VITE_SUPABASE_URL;
+  const viteKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  if (typeof viteUrl === "string" && viteUrl && typeof viteKey === "string" && viteKey) {
+    return { url: viteUrl, key: viteKey };
+  }
+
   if (typeof window !== "undefined" && window.__TNY_SUPABASE_PUBLIC__) {
     const { url, key } = window.__TNY_SUPABASE_PUBLIC__;
     if (url && key) return { url, key };
@@ -74,8 +81,9 @@ export function buildSupabaseRuntimeScript(): string | null {
   return `(function(){try{window.__TNY_SUPABASE_PUBLIC__=${payload}}catch(e){}})();`;
 }
 
+/** Shown when auto-injected Lovable Cloud credentials are not reaching the browser. */
 export const SUPABASE_PUBLIC_ENV_HINT =
-  "Set VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY (or SUPABASE_URL + SUPABASE_PUBLISHABLE_KEY) in Lovable Cloud → Secrets.";
+  "Reconnect Supabase under Lovable → Integrations (credentials are injected automatically), then restart the preview.";
 
 export function isSupabasePublicEnvConfigured(): boolean {
   const { url, key } = readSupabasePublicEnv();
