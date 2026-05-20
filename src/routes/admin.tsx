@@ -28,8 +28,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { AdminKeyboardHelp } from "@/components/admin/admin-keyboard-help";
-import { isSupabaseConfigured } from "@/integrations/supabase/client";
-import { LOVABLE_CLOUD_BACKEND_HINT } from "@/lib/env";
+import { useLovableCloudBackend } from "@/hooks/use-lovable-cloud-backend";
+import { LOVABLE_CLOUD_CREDENTIALS_HINT } from "@/lib/lovable-cloud-backend";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Tires Near You" }, { name: "robots", content: "noindex" }] }),
@@ -93,6 +93,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 function AdminLayout() {
   const { user, isStaff, loading } = useAuth();
+  const cloudBackend = useLovableCloudBackend();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   useLeadNotifications(Boolean(isStaff && user && !loading));
@@ -203,13 +204,13 @@ function AdminLayout() {
 
       <main className="mt-12 flex-1 md:ml-0 md:mt-0">
         <div className="mx-auto w-full max-w-[1600px] p-4 md:p-8">
-          {!isSupabaseConfigured() && (
+          {cloudBackend === "unavailable" && (
             <div
               role="alert"
               className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950"
             >
-              <p className="font-semibold">Lovable Cloud backend is not available in this preview</p>
-              <p className="mt-1 text-xs">{LOVABLE_CLOUD_BACKEND_HINT}</p>
+              <p className="font-semibold">Cloud keys not loaded in this preview</p>
+              <p className="mt-1 text-xs">{LOVABLE_CLOUD_CREDENTIALS_HINT}</p>
             </div>
           )}
           <Outlet />

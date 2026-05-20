@@ -15,7 +15,8 @@ import { deleteFile, uploadFile } from "@/components/admin/media-picker";
 import { AdminUnsavedPill } from "@/components/admin/admin-unsaved-pill";
 import { useAdminForm } from "@/hooks/use-admin-form";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
-import { LOVABLE_CLOUD_BACKEND_HINT } from "@/lib/env";
+import { useLovableCloudBackend } from "@/hooks/use-lovable-cloud-backend";
+import { LOVABLE_CLOUD_CREDENTIALS_HINT } from "@/lib/lovable-cloud-backend";
 import {
   createEmptySlide,
   DEFAULT_BRAND_SLIDESHOW,
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/admin/brand-slideshow")({
 
 function BrandSlideshowAdmin() {
   const qc = useQueryClient();
+  const cloudBackend = useLovableCloudBackend();
   const [loadError, setLoadError] = useState<string | null>(null);
   const [previewUploading, setPreviewUploading] = useState(false);
 
@@ -140,9 +142,9 @@ function BrandSlideshowAdmin() {
       <p className="mt-1 text-sm text-muted-foreground">
         Manage the &ldquo;Premium brands in stock&rdquo; background slideshow. Changes preview below before you save.
       </p>
-      {!isSupabaseConfigured() && (
+      {cloudBackend === "unavailable" && (
         <p className="mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-          Cloud storage unavailable in this preview — uploads save locally only. {LOVABLE_CLOUD_BACKEND_HINT}
+          Cloud storage unavailable in this preview — uploads save locally only. {LOVABLE_CLOUD_CREDENTIALS_HINT}
         </p>
       )}
       <AdminPreviewMobileLink previewPath="/" previewHash="inventory-band" />

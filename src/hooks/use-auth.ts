@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
+import { ensureLovableCloudBackend } from "@/lib/lovable-cloud-backend";
 
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
@@ -9,16 +10,29 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-    });
-    supabase.auth.getSession().then(({ data }) => {
+    let sub: { subscription: { unsubscribe: () => void } } | undefined;
+    let cancelled = false;
+
+    void (async () => {
+      await ensureLovableCloudBackend();
+      if (cancelled) return;
+
+      const { data: subData } = supabase.auth.onAuthStateChange((_e, s) => {
+        setSession(s);
+        setUser(s?.user ?? null);
+      });
+      sub = subData;
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
-    });
-    return () => sub.subscription.unsubscribe();
+    })();
+
+    return () => {
+      cancelled = true;
+      sub?.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {

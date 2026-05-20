@@ -3,8 +3,8 @@ import { createClient, type SupabaseClient as RealSupabaseClient } from "@supaba
 import {
   isSupabasePublicEnvConfigured,
   readSupabasePublicEnv,
-  LOVABLE_CLOUD_BACKEND_HINT,
 } from "@/lib/env";
+import { LOVABLE_CLOUD_CREDENTIALS_HINT } from "@/lib/lovable-cloud-backend";
 import type { Database } from "./types";
 
 export type SupabaseClient = RealSupabaseClient<Database>;
@@ -17,7 +17,7 @@ function createSupabaseClient(): SupabaseClient | null {
   const { url, key } = readSupabasePublicEnv();
 
   if (!url || !key) {
-    console.warn(`[Lovable Cloud] Backend credentials not in preview — ${LOVABLE_CLOUD_BACKEND_HINT}`);
+    console.warn(`[Lovable Cloud] Backend credentials not in preview — ${LOVABLE_CLOUD_CREDENTIALS_HINT}`);
     return null;
   }
 
@@ -102,11 +102,18 @@ function createStubClient(): SupabaseClient {
 
 let _supabase: SupabaseClient | null | undefined;
 
+export function resetSupabaseClientCache(): void {
+  _supabase = undefined;
+}
+
 function getClient(): SupabaseClient {
-  if (_supabase === undefined) {
-    _supabase = createSupabaseClient();
+  const live = createSupabaseClient();
+  if (live) {
+    _supabase = live;
+    return live;
   }
-  return _supabase ?? createStubClient();
+  if (_supabase) return _supabase;
+  return createStubClient();
 }
 
 // Import the supabase client like this:

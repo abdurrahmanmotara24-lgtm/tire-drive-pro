@@ -14,6 +14,8 @@ const SUPABASE_KEY_KEYS = [
   "SUPABASE_ANON_KEY",
 ] as const;
 
+const SUPABASE_PROJECT_ID_KEYS = ["VITE_SUPABASE_PROJECT_ID", "SUPABASE_PROJECT_ID"] as const;
+
 declare global {
   interface Window {
     /** Injected from SSR when Lovable Cloud secrets exist server-side only. */
@@ -74,12 +76,18 @@ export function readSupabasePublicEnv(): { url?: string; key?: string } {
   const fromMeta = readFromEnvBag(import.meta.env as EnvBag);
   if (fromMeta.url && fromMeta.key) return fromMeta;
 
+  const projectId = pickEnv(import.meta.env as EnvBag, SUPABASE_PROJECT_ID_KEYS);
+  const derivedKey = pickEnv(import.meta.env as EnvBag, SUPABASE_KEY_KEYS);
+  if (projectId && derivedKey) {
+    return { url: `https://${projectId}.supabase.co`, key: derivedKey };
+  }
+
   return {};
 }
 
 /** Shown when Lovable Cloud credentials are not reaching the browser preview. */
 export const LOVABLE_CLOUD_BACKEND_HINT =
-  "Open the Cloud tab and confirm Cloud is enabled, then restart the preview. For local npm run dev, copy the auto-generated URL and publishable key from Cloud → Secrets into a .env file.";
+  "Cloud is enabled, but this preview has not loaded backend keys yet. Restart the preview or refresh. For local npm run dev, copy URL + publishable key from Cloud → Secrets into a .env file.";
 
 /** @deprecated Use LOVABLE_CLOUD_BACKEND_HINT */
 export const SUPABASE_PUBLIC_ENV_HINT = LOVABLE_CLOUD_BACKEND_HINT;

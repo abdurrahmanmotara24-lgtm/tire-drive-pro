@@ -22,6 +22,7 @@ import { useContactContent } from "@/hooks/use-contact-content";
 import { DEFAULTS } from "@/lib/site-content";
 import { colorModeScript } from "@/components/color-mode-script";
 import { buildSupabaseRuntimeScript } from "@/lib/env";
+import { CloudConfigBootstrap } from "@/components/cloud-config-bootstrap";
 
 import { useContentRealtime } from "@/hooks/use-content-realtime";
 
@@ -141,6 +142,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <CloudConfigBootstrap />
       <RealtimeBridge />
       <ThemeApplier />
       <a
