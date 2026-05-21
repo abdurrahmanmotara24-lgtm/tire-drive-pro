@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ensureLovableCloudBackend } from "@/lib/lovable-cloud-backend";
-import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase-browser";
 
 /** Loads Lovable Cloud keys into the browser, then refreshes Supabase client consumers. */
 export function CloudConfigBootstrap() {

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-browser";
 import { fetchLocations, type LocationRow } from "@/lib/site-content";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
