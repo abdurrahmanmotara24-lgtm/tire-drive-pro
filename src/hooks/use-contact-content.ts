@@ -1,14 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { DEFAULTS, fetchContent } from "@/lib/site-content";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 
 function digitsOnly(value: string) {
   return value.replace(/[^\d]/g, "");
 }
 
 export function useContactContent() {
+  const cmsReady = usePublicContentReady();
   const { data: contact = DEFAULTS.contact } = useQuery({
     queryKey: ["content", "contact"],
     queryFn: () => fetchContent("contact"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.contact,
   });
 

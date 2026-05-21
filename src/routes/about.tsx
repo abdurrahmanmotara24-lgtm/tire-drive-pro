@@ -6,6 +6,7 @@ import { FALLBACK_IMAGES, resolveSiteImage } from "@/lib/site-images";
 import { PageIntro } from "@/components/marketing/page-intro";
 import { SeoMeta } from "@/components/seo-meta";
 import { useReveal } from "@/hooks/use-reveal";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -19,14 +20,17 @@ export const Route = createFileRoute("/about")({
 });
 
 function About() {
+  const cmsReady = usePublicContentReady();
   const { data: about = DEFAULTS.about } = useQuery({
     queryKey: ["content", "about"],
     queryFn: () => fetchContent("about"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.about,
   });
   const { data: homepage = DEFAULTS.homepage } = useQuery({
     queryKey: ["content", "homepage"],
     queryFn: () => fetchContent("homepage"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.homepage,
   });
 

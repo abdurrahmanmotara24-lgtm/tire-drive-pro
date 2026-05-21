@@ -5,6 +5,7 @@ import { PageIntro } from "@/components/marketing/page-intro";
 import { BranchCard } from "@/components/marketing/branch-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SeoMeta } from "@/components/seo-meta";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 
 export const Route = createFileRoute("/locations")({
   head: () => ({
@@ -33,9 +34,11 @@ function LocationSkeleton() {
 }
 
 function Locations() {
+  const cmsReady = usePublicContentReady();
   const { data: branches = [], isLoading } = useQuery({
     queryKey: ["locations", "public"],
     queryFn: () => fetchLocations(false),
+    enabled: cmsReady,
   });
 
   return (

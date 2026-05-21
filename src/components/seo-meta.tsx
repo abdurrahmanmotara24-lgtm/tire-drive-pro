@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DEFAULTS, fetchContent } from "@/lib/site-content";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 
 type Props = {
   title?: string;
@@ -19,11 +20,12 @@ function setMeta(attr: "name" | "property", key: string, content: string) {
 }
 
 export function SeoMeta({ title, description }: Props) {
+  const cmsReady = usePublicContentReady();
   const { data: seo = DEFAULTS.seo } = useQuery({
     queryKey: ["content", "seo"],
     queryFn: () => fetchContent("seo"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.seo,
-    staleTime: 60_000,
   });
 
   const pageTitle = title ?? seo.title;

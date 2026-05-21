@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { resolveBrandPalette } from "@/lib/brand-colors";
 import { DEFAULTS, fetchContent, resolveTheme } from "@/lib/site-content";
 import { useColorMode } from "@/hooks/use-color-mode";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 
 const FONT_STACKS: Record<string, string> = {
   Inter: '"Inter", ui-sans-serif, system-ui, sans-serif',
@@ -12,9 +13,11 @@ const FONT_STACKS: Record<string, string> = {
 
 export function ThemeApplier() {
   const { mode } = useColorMode();
+  const cmsReady = usePublicContentReady();
   const { data: raw } = useQuery({
     queryKey: ["content", "theme"],
     queryFn: () => fetchContent("theme"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.theme,
   });
   const theme = resolveTheme(raw);

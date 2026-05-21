@@ -14,6 +14,7 @@ import { AdminPreviewMobileLink } from "@/components/admin/admin-preview-layout"
 import { deleteFile, uploadFile } from "@/components/admin/media-picker";
 import { AdminUnsavedPill } from "@/components/admin/admin-unsaved-pill";
 import { useAdminForm } from "@/hooks/use-admin-form";
+import { invalidatePublicContentQueries } from "@/lib/invalidate-public-content";
 import { isSupabaseConfigured } from "@/lib/supabase-browser";
 import { useLovableCloudBackend } from "@/hooks/use-lovable-cloud-backend";
 import { LOVABLE_CLOUD_CREDENTIALS_HINT } from "@/lib/lovable-cloud-backend";

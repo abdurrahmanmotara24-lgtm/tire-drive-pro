@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase-browser";
+import { CLOUD_CREDENTIALS_READY_EVENT } from "@/lib/lovable-cloud-backend";
+import { invalidatePublicContentQueries } from "@/lib/invalidate-public-content";
 
 /**
  * Subscribes to changes on site_content and locations so the public site
@@ -10,7 +12,12 @@ export function useContentRealtime() {
   const qc = useQueryClient();
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
+    const onCredentialsReady = () => invalidatePublicContentQueries(qc);
+    window.addEventListener(CLOUD_CREDENTIALS_READY_EVENT, onCredentialsReady);
+
+    if (!isSupabaseConfigured()) {
+      return () => window.removeEventListener(CLOUD_CREDENTIALS_READY_EVENT, onCredentialsReady);
+    }
 
     const channel = supabase
       .channel("public-content")
@@ -21,23 +28,25 @@ export function useContentRealtime() {
           const key = (payload.new as { key?: string } | null)?.key
             ?? (payload.old as { key?: string } | null)?.key;
           if (key) {
-            qc.invalidateQueries({ queryKey: ["content", key] });
-            if (key === "brand_slideshow") qc.invalidateQueries({ queryKey: ["brand_slideshow"] });
+            void qc.invalidateQueries({ queryKey: ["content", key] });
+            if (key === "brand_slideshow") {
+              void qc.invalidateQueries({ queryKey: ["brand_slideshow"] });
+            }
           } else {
-            qc.invalidateQueries({ queryKey: ["content"] });
-            qc.invalidateQueries({ queryKey: ["brand_slideshow"] });
+            invalidatePublicContentQueries(qc);
           }
         },
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "locations" },
-        () => qc.invalidateQueries({ queryKey: ["locations"] }),
+        () => void qc.invalidateQueries({ queryKey: ["locations"] }),
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      window.removeEventListener(CLOUD_CREDENTIALS_READY_EVENT, onCredentialsReady);
+      void supabase.removeChannel(channel);
     };
   }, [qc]);
 }

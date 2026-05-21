@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { invalidatePublicContentQueries } from "@/lib/invalidate-public-content";
 
 type Options<T> = {
   data: T | undefined;
@@ -32,6 +33,7 @@ export function useAdminForm<T>({ data, queryKey, onSave, successMessage = "Save
       await onSave(form);
       baselineRef.current = JSON.stringify(form);
       await qc.invalidateQueries({ queryKey });
+      invalidatePublicContentQueries(qc);
       toast.success(successMessage);
     } catch (e) {
       toast.error((e as Error).message);

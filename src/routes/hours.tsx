@@ -13,6 +13,7 @@ import {
 import { PageHero } from "@/components/page-hero";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 
 export const Route = createFileRoute("/hours")({
   head: () => ({
@@ -37,9 +38,11 @@ function formatTime12h(time: string) {
 }
 
 function HoursPage() {
+  const cmsReady = usePublicContentReady();
   const { data: contact = DEFAULTS.contact } = useQuery({
     queryKey: ["content", "contact"],
     queryFn: () => fetchContent("contact"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.contact,
   });
 

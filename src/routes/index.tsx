@@ -14,6 +14,7 @@ import { FinalCta } from "@/components/marketing/final-cta";
 import { TrustBar } from "@/components/marketing/trust-bar";
 import { ImageBand } from "@/components/marketing/image-band";
 import { useBrandSlideshow } from "@/hooks/use-brand-slideshow";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 import { FALLBACK_IMAGES, resolveSiteImage } from "@/lib/site-images";
 import { HomePageSkeleton } from "@/components/home-page-skeleton";
 
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const cmsReady = usePublicContentReady();
   const { telHref, hasPhone, contact } = useContactContent();
   const callHref = hasPhone ? telHref : undefined;
   const { data: brandSlideshow, isLoading: slideshowLoading } = useBrandSlideshow();
@@ -39,37 +41,44 @@ function Index() {
   const heroQuery = useQuery({
     queryKey: ["content", "hero"],
     queryFn: () => fetchContent("hero"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.hero,
   });
   const { data: hero = DEFAULTS.hero } = heroQuery;
   const { data: sections = DEFAULTS.sections } = useQuery({
     queryKey: ["content", "sections"],
     queryFn: () => fetchContent("sections"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.sections,
   });
   const { data: services = DEFAULTS.services } = useQuery({
     queryKey: ["content", "services"],
     queryFn: () => fetchContent("services"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.services,
   });
   const { data: brands = DEFAULTS.brands } = useQuery({
     queryKey: ["content", "brands"],
     queryFn: () => fetchContent("brands"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.brands,
   });
   const { data: process = DEFAULTS.process } = useQuery({
     queryKey: ["content", "process"],
     queryFn: () => fetchContent("process"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.process,
   });
   const { data: testimonials = DEFAULTS.testimonials } = useQuery({
     queryKey: ["content", "testimonials"],
     queryFn: () => fetchContent("testimonials"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.testimonials,
   });
   const { data: homepage = DEFAULTS.homepage } = useQuery({
     queryKey: ["content", "homepage"],
     queryFn: () => fetchContent("homepage"),
+    enabled: cmsReady,
     placeholderData: DEFAULTS.homepage,
   });
 

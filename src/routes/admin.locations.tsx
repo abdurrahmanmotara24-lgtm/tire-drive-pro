@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Copy, Plus, Trash2 } from "lucide-react";
 import { ReorderButtons } from "@/components/admin/reorder-buttons";
 import { toast } from "sonner";
+import { invalidatePublicContentQueries } from "@/lib/invalidate-public-content";
 
 export const Route = createFileRoute("/admin/locations")({ component: LocationsAdmin });
 
@@ -19,7 +20,10 @@ function LocationsAdmin() {
   const qc = useQueryClient();
   const { data: locs } = useQuery({ queryKey: ["locations", "all"], queryFn: () => fetchLocations(true) });
 
-  const refresh = () => qc.invalidateQueries({ queryKey: ["locations"] });
+  const refresh = () => {
+    void qc.invalidateQueries({ queryKey: ["locations"] });
+    invalidatePublicContentQueries(qc);
+  };
 
   const reorder = async (id: string, sort_order: number) => {
     const { error } = await supabase.from("locations").update({ sort_order }).eq("id", id);

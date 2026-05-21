@@ -5,13 +5,15 @@ import {
   toPublicSlideshow,
   type BrandSlideshowPublic,
 } from "@/lib/brand-slideshow";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 
 export function useBrandSlideshow() {
+  const cmsReady = usePublicContentReady();
   return useQuery({
     queryKey: ["brand_slideshow", "public"],
     queryFn: fetchBrandSlideshowPublic,
+    enabled: cmsReady,
     placeholderData: toPublicSlideshow(DEFAULT_BRAND_SLIDESHOW),
-    staleTime: 60_000,
   });
 }
 
