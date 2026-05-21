@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase-browser";
 import {
   CLOUD_CREDENTIALS_READY_EVENT,
   ensureLovableCloudBackend,

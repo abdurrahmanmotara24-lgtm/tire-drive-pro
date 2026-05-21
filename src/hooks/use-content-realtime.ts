@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase-browser";
 
 /**
  * Subscribes to changes on site_content and locations so the public site
