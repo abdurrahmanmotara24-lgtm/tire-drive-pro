@@ -1,4 +1,4 @@
-import { requireSupabaseConfigured, supabase } from "@/integrations/supabase/client";
+import { requireSupabaseConfigured, supabase } from "@/lib/supabase-browser";
 import { isSupabasePublicEnvConfigured, readSupabasePublicEnv } from "@/lib/env";
 import {
   DEFAULT_HOURS_SCHEDULE,

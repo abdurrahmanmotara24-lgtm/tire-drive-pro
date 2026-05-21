@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-browser";
 import { isSupabasePublicEnvConfigured } from "@/lib/env";
 import { INVENTORY_SLIDESHOW_PLACEHOLDERS } from "@/lib/inventory-slideshow-images";
 
