@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-browser";
 import type { Session, User } from "@supabase/supabase-js";
 import { ensureLovableCloudBackend } from "@/lib/lovable-cloud-backend";
 
