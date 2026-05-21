@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { ensureLovableCloudBackend, CLOUD_CREDENTIALS_READY_EVENT } from "@/lib/lovable-cloud-backend";
-import { isSupabaseConfigured } from "@/lib/supabase-browser";
+import { isSupabasePublicEnvConfigured } from "@/lib/env";
+import { CLOUD_CREDENTIALS_READY_EVENT } from "@/lib/lovable-cloud-backend";
 import { invalidatePublicContentQueries } from "@/lib/invalidate-public-content";
 
 /** Loads Lovable Cloud keys, then refetches public CMS queries from the database. */
@@ -13,13 +13,15 @@ export function CloudConfigBootstrap() {
 
     window.addEventListener(CLOUD_CREDENTIALS_READY_EVENT, onReady);
 
-    if (isSupabaseConfigured()) {
+    if (isSupabasePublicEnvConfigured()) {
       onReady();
       return () => window.removeEventListener(CLOUD_CREDENTIALS_READY_EVENT, onReady);
     }
 
-    void ensureLovableCloudBackend().then((ok) => {
-      if (ok) onReady();
+    void import("@/lib/lovable-cloud-backend").then(({ ensureLovableCloudBackend }) => {
+      void ensureLovableCloudBackend().then((ok) => {
+        if (ok) onReady();
+      });
     });
 
     return () => window.removeEventListener(CLOUD_CREDENTIALS_READY_EVENT, onReady);
