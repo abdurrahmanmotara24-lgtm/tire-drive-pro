@@ -9,8 +9,8 @@ type Props = {
 
 export function AdminSaveBar({ busy, isDirty, onSave, label = "Save changes" }: Props) {
   return (
-    <div className="sticky bottom-0 z-10 -mx-4 mt-6 border-t border-border bg-background/95 px-4 py-3 backdrop-blur md:-mx-8 md:px-8">
-      <div className="flex items-center justify-between gap-3">
+    <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-border bg-background/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:-mx-8 md:px-8">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
         <p className="text-xs text-muted-foreground">
           {isDirty ? (
             <>
@@ -20,7 +20,12 @@ export function AdminSaveBar({ busy, isDirty, onSave, label = "Save changes" }: 
             "All changes saved"
           )}
         </p>
-        <Button onClick={onSave} disabled={busy || !isDirty} size="sm">
+        <Button
+          onClick={onSave}
+          disabled={busy || !isDirty}
+          size="sm"
+          className="w-full md:w-auto"
+        >
           {busy ? "Saving…" : isDirty ? label : "Saved"}
         </Button>
       </div>
