@@ -122,13 +122,6 @@ export function CinematicHero({ hero, callHref, fallbackImage = heroWarehouse, b
             </a>
           )}
         </div>
-        {bleedUnderHeader && hoursSnippet && (
-          <p className="animate-in-view mt-4 text-sm md:hidden">
-            <Link to="/hours" className="hero-hours-link text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
-              Open today · {hoursSnippet}
-            </Link>
-          </p>
-        )}
         <div
           className={cn(
             "animate-in-view mt-6 flex flex-wrap gap-2 sm:mt-8",
