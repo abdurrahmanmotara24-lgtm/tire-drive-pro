@@ -64,10 +64,11 @@ export function SiteHeader() {
       );
 
     const focusables = getFocusables();
-    focusables[0]?.focus();
+    if (focusables.length === 0) return;
+    focusables[0].focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Tab" || focusables.length === 0) return;
+      if (e.key !== "Tab") return;
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
       if (e.shiftKey && document.activeElement === first) {
