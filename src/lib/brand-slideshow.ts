@@ -2,8 +2,8 @@ import { supabase } from "@/lib/supabase-browser";
 import { isSupabasePublicEnvConfigured } from "@/lib/env";
 import { INVENTORY_SLIDESHOW_PLACEHOLDERS } from "@/lib/inventory-slideshow-images";
 
-/** Default focus — left-centre keeps logos visible (section text sits on the right). */
-export const BRAND_SLIDESHOW_DEFAULT_FOCAL = { focal_x: 32, focal_y: 50 } as const;
+/** Default focus — centre-right keeps product visible (section text sits on the left). */
+export const BRAND_SLIDESHOW_DEFAULT_FOCAL = { focal_x: 66, focal_y: 48 } as const;
 
 export type BrandSlideshowSlide = {
   id: string;

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { BrandSlideshowPublicSlide, BrandSlideshowSettings } from "@/lib/brand-slideshow";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { cn } from "@/lib/utils";
@@ -81,6 +82,9 @@ export function ImageBandSlideshowBg({ slides, settings }: Props) {
     setActive(index);
   };
 
+  const goPrev = () => goTo((active - 1 + count) % count);
+  const goNext = () => goTo((active + 1) % count);
+
   if (count === 0) return null;
 
   return (
@@ -90,8 +94,9 @@ export function ImageBandSlideshowBg({ slides, settings }: Props) {
         !zoomEnabled && "image-band__slideshow--no-zoom",
         paused && "image-band__slideshow--paused",
       )}
-      aria-hidden
-      data-zoom={zoomEnabled ? "on" : "off"}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Brand showcase slideshow"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -110,13 +115,14 @@ export function ImageBandSlideshowBg({ slides, settings }: Props) {
         <div
           key={`${i}-${slide.image_url}`}
           className={cn("image-band__slide", i === active && "is-active")}
+          aria-hidden={i !== active}
         >
           <img
             src={slide.image_url}
             alt=""
             className={cn("image-band__slide-img", loaded[i] && "is-loaded")}
             style={{
-              objectPosition: `${slide.focal_x ?? 32}% ${slide.focal_y ?? 50}%`,
+              objectPosition: `${slide.focal_x ?? 66}% ${slide.focal_y ?? 48}%`,
             }}
             loading={i === 0 ? "eager" : "lazy"}
             decoding="async"
@@ -126,39 +132,62 @@ export function ImageBandSlideshowBg({ slides, settings }: Props) {
           />
         </div>
       ))}
-      <div className="image-band__slideshow-scrim" />
+      <div className="image-band__slideshow-scrim" aria-hidden />
       {count > 1 && (
-        <div
-          className="image-band__slideshow-progress"
-          role="tablist"
-          aria-label="Slideshow slides"
-        >
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              role="tab"
-              aria-selected={i === active}
-              aria-label={`Slide ${i + 1}`}
-              className={cn(
-                "image-band__progress-seg",
-                i === active && "is-active",
-                i < active && "is-done",
-              )}
-              onClick={() => goTo(i)}
-            >
-              <span
-                key={i === active ? progressKeyRef.current : `done-${i}`}
-                className="image-band__progress-fill"
-                style={
-                  i === active && autoplayEnabled
-                    ? { animationDuration: `${slideMs}ms` }
-                    : undefined
-                }
-              />
-            </button>
-          ))}
-        </div>
+        <>
+          <button
+            type="button"
+            className="image-band__slideshow-nav image-band__slideshow-nav--prev"
+            onClick={goPrev}
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            className="image-band__slideshow-nav image-band__slideshow-nav--next"
+            onClick={goNext}
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+          {paused && (
+            <span className="image-band__slideshow-paused-badge" aria-live="polite">
+              Paused
+            </span>
+          )}
+          <div
+            className="image-band__slideshow-progress"
+            role="tablist"
+            aria-label="Slideshow slides"
+          >
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={i === active}
+                aria-label={`Slide ${i + 1}`}
+                className={cn(
+                  "image-band__progress-seg",
+                  i === active && "is-active",
+                  i < active && "is-done",
+                )}
+                onClick={() => goTo(i)}
+              >
+                <span
+                  key={i === active ? progressKeyRef.current : `done-${i}`}
+                  className="image-band__progress-fill"
+                  style={
+                    i === active && autoplayEnabled
+                      ? { animationDuration: `${slideMs}ms` }
+                      : undefined
+                  }
+                />
+              </button>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

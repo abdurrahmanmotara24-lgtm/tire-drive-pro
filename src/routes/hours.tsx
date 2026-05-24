@@ -14,13 +14,14 @@ import { PageHero } from "@/components/page-hero";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { usePublicContentReady } from "@/hooks/use-public-content-ready";
+import { BRAND_NAME, brandPageTitle } from "@/lib/brand";
 
 export const Route = createFileRoute("/hours")({
   head: () => ({
     meta: [
-      { title: "Operating Hours — Tires Near You" },
-      { name: "description", content: "When we're open. Daily operating hours and current status for Tires Near You." },
-      { property: "og:title", content: "Operating Hours — Tires Near You" },
+      { title: brandPageTitle("Operating Hours") },
+      { name: "description", content: `When we're open. Daily operating hours and current status for ${BRAND_NAME}.` },
+      { property: "og:title", content: brandPageTitle("Operating Hours") },
       { property: "og:description", content: "When we're open. Daily operating hours and current status." },
     ],
   }),

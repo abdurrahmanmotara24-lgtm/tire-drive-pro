@@ -5,11 +5,15 @@ import { useReveal } from "@/hooks/use-reveal";
 
 const perks = ["Same-day fitment available", "Best price guarantee", "Full safety inspection included"];
 
-export function QuotePanel() {
+export function QuotePanel({ serviceHint }: { serviceHint?: string }) {
   const reveal = useReveal<HTMLElement>();
 
   return (
-    <section id="quote" ref={reveal.ref} className={`section-dark section border-t border-border ${reveal.className}`}>
+    <section
+      id="quote"
+      ref={reveal.ref}
+      className={`section-dark section scroll-pad-quote border-t border-border ${reveal.className}`}
+    >
       <div className="container-tny grid gap-10 lg:grid-cols-2 lg:items-center">
         <div>
           <SectionHeading
@@ -27,7 +31,7 @@ export function QuotePanel() {
           </ul>
         </div>
         <div className="hover-glass glass-panel rounded-sm p-1">
-          <QuoteForm />
+          <QuoteForm serviceHint={serviceHint} />
         </div>
       </div>
     </section>

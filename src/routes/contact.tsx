@@ -3,11 +3,12 @@ import { PageIntro } from "@/components/marketing/page-intro";
 import { ContactPanel } from "@/components/marketing/contact-panel";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { SeoMeta } from "@/components/seo-meta";
+import { BRAND_NAME, brandPageTitle } from "@/lib/brand";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — Tires Near You" },
+      { title: brandPageTitle("Contact") },
       { name: "description", content: "Call, email, or message our fitment team." },
     ],
     links: [{ rel: "canonical", href: "/contact" }],
@@ -17,11 +18,11 @@ export const Route = createFileRoute("/contact")({
 
 function Contact() {
   const { contact } = useContactContent();
-  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(contact.address || "tire shop")}&output=embed`;
+  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(contact.address || "tyre shop")}&output=embed`;
 
   return (
     <>
-      <SeoMeta title="Contact — Tires Near You" description="Call, email, or message our fitment team." />
+      <SeoMeta title={brandPageTitle("Contact")} description="Call, email, or message our fitment team." />
       <PageIntro
         eyebrow="Contact"
         title="Get in touch"
@@ -31,7 +32,7 @@ function Contact() {
       <section className="container-tny pb-16">
         <div className="overflow-hidden rounded-sm border border-border">
           <iframe
-            title="Map to Tires Near You"
+            title={`Map to ${BRAND_NAME}`}
             src={mapSrc}
             className="h-[min(360px,50vh)] w-full border-0"
             loading="lazy"

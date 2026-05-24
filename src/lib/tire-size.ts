@@ -1,4 +1,4 @@
-/** Common passenger tire format: 225/45R18 or 225/45 R18 */
+/** Common passenger tyre size format: 225/45R18 or 225/45 R18 */
 const TIRE_SIZE_PATTERN = /^\d{3}\/\d{2}\s*R?\s?\d{2}$/i;
 
 export function isValidTireSize(value: string): boolean {
@@ -17,4 +17,5 @@ export function normalizeTireSize(value: string): string {
 }
 
 export const TIRE_SIZE_PLACEHOLDER = "e.g. 225/45R18";
-export const TIRE_SIZE_HINT = "Width / aspect ratio / rim diameter — check the sidewall of your current tires.";
+export const TIRE_SIZE_HINT =
+  "Width / aspect ratio / rim diameter — check the sidewall of your current tyres.";

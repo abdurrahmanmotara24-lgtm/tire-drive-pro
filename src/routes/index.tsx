@@ -16,15 +16,24 @@ import { ImageBand } from "@/components/marketing/image-band";
 import { useBrandSlideshow } from "@/hooks/use-brand-slideshow";
 import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 import { FALLBACK_IMAGES, resolveSiteImage } from "@/lib/site-images";
-import { HomePageSkeleton } from "@/components/home-page-skeleton";
+import { HomePageSubnav } from "@/components/marketing/home-page-subnav";
+import { BRAND_FULL_TITLE } from "@/lib/brand";
+
+type HomeSearch = { service?: string };
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): HomeSearch => {
+    const raw = search.service;
+    return {
+      service: typeof raw === "string" && raw.trim() ? raw.trim() : undefined,
+    };
+  },
   head: () => ({
     meta: [
-      { title: "Tires Near You — Premium Tires & Performance Fitment" },
+      { title: BRAND_FULL_TITLE },
       {
         name: "description",
-        content: "Premium tires, precision fitment, laser alignment and balancing. Performance service for drivers who expect more.",
+        content: "Premium tyres, precision fitment, laser alignment and balancing. Performance service for drivers who expect more.",
       },
     ],
     links: [{ rel: "canonical", href: "/" }],
@@ -33,6 +42,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { service: serviceHint } = Route.useSearch();
   const cmsReady = usePublicContentReady();
   const { telHref, hasPhone, contact } = useContactContent();
   const callHref = hasPhone ? telHref : undefined;
@@ -91,6 +101,7 @@ function Index() {
       <SeoMeta />
       <CinematicHero hero={hero} callHref={callHref} bleedUnderHeader />
       <div id="content">
+        <HomePageSubnav sections={sections} />
         {sections.brands_enabled && <BrandMarquee brands={brands} priority />}
         <TrustBar />
         <StatStrip stats={hero.stats} variant="compact" />
@@ -133,7 +144,7 @@ function Index() {
             eyebrow={homepage.inventory_band.eyebrow}
             title={homepage.inventory_band.title}
             subtitle={homepage.inventory_band.subtitle}
-            align="right"
+            align="left"
           />
           </div>
         )}
@@ -142,7 +153,7 @@ function Index() {
             <TestimonialCarousel testimonials={testimonials} />
           </div>
         )}
-        {sections.quote_enabled && <QuotePanel />}
+        {sections.quote_enabled && <QuotePanel serviceHint={serviceHint} />}
         {sections.final_cta_enabled && <FinalCta callHref={callHref} hours={contact.hours} />}
       </div>
     </>

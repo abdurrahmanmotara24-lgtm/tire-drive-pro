@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
+import { ADMIN_APP_NAME, brandPageTitle } from "@/lib/brand";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth, signOut } from "@/hooks/use-auth";
@@ -32,7 +33,7 @@ import { AdminCloudGate } from "@/components/admin/admin-cloud-gate";
 import { useLovableCloudBackend } from "@/hooks/use-lovable-cloud-backend";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — Tires Near You" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: brandPageTitle("Admin") }, { name: "robots", content: "noindex" }] }),
   component: AdminLayout,
 });
 
@@ -47,7 +48,7 @@ const nav = [
   { to: "/admin/about", label: "About", icon: FileText },
   { to: "/admin/contact", label: "Contact", icon: Phone },
   { to: "/admin/leads", label: "Leads", icon: Inbox },
-  { to: "/admin/locations", label: "Locations", icon: MapPin },
+  { to: "/admin/locations", label: "Store location", icon: MapPin },
   { to: "/admin/media", label: "Media Library", icon: FolderOpen },
   { to: "/admin/theme", label: "Theme", icon: Palette },
   { to: "/admin/seo", label: "SEO", icon: Search },
@@ -173,7 +174,7 @@ function AdminLayoutBody({
     <div className="admin-light flex min-h-screen bg-secondary/30">
       <aside className="hidden w-64 flex-col border-r border-border bg-background md:flex">
         <div className="flex h-14 items-center border-b border-border px-4">
-          <Link to="/admin" className="text-base font-bold">Tires Admin</Link>
+          <Link to="/admin" className="text-base font-bold">{ADMIN_APP_NAME}</Link>
         </div>
         <nav className="flex-1 space-y-0.5 p-3">
           <NavLinks />
@@ -200,7 +201,7 @@ function AdminLayoutBody({
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-72 p-0">
-            <div className="flex h-14 items-center border-b border-border px-4 font-bold">Tires Admin</div>
+            <div className="flex h-14 items-center border-b border-border px-4 font-bold">{ADMIN_APP_NAME}</div>
             <nav className="space-y-0.5 p-3">
               <NavLinks onNavigate={() => setMenuOpen(false)} />
             </nav>
@@ -217,7 +218,7 @@ function AdminLayoutBody({
           </SheetContent>
         </Sheet>
         <Link to="/admin" className="text-sm font-bold">
-          Tires Admin
+          {ADMIN_APP_NAME}
         </Link>
         <button
           type="button"

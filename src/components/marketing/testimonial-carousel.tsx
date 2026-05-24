@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Star } from "lucide-react";
 import type { TestimonialItem } from "@/lib/site-content";
 import { SectionHeading } from "./section-heading";
 import { useReveal } from "@/hooks/use-reveal";
@@ -108,21 +108,40 @@ export function TestimonialCarousel({ testimonials }: { testimonials: Testimonia
           <div className="flex gap-4">
             {testimonials.map((t) => (
               <article
-                key={t.name}
+                key={`${t.name}-${t.text.slice(0, 24)}`}
                 className="hover-glass glass-panel min-w-0 flex-[0_0_100%] rounded-sm p-6 sm:flex-[0_0_calc(50%-8px)] lg:flex-[0_0_calc(33.333%-11px)]"
               >
                 <div className="flex items-center gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/15 font-display text-sm text-primary">
                     {initials(t.name)}
                   </span>
-                  <div className="flex gap-0.5 text-primary" aria-label={`${t.rating} stars`}>
-                    {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} className="h-3.5 w-3.5 fill-current" aria-hidden />
-                    ))}
+                  <div>
+                    <div className="flex gap-0.5 text-primary" aria-label={`${t.rating} stars`}>
+                      {Array.from({ length: Math.min(5, Math.max(1, t.rating)) }).map((_, i) => (
+                        <Star key={i} className="h-3.5 w-3.5 fill-current" aria-hidden />
+                      ))}
+                    </div>
+                    {t.service && (
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {t.service}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <p className="mt-4 text-sm leading-relaxed">&ldquo;{t.text}&rdquo;</p>
-                <p className="mt-4 font-display text-sm text-chrome">{t.name}</p>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-display text-sm text-chrome">{t.name}</p>
+                  {t.review_url?.trim() && (
+                    <a
+                      href={t.review_url.trim()}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-primary hover:underline"
+                    >
+                      Google review <ExternalLink className="h-3 w-3" aria-hidden />
+                    </a>
+                  )}
+                </div>
               </article>
             ))}
           </div>
@@ -130,7 +149,7 @@ export function TestimonialCarousel({ testimonials }: { testimonials: Testimonia
         <div className="mt-4 flex justify-center gap-2 md:hidden" role="tablist" aria-label="Review slides">
           {testimonials.map((t, i) => (
             <button
-              key={t.name}
+              key={`dot-${t.name}-${i}`}
               type="button"
               role="tab"
               aria-selected={i === selectedIndex}

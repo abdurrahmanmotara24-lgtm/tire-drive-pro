@@ -14,10 +14,10 @@ export function FinalCta({ callHref, hours }: Props) {
     <section id="final-cta" className="bg-accent-gradient py-14">
       <div className="container-tny flex flex-col items-center justify-between gap-6 text-center md:flex-row md:text-left">
         <div>
-          <h2 className="font-display text-3xl text-primary-foreground sm:text-4xl">Need tires today?</h2>
+          <h2 className="font-display text-3xl text-primary-foreground sm:text-4xl">Need tyres today?</h2>
           <p className="mt-2 text-primary-foreground/85">
             {hours ? `${hours} · ` : ""}
-            Call or visit your nearest branch.
+            Call or visit our store today.
           </p>
           {status.open !== null && (
             <p
@@ -33,24 +33,31 @@ export function FinalCta({ callHref, hours }: Props) {
             </p>
           )}
         </div>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3">
           {callHref && (
             <a
               href={callHref}
-              className="hover-btn-primary hover-icon-bump inline-flex items-center gap-2 rounded-sm bg-background px-6 py-3 text-sm font-bold uppercase tracking-wider text-primary"
+              className="hover-btn-primary hover-icon-bump inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm bg-background px-6 py-3 text-sm font-bold uppercase tracking-wider text-primary sm:w-auto"
             >
               <Phone className="icon-bump h-4 w-4" /> Call now
             </a>
           )}
           <Link
-            to="/locations"
-            className="hover-btn-outline hover-icon-bump inline-flex items-center gap-2 rounded-sm border border-primary-foreground/30 px-6 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground"
+            to="/"
+            hash="quote"
+            className="hover-btn-outline hover-icon-bump inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-primary-foreground/30 px-6 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground sm:w-auto"
           >
-            Find a branch <ArrowRight className="icon-bump h-4 w-4" />
+            Get a quote <ArrowRight className="icon-bump h-4 w-4" />
+          </Link>
+          <Link
+            to="/locations"
+            className="hover-btn-outline inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-primary-foreground/20 px-4 py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground/90 sm:w-auto"
+          >
+            Visit us
           </Link>
           <Link
             to="/hours"
-            className="hover-btn-outline inline-flex items-center gap-2 rounded-sm border border-primary-foreground/20 px-4 py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground/90"
+            className="hover-btn-outline inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-primary-foreground/20 px-4 py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground/90 sm:w-auto"
           >
             Hours
           </Link>

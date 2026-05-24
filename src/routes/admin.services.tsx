@@ -11,6 +11,15 @@ import { AdminSaveBar } from "@/components/admin/admin-save-bar";
 import { useDirtyGuard, useSaveShortcut } from "@/hooks/use-admin-form";
 import { toast } from "sonner";
 import { Copy, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SERVICE_ICON_OPTIONS } from "@/lib/icon-catalog";
+import { getIcon } from "@/lib/icons";
 import { ReorderButtons } from "@/components/admin/reorder-buttons";
 import { ResetDefaultsButton } from "@/components/admin/reset-defaults-button";
 import { AdminPreviewLayout, AdminPreviewMobileLink } from "@/components/admin/admin-preview-layout";
@@ -84,15 +93,35 @@ function ServicesAdmin() {
               onMoveDown={() => setItems(moveItem(items, i, 1))}
             />
             <div className="grid flex-1 gap-3 sm:grid-cols-3">
-            <Input
-              placeholder="Icon (Wrench, Gauge…)"
-              value={item.icon}
-              onChange={(e) => {
-                const next = [...items];
-                next[i] = { ...item, icon: e.target.value };
-                setItems(next);
-              }}
-            />
+            <div className="flex items-center gap-2">
+              {(() => {
+                const Icon = getIcon(item.icon);
+                return (
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border bg-muted text-primary">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                );
+              })()}
+              <Select
+                value={item.icon || "Wrench"}
+                onValueChange={(icon) => {
+                  const next = [...items];
+                  next[i] = { ...item, icon };
+                  setItems(next);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Icon" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SERVICE_ICON_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <Input
               placeholder="Title"
               value={item.title}

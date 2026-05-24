@@ -1,16 +1,25 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter, MessageCircle } from "lucide-react";
 import { useContactContent } from "@/hooks/use-contact-content";
+import { DEFAULTS, fetchContent } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
 
 export function SiteFooter({ className }: { className?: string }) {
   const { contact, telHref, mailHref, waHref, hasPhone } = useContactContent();
+  const { data: services = DEFAULTS.services } = useQuery({
+    queryKey: ["content", "services"],
+    queryFn: () => fetchContent("services"),
+    staleTime: 60_000,
+  });
 
   const socials = [
     { icon: Facebook, href: contact.facebook, label: "Facebook" },
     { icon: Instagram, href: contact.instagram, label: "Instagram" },
     { icon: Twitter, href: contact.twitter, label: "Twitter" },
   ].filter((s) => s.href);
+
+  const serviceLinks = services.filter((s) => s.title.trim()).slice(0, 6);
 
   return (
     <footer className={cn("border-t border-border bg-card", className)}>
@@ -19,8 +28,8 @@ export function SiteFooter({ className }: { className?: string }) {
           className={cn(
             "grid gap-8",
             socials.length > 0
-              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:gap-10"
-              : "grid-cols-1 sm:grid-cols-2 md:gap-10",
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10"
+              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10",
           )}
         >
           <div>
@@ -38,7 +47,7 @@ export function SiteFooter({ className }: { className?: string }) {
               </li>
               <li>
                 <Link to="/locations" className="hover-link">
-                  Locations
+                  Visit us
                 </Link>
               </li>
               <li>
@@ -48,6 +57,20 @@ export function SiteFooter({ className }: { className?: string }) {
               </li>
             </ul>
           </div>
+          {serviceLinks.length > 0 && (
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Services</p>
+              <ul className="mt-3 space-y-2 text-sm">
+                {serviceLinks.map((s) => (
+                  <li key={s.title}>
+                    <Link to="/" search={{ service: s.title }} hash="quote" className="hover-link">
+                      {s.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
             <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
@@ -86,7 +109,7 @@ export function SiteFooter({ className }: { className?: string }) {
             </ul>
           </div>
           {socials.length > 0 && (
-            <div className="sm:col-span-2 md:col-span-1 md:col-start-3 md:row-start-1">
+            <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Follow</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {socials.map((s) => (
@@ -128,7 +151,7 @@ export function SiteFooter({ className }: { className?: string }) {
           </div>
         )}
         <p className="mt-6 border-t border-border pt-5 text-center text-xs text-muted-foreground md:mt-8">
-          © {new Date().getFullYear()} Tires Near You. All rights reserved.
+          © {new Date().getFullYear()} Tyres Near Me. All rights reserved.
         </p>
       </div>
     </footer>

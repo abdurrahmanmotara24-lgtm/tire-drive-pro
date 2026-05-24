@@ -1,11 +1,18 @@
-import { MapPin, Phone, Clock } from "lucide-react";
+import { MapPin, Phone, Clock, MessageCircle, Navigation } from "lucide-react";
 import type { LocationRow } from "@/lib/site-content";
+import { useContactContent } from "@/hooks/use-contact-content";
 
 export function BranchCard({ branch }: { branch: LocationRow }) {
+  const { contact, waHref: siteWa, telHref: siteTel } = useContactContent();
   const mapQ = branch.address || branch.name;
   const mapSrc = branch.map_embed_url || `https://www.google.com/maps?q=${encodeURIComponent(mapQ)}&output=embed`;
   const directions = `https://www.google.com/maps?q=${encodeURIComponent(mapQ)}`;
-  const tel = branch.phone ? `tel:${branch.phone.replace(/[^+\d]/g, "")}` : undefined;
+  const phone = branch.phone || contact.phone;
+  const tel = phone ? `tel:${phone.replace(/[^+\d]/g, "")}` : siteTel;
+  const storeWa =
+    phone && siteWa
+      ? `https://wa.me/${phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent("Hi, I'd like to enquire about tyres.")}`
+      : siteWa;
 
   return (
     <article className="hover-lift overflow-hidden rounded-sm border border-border bg-card shadow-soft transition-colors hover:border-primary/30">
@@ -19,12 +26,16 @@ export function BranchCard({ branch }: { branch: LocationRow }) {
                 {branch.address}
               </li>
             )}
-            {branch.phone && (
+            {phone && (
               <li className="flex gap-3">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <a href={tel} className="hover-link">
-                  {branch.phone}
-                </a>
+                {tel ? (
+                  <a href={tel} className="hover-link">
+                    {phone}
+                  </a>
+                ) : (
+                  phone
+                )}
               </li>
             )}
             {branch.hours && (
@@ -34,21 +45,34 @@ export function BranchCard({ branch }: { branch: LocationRow }) {
               </li>
             )}
           </ul>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap gap-2">
             <a
               href={directions}
               target="_blank"
               rel="noreferrer"
-              className="hover-btn-primary inline-flex min-h-11 items-center rounded-sm bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-primary-foreground"
+              className="hover-btn-primary inline-flex min-h-11 items-center gap-1.5 rounded-sm bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-primary-foreground"
             >
+              <Navigation className="h-3.5 w-3.5" aria-hidden />
               Directions
             </a>
             {tel && (
               <a
                 href={tel}
-                className="hover-btn-outline inline-flex min-h-11 items-center rounded-sm border border-border px-5 py-2.5 text-xs font-bold uppercase tracking-wider"
+                className="hover-btn-outline inline-flex min-h-11 items-center gap-1.5 rounded-sm border border-border px-4 py-2.5 text-xs font-bold uppercase tracking-wider"
               >
-                Call branch
+                <Phone className="h-3.5 w-3.5 text-primary" aria-hidden />
+                Call
+              </a>
+            )}
+            {storeWa && (
+              <a
+                href={storeWa}
+                target="_blank"
+                rel="noreferrer"
+                className="hover-btn-outline inline-flex min-h-11 items-center gap-1.5 rounded-sm border border-border px-4 py-2.5 text-xs font-bold uppercase tracking-wider"
+              >
+                <MessageCircle className="h-3.5 w-3.5 text-primary" aria-hidden />
+                WhatsApp
               </a>
             )}
           </div>

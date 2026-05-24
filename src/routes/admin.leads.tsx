@@ -32,12 +32,12 @@ const filters: { value: LeadStatus | "all"; label: string }[] = [
 
 const pipeline: LeadStatus[] = ["new", "contacted", "booked", "lost", "archived"];
 
-function whatsAppTemplate(lead: LeadRow, businessName = "Tires Near You") {
+function whatsAppTemplate(lead: LeadRow, businessName = "Tyres Near Me") {
   const intro =
     lead.type === "quote"
       ? `Hi ${lead.name}, thanks for your quote request at ${businessName}.`
       : `Hi ${lead.name}, thanks for reaching out to ${businessName}.`;
-  const detail = [lead.vehicle && `Vehicle: ${lead.vehicle}`, lead.tire_size && `Tire size: ${lead.tire_size}`]
+  const detail = [lead.vehicle && `Vehicle: ${lead.vehicle}`, lead.tire_size && `Tyre size: ${lead.tire_size}`]
     .filter(Boolean)
     .join(". ");
   return `${intro} ${detail ? `${detail}. ` : ""}How can we help you today?`;
@@ -270,7 +270,7 @@ function LeadCard({
             )}
             {lead.tire_size && (
               <div>
-                <dt className="text-xs text-muted-foreground">Tire size</dt>
+                <dt className="text-xs text-muted-foreground">Tyre size</dt>
                 <dd>{lead.tire_size}</dd>
               </div>
             )}

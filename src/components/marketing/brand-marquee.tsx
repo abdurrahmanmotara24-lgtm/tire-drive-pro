@@ -53,7 +53,7 @@ export function BrandMarquee({ brands, priority }: Props) {
             {row1.map((b, i) => (
               <span
                 key={`a-${b}-${i}`}
-                className="hover-brand font-display shrink-0 text-xl tracking-[0.12em] text-muted-foreground sm:text-2xl md:text-3xl"
+                className="brand-marquee__brand hover-brand font-display shrink-0 text-xl tracking-[0.12em] text-muted-foreground sm:text-2xl md:text-3xl"
               >
                 {b}
               </span>
@@ -65,7 +65,7 @@ export function BrandMarquee({ brands, priority }: Props) {
             {row2.map((b, i) => (
               <span
                 key={`b-${b}-${i}`}
-                className="hover-brand font-display shrink-0 text-lg tracking-[0.12em] text-muted-foreground/70 sm:text-xl md:text-2xl"
+                className="brand-marquee__brand hover-brand font-display shrink-0 text-lg tracking-[0.12em] text-muted-foreground/70 sm:text-xl md:text-2xl"
               >
                 {b}
               </span>

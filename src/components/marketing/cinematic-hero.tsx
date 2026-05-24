@@ -1,20 +1,15 @@
 import type { CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ChevronDown, Phone, Truck, ShieldCheck, BadgeCheck } from "lucide-react";
+import { ArrowRight, ChevronDown, Phone } from "lucide-react";
 import type { HeroContent } from "@/lib/site-content";
 import heroWarehouse from "@/assets/hero-warehouse.png";
 import logo from "@/assets/logo.png";
 import logoWebp from "@/assets/logo.webp";
 import { cn } from "@/lib/utils";
 import { HeroBackground } from "./hero-background";
+import { HeroOfferings } from "./hero-offerings";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { useColorMode } from "@/hooks/use-color-mode";
-
-const trustPills = [
-  { icon: Truck, label: "Fast fitment" },
-  { icon: ShieldCheck, label: "Trusted brands" },
-  { icon: BadgeCheck, label: "Best price guarantee" },
-];
 
 type Props = {
   hero: HeroContent;
@@ -101,9 +96,10 @@ export function CinematicHero({ hero, callHref, fallbackImage = heroWarehouse, b
         >
           {hero.subtitle}
         </p>
+        <HeroOfferings offerings={hero.offerings} centered={bleedUnderHeader} />
         <div
           className={cn(
-            "animate-in-view mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap",
+            "animate-in-view mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:flex-wrap",
             bleedUnderHeader && "w-full justify-center",
           )}
         >
@@ -121,22 +117,6 @@ export function CinematicHero({ hero, callHref, fallbackImage = heroWarehouse, b
               <Phone className="icon-bump h-4 w-4" /> {hero.cta_secondary_text}
             </a>
           )}
-        </div>
-        <div
-          className={cn(
-            "animate-in-view mt-6 flex flex-wrap gap-2 sm:mt-8",
-            bleedUnderHeader && "justify-center",
-          )}
-        >
-          {trustPills.map((p) => (
-            <span
-              key={p.label}
-              className="hero-trust-pill hover-scale inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur-sm transition-colors hover:border-primary/50 hover:text-foreground"
-            >
-              <p.icon className="h-3.5 w-3.5 text-primary" />
-              {p.label}
-            </span>
-          ))}
         </div>
         {bleedUnderHeader ? (
           <a

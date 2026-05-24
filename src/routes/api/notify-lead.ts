@@ -44,7 +44,7 @@ export const Route = createFileRoute("/api/notify-lead")({
           body.phone && `Phone: ${body.phone}`,
           body.email && `Email: ${body.email}`,
           body.vehicle && `Vehicle: ${body.vehicle}`,
-          body.tire_size && `Tire size: ${body.tire_size}`,
+          body.tire_size && `Tyre size: ${body.tire_size}`,
           body.message && `Message: ${body.message}`,
         ].filter(Boolean);
 
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/api/notify-lead")({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: process.env.RESEND_FROM ?? "Tires Near You <onboarding@resend.dev>",
+            from: process.env.RESEND_FROM ?? "Tyres Near Me <onboarding@resend.dev>",
             to: [to],
             subject,
             text: lines.join("\n"),

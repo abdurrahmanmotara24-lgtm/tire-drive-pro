@@ -6,12 +6,23 @@ import {
   normalizeHoursSchedule,
   type HoursSchedule,
 } from "@/lib/hours-schedule";
+import { BRAND_DEFAULT_EMAIL, BRAND_FULL_TITLE, BRAND_NAME } from "@/lib/brand";
+
+export type HeroOffering = {
+  label: string;
+  description: string;
+  icon: string;
+  /** Prefills the quote form when this offering is clicked */
+  quote_service?: string;
+};
 
 export type HeroContent = {
   badge: string;
   title_line1: string;
   title_line2: string;
   subtitle: string;
+  /** Primary service lines shown in the hero (passenger, truck, mag wheels, etc.) */
+  offerings: HeroOffering[];
   cta_primary_text: string;
   cta_primary_link: string;
   cta_secondary_text: string;
@@ -24,6 +35,46 @@ export type HeroContent = {
   focal_y?: number;
   stats: { value: string; label: string }[];
 };
+
+export const DEFAULT_HERO_OFFERINGS: HeroOffering[] = [
+  {
+    label: "Passenger tyres",
+    description: "Premium brands & precision fitment",
+    icon: "Gauge",
+    quote_service: "Passenger tyres",
+  },
+  {
+    label: "Truck tyres",
+    description: "Commercial, fleet & heavy-duty",
+    icon: "Truck",
+    quote_service: "Truck tyres",
+  },
+  {
+    label: "Mag wheels",
+    description: "Alloy wheels fitted & balanced",
+    icon: "Disc2",
+    quote_service: "Mag wheels",
+  },
+];
+
+export function resolveHero(stored: Partial<HeroContent> | null | undefined): HeroContent {
+  const d = DEFAULTS.hero;
+  const offerings =
+    Array.isArray(stored?.offerings) && stored.offerings.length > 0
+      ? stored.offerings.map((o, i) => ({
+          ...DEFAULT_HERO_OFFERINGS[i % DEFAULT_HERO_OFFERINGS.length],
+          ...o,
+          label: o.label?.trim() || DEFAULT_HERO_OFFERINGS[i % DEFAULT_HERO_OFFERINGS.length]!.label,
+        }))
+      : d.offerings;
+  return {
+    ...d,
+    ...(stored ?? {}),
+    offerings,
+    focal_x: stored?.focal_x ?? d.focal_x,
+    focal_y: stored?.focal_y ?? d.focal_y,
+  };
+}
 
 export type ContactContent = {
   phone: string;
@@ -97,14 +148,71 @@ export type HomepageContent = {
 };
 
 export type ServiceItem = { icon: string; title: string; desc: string };
-export type TestimonialItem = { name: string; text: string; rating: number };
+
+export function resolveServiceIcon(item: ServiceItem): ServiceItem {
+  const t = item.title.trim().toLowerCase();
+  if (t.includes("aircon") || t.includes("air con") || (t.includes("regas") && (t.includes("air") || t.includes("ac")))) {
+    return { ...item, icon: "Snowflake" };
+  }
+  if (/\bbrake\b/.test(t) && /\b(pads?|discs?)\b/.test(t)) {
+    return { ...item, icon: "BrakePad" };
+  }
+  if (/\bmag\b/.test(t) && /\b(wheel|rim)s?\b/.test(t)) {
+    return { ...item, icon: "Disc2" };
+  }
+  if (/\btruck\b/.test(t) && /\btyres?\b/.test(t)) {
+    return { ...item, icon: "Truck" };
+  }
+  return item;
+}
+
+export function resolveServices(stored: unknown): ServiceItem[] {
+  const arr = Array.isArray(stored) && stored.length > 0 ? (stored as ServiceItem[]) : DEFAULTS.services;
+  return arr.map(resolveServiceIcon);
+}
+
+export type TestimonialItem = {
+  name: string;
+  text: string;
+  rating: number;
+  branch?: string;
+  service?: string;
+  review_url?: string;
+};
 export type AboutValue = { title: string; text: string };
 export type AboutContent = {
   headline: string;
   intro: string;
   story: string;
+  story_bullets: string[];
   values: AboutValue[];
 };
+
+export function resolveAbout(stored: Partial<AboutContent> | null | undefined): AboutContent {
+  const d = DEFAULTS.about;
+  const story_bullets =
+    Array.isArray(stored?.story_bullets) && stored.story_bullets.length > 0
+      ? stored.story_bullets.map((b) => String(b).trim()).filter(Boolean)
+      : d.story_bullets;
+  const values =
+    Array.isArray(stored?.values) && stored.values.length > 0
+      ? stored.values.map((v, i) => ({
+          ...d.values[i % d.values.length]!,
+          ...v,
+          title: v.title?.trim() || d.values[i % d.values.length]!.title,
+          text: v.text?.trim() || d.values[i % d.values.length]!.text,
+        }))
+      : d.values;
+  return {
+    ...d,
+    ...(stored ?? {}),
+    headline: stored?.headline?.trim() || d.headline,
+    intro: stored?.intro?.trim() || d.intro,
+    story: stored?.story?.trim() || d.story,
+    story_bullets,
+    values,
+  };
+}
 export type ProcessStep = { step: string; title: string; desc: string };
 
 export type {
@@ -126,6 +234,9 @@ export type ThemeContent = {
   brand_green?: string;
   brand_red_accent?: string;
   brand_red: string;
+  /** Glow strength 0–100 (% mixed into --shadow-glow) */
+  glow_intensity_light?: number;
+  glow_intensity_dark?: number;
   radius: string;
   font: string;
   palette_version?: number;
@@ -156,7 +267,8 @@ export const DEFAULTS = {
     title_line1: "Drive",
     title_line2: "Performance.",
     subtitle:
-      "Top-tier tires, precision fitment, and same-day service from technicians who treat every vehicle like their own.",
+      "Same-day fitment, laser alignment, and honest advice — from daily drivers to fleets and custom builds.",
+    offerings: DEFAULT_HERO_OFFERINGS,
     cta_primary_text: "Get a Free Quote",
     cta_primary_link: "#quote",
     cta_secondary_text: "Call Now",
@@ -173,7 +285,7 @@ export const DEFAULTS = {
   } as HeroContent,
   contact: {
     phone: "",
-    email: "hello@tiresnearyou.com",
+    email: BRAND_DEFAULT_EMAIL,
     whatsapp: "",
     address: "123 Main Street, City",
     hours: formatHoursSummary(DEFAULT_HOURS_SCHEDULE),
@@ -208,10 +320,12 @@ export const DEFAULTS = {
     about_banner_image: "",
   } as HomepageContent,
   services: [
-    { icon: "Wrench", title: "Expert Fitment", desc: "Factory-spec torque and premium equipment on every wheel." },
-    { icon: "Gauge", title: "Laser Alignment", desc: "Precision geometry for grip, wear, and confident handling." },
-    { icon: "ShieldCheck", title: "Genuine Warranty", desc: "Authorized brands with full manufacturer backing." },
-    { icon: "Truck", title: "Fleet & SUV", desc: "Commercial and heavy-duty setups done right." },
+    { icon: "Gauge", title: "Passenger tyres", desc: "Premium brands, mount, balance, and fitment for every car." },
+    { icon: "Truck", title: "Truck tyres", desc: "Commercial, fleet, and SUV — heavy-duty stock and expert fitting." },
+    { icon: "Disc2", title: "Mag wheels", desc: "Alloy and mag wheels supplied, fitted, and balanced in-house." },
+    { icon: "Gauge", title: "Laser alignment", desc: "Precision geometry for grip, wear, and confident handling." },
+    { icon: "BrakePad", title: "Brake pads & discs", desc: "Precision brake servicing for safer stopping." },
+    { icon: "Snowflake", title: "Aircon regas", desc: "A/C regas and climate service for comfortable driving." },
   ] as ServiceItem[],
   testimonials: [
     { name: "Marcus T.", text: "Flawless fitment and zero upsell. The shop my crew trusts.", rating: 5 },
@@ -220,19 +334,37 @@ export const DEFAULTS = {
   ] as TestimonialItem[],
   brands: ["Michelin", "Bridgestone", "Pirelli", "Continental", "Goodyear", "Dunlop", "Hankook", "Yokohama"],
   about: {
-    headline: "Built for drivers who demand more",
-    intro: "Precision, transparency, and craft — that's the standard at Tires Near You.",
+    headline: "One shop. Serious fitment.",
+    intro:
+      "We're a single-bay tyre and wheel centre — passenger, truck, and mag wheels — with honest advice and no pressure.",
     story:
-      "We started as a single-bay fitment shop with one promise: treat every customer like family and every vehicle like a flagship. Today we stock the world's leading tire brands, run state-of-the-art alignment bays, and back every job with a full safety inspection — included.",
+      `${BRAND_NAME} started with one promise: treat every customer like family and every vehicle like it was our own. From daily commuters to fleets and custom builds, we stock leading brands, fit with factory-spec torque, and finish every job with a full safety inspection — included.`,
+    story_bullets: [
+      "Passenger, truck, and mag wheel fitment in one place",
+      "Laser alignment and factory-spec torque on every job",
+      "Full safety check included — walk in or book ahead",
+    ],
     values: [
-      { title: "Craft", text: "Certified technicians. No shortcuts." },
-      { title: "Honesty", text: "Clear options. Fair pricing. No pressure." },
-      { title: "Speed", text: "Same-day service when you need it." },
-      { title: "Care", text: "Every fitment ends with a safety check." },
+      {
+        title: "Craft",
+        text: "Certified technicians, laser alignment, and factory-spec torque — no shortcuts.",
+      },
+      {
+        title: "Honesty",
+        text: "Clear options and fair pricing. We recommend what your driving actually needs.",
+      },
+      {
+        title: "Speed",
+        text: "Same-day fitment when stock is on hand — we respect your time.",
+      },
+      {
+        title: "Care",
+        text: "Every fitment ends with a complete safety check before you drive away.",
+      },
     ],
   } as AboutContent,
   process: [
-    { step: "01", title: "Book or walk in", desc: "Tell us your vehicle and tire goals." },
+    { step: "01", title: "Book or walk in", desc: "Tell us your vehicle and tyre goals." },
     { step: "02", title: "We recommend", desc: "Honest options matched to your driving." },
     { step: "03", title: "Precision fit", desc: "Mount, balance, align, inspect." },
     { step: "04", title: "Drive confident", desc: "Leave with warranty-backed peace of mind." },
@@ -243,15 +375,17 @@ export const DEFAULTS = {
     primary_dark: "oklch(0.54 0.21 27)",
     brand_red_accent: "oklch(0.48 0.2 27)",
     brand_red: "oklch(0.82 0.01 0)",
+    glow_intensity_light: 35,
+    glow_intensity_dark: 50,
     radius: "0.5rem",
     font: "Source Sans 3",
     palette_version: THEME_PALETTE_VERSION,
   } as ThemeContent,
   brand_slideshow: DEFAULT_BRAND_SLIDESHOW,
   seo: {
-    title: "Tires Near You — Premium Tires & Performance Fitment",
+    title: BRAND_FULL_TITLE,
     description:
-      "Premium tires, precision fitment, laser alignment and balancing. Performance service for drivers who expect more.",
+      "Premium tyres, precision fitment, laser alignment and balancing. Performance service for drivers who expect more.",
     og_image: "",
   } as SeoContent,
 };
@@ -277,6 +411,7 @@ export async function fetchContent<K extends keyof ContentMap>(
   const defaultVal = DEFAULTS[key];
 
   if (!isSupabasePublicEnvConfigured()) {
+    if (key === "services") return resolveServices(defaultVal) as ContentMap[K];
     return defaultVal;
   }
 
@@ -295,6 +430,9 @@ export async function fetchContent<K extends keyof ContentMap>(
     const stored = data?.value;
 
     if (Array.isArray(defaultVal)) {
+      if (key === "services") {
+        return resolveServices(stored) as ContentMap[K];
+      }
       const arr = Array.isArray(stored) && stored.length > 0 ? stored : defaultVal;
       return arr as ContentMap[K];
     }
@@ -311,12 +449,7 @@ export async function fetchContent<K extends keyof ContentMap>(
       } as ContentMap[K];
     }
     if (key === "hero") {
-      const h = merged as HeroContent;
-      return {
-        ...h,
-        focal_x: h.focal_x ?? DEFAULTS.hero.focal_x,
-        focal_y: h.focal_y ?? DEFAULTS.hero.focal_y,
-      } as ContentMap[K];
+      return resolveHero(stored as Partial<HeroContent> | null) as ContentMap[K];
     }
     if (key === "sections") {
       return resolveSections(stored as Partial<SectionsContent> | null) as ContentMap[K];
@@ -326,6 +459,9 @@ export async function fetchContent<K extends keyof ContentMap>(
     }
     if (key === "brand_slideshow") {
       return resolveBrandSlideshow(stored as Partial<BrandSlideshowContent> | null) as ContentMap[K];
+    }
+    if (key === "about") {
+      return resolveAbout(stored as Partial<AboutContent> | null) as ContentMap[K];
     }
     return merged;
   } catch (e) {

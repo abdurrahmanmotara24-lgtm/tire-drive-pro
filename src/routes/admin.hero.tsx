@@ -1,6 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { DEFAULTS, fetchContent, saveContent, type HeroContent } from "@/lib/site-content";
+import {
+  DEFAULTS,
+  DEFAULT_HERO_OFFERINGS,
+  fetchContent,
+  saveContent,
+  type HeroContent,
+  type HeroOffering,
+} from "@/lib/site-content";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +18,15 @@ import { AdminPreviewLayout, AdminPreviewMobileLink } from "@/components/admin/a
 import { HeroPreviewPanel } from "@/components/admin/hero-preview-panel";
 import { ResetDefaultsButton } from "@/components/admin/reset-defaults-button";
 import { useAdminForm } from "@/hooks/use-admin-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SERVICE_ICON_OPTIONS } from "@/lib/icon-catalog";
+import { getIcon } from "@/lib/icons";
 
 export const Route = createFileRoute("/admin/hero")({
   component: HeroAdmin,
@@ -42,7 +58,37 @@ function HeroAdmin() {
       </div>
       <div>
         <Label>Subtitle</Label>
-        <Textarea rows={3} value={form.subtitle} onChange={(e) => update("subtitle", e.target.value)} />
+        <Textarea rows={2} value={form.subtitle} onChange={(e) => update("subtitle", e.target.value)} />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Keep this general — use the service lines below for passenger, truck, and mag wheels.
+        </p>
+      </div>
+
+      <div>
+        <Label>Hero service lines</Label>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Three focus areas shown as cards under the headline (each links to the quote form).
+        </p>
+        <div className="mt-3 space-y-3">
+          {form.offerings.map((o, i) => (
+            <OfferingEditor
+              key={i}
+              offering={o}
+              onChange={(patch) => {
+                const offerings = [...form.offerings];
+                offerings[i] = { ...o, ...patch };
+                update("offerings", offerings);
+              }}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          className="mt-2 text-xs text-primary hover:underline"
+          onClick={() => update("offerings", [...DEFAULT_HERO_OFFERINGS])}
+        >
+          Reset service lines to defaults
+        </button>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Primary CTA text" value={form.cta_primary_text} onChange={(v) => update("cta_primary_text", v)} />
@@ -106,6 +152,56 @@ function HeroAdmin() {
         </AdminPreviewLayout>
       </div>
       <div className="mt-6 lg:hidden">{formPanel}</div>
+    </div>
+  );
+}
+
+function OfferingEditor({
+  offering,
+  onChange,
+}: {
+  offering: HeroOffering;
+  onChange: (patch: Partial<HeroOffering>) => void;
+}) {
+  const Icon = getIcon(offering.icon);
+  return (
+    <div className="rounded-md border border-border p-3">
+      <div className="flex items-start gap-2">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border bg-muted text-primary">
+          <Icon className="h-4 w-4" />
+        </span>
+        <div className="grid flex-1 gap-2 sm:grid-cols-2">
+          <Input
+            placeholder="Label e.g. Truck tyres"
+            value={offering.label}
+            onChange={(e) => onChange({ label: e.target.value })}
+          />
+          <Select value={offering.icon || "Truck"} onValueChange={(icon) => onChange({ icon })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Icon" />
+            </SelectTrigger>
+            <SelectContent>
+              {SERVICE_ICON_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            className="sm:col-span-2"
+            placeholder="Short description"
+            value={offering.description}
+            onChange={(e) => onChange({ description: e.target.value })}
+          />
+          <Input
+            className="sm:col-span-2"
+            placeholder="Quote prefill (optional)"
+            value={offering.quote_service ?? ""}
+            onChange={(e) => onChange({ quote_service: e.target.value })}
+          />
+        </div>
+      </div>
     </div>
   );
 }

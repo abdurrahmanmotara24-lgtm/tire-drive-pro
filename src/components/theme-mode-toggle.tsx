@@ -20,7 +20,7 @@ export function ThemeModeToggle({ className }: Props) {
             onClick={(e) => toggle({ x: e.clientX, y: e.clientY })}
             data-mode={isDark ? "dark" : "light"}
             className={cn(
-              "rim-mode-toggle touch-target",
+              "rim-mode-toggle site-header-action-btn touch-target hover-icon-bump",
               isDark ? "rim-mode-toggle--dark" : "rim-mode-toggle--light",
               className,
             )}

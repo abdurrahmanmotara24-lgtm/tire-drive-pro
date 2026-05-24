@@ -37,6 +37,18 @@ export function HeroPreviewPanel({ form, className }: Props) {
             <span className="block text-primary">{form.title_line2}</span>
           </p>
           <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{form.subtitle}</p>
+          {form.offerings?.length > 0 && (
+            <ul className="mt-2 flex flex-wrap gap-1">
+              {form.offerings.map((o) => (
+                <li
+                  key={o.label}
+                  className="rounded-sm border border-border/60 bg-background/80 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-foreground"
+                >
+                  {o.label}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div
           className="pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-primary/40 shadow-[0_0_12px_var(--primary)]"

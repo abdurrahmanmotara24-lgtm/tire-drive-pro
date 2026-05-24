@@ -96,11 +96,11 @@ export function HomePageSkeleton({ bleedUnderHeader }: { bleedUnderHeader?: bool
 
         {/* Inventory slideshow band */}
         <div className="relative min-h-[min(40vh,20rem)] bg-muted/80 md:min-h-[min(52vh,28rem)]">
-          <div className="container-tny flex min-h-[inherit] items-end justify-end py-10 md:items-center md:py-16">
-            <div className="max-w-lg space-y-3 md:text-right">
-              <Bone className="ml-auto h-3 w-24" />
-              <Bone className="ml-auto h-10 w-full max-w-sm" />
-              <Bone className="ml-auto h-4 w-4/5" />
+          <div className="container-tny flex min-h-[inherit] items-end py-10 md:items-center md:py-16">
+            <div className="max-w-lg space-y-3">
+              <Bone className="h-3 w-24" />
+              <Bone className="h-10 w-full max-w-sm" />
+              <Bone className="h-4 w-4/5" />
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import type { ServiceItem } from "@/lib/site-content";
-import { getIcon } from "@/lib/icons";
+import { getServiceIcon } from "@/lib/icons";
 import { SectionHeading } from "./section-heading";
 import { useReveal } from "@/hooks/use-reveal";
 
@@ -18,7 +18,7 @@ export function ServiceGrid({ services }: { services: ServiceItem[] }) {
         />
         <div className="stagger-children mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((s) => {
-            const Icon = getIcon(s.icon);
+            const Icon = getServiceIcon(s);
             return (
               <div
                 key={s.title}
@@ -31,6 +31,7 @@ export function ServiceGrid({ services }: { services: ServiceItem[] }) {
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
                 <Link
                   to="/"
+                  search={{ service: s.title }}
                   hash="quote"
                   className="mt-3 inline-flex min-h-11 items-center gap-1 text-xs font-bold uppercase tracking-wider text-primary"
                 >

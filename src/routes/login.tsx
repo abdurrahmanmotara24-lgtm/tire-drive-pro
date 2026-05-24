@@ -8,9 +8,10 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { AdminCloudGate } from "@/components/admin/admin-cloud-gate";
 import { useLovableCloudBackend } from "@/hooks/use-lovable-cloud-backend";
+import { brandPageTitle } from "@/lib/brand";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Admin Login — Tires Near You" }] }),
+  head: () => ({ meta: [{ title: brandPageTitle("Admin Login") }] }),
   component: LoginPage,
 });
 

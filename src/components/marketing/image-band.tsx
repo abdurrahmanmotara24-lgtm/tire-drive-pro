@@ -38,6 +38,9 @@ export function ImageBand({
         isSlideshow && "image-band--slideshow",
         isSlideshow && align === "right" && "image-band--align-right",
         isSlideshow && align === "left" && "image-band--align-left",
+        !isSlideshow && "image-band--static",
+        !isSlideshow && align === "right" && "image-band--align-right",
+        !isSlideshow && align !== "right" && "image-band--align-left",
         slideshowLoading && isSlideshow && "image-band--loading",
         reveal.className,
       )}
@@ -60,10 +63,10 @@ export function ImageBand({
         />
 
       )}
+      {!isSlideshow && <div className="image-band__static-scrim absolute inset-0 z-[1]" aria-hidden />}
       <div
         className={cn(
-          "image-band__gradient absolute inset-0",
-          !isSlideshow && "md:bg-gradient-to-r md:from-background md:via-background/75 md:to-background/20",
+          "image-band__gradient absolute inset-0 z-[2]",
           isSlideshow && "image-band__gradient--slideshow",
         )}
         aria-hidden
@@ -72,15 +75,43 @@ export function ImageBand({
         className={cn(
           "container-tny relative z-10 flex min-h-[min(40vh,20rem)] items-end py-10 md:min-h-[min(52vh,28rem)] md:items-center md:py-16",
           align === "right" ? "md:justify-end md:text-right" : "",
-          isSlideshow && "image-band__content",
+          "image-band__content",
         )}
       >
-        <div className="max-w-lg">
-          {eyebrow && (
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{eyebrow}</p>
+        <div
+          className={cn(
+            "image-band__text-panel",
+            isSlideshow && align === "right" && "max-w-lg",
+            isSlideshow && align !== "right" && "image-band__text-panel--compact",
           )}
-          <h2 className="font-display mt-2 text-2xl leading-tight sm:text-4xl lg:text-5xl">{title}</h2>
-          {subtitle && <p className="mt-3 text-sm text-muted-foreground sm:text-lg">{subtitle}</p>}
+        >
+          {eyebrow && (
+            <p className="image-band__eyebrow text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              {eyebrow}
+            </p>
+          )}
+          <h2
+            className={cn(
+              "image-band__title font-display mt-2 leading-tight",
+              isSlideshow && align === "right"
+                ? "text-2xl sm:text-4xl lg:text-5xl"
+                : "text-xl sm:text-2xl lg:text-3xl",
+            )}
+          >
+            {title}
+          </h2>
+          {subtitle && (
+            <p
+              className={cn(
+                "image-band__subtitle leading-relaxed",
+                isSlideshow && align === "right"
+                  ? "mt-3 text-sm sm:text-lg"
+                  : "mt-2 text-xs sm:text-sm",
+              )}
+            >
+              {subtitle}
+            </p>
+          )}
         </div>
       </div>
     </section>

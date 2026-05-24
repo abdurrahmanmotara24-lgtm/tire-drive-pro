@@ -71,6 +71,24 @@ function TestimonialsAdmin() {
                 setForm(next);
               }}
             />
+            <Input
+              placeholder="Service (optional)"
+              value={item.service ?? ""}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = { ...item, service: e.target.value };
+                setForm(next);
+              }}
+            />
+            <Input
+              placeholder="Google review URL (optional)"
+              value={item.review_url ?? ""}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = { ...item, review_url: e.target.value };
+                setForm(next);
+              }}
+            />
           </div>
           <div className="flex flex-col gap-1">
             <Button type="button" variant="outline" size="icon" className="h-8 w-8" onClick={() => setForm(duplicateItem(items, i))} aria-label="Duplicate">

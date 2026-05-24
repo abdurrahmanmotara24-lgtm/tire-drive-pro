@@ -1,17 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLocations } from "@/lib/site-content";
+import { resolvePublicStore } from "@/lib/store";
 import { PageIntro } from "@/components/marketing/page-intro";
 import { BranchCard } from "@/components/marketing/branch-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SeoMeta } from "@/components/seo-meta";
 import { usePublicContentReady } from "@/hooks/use-public-content-ready";
+import { useContactContent } from "@/hooks/use-contact-content";
+import { brandPageTitle } from "@/lib/brand";
+
+const PAGE_TITLE = brandPageTitle("Visit us");
+const PAGE_DESC = "Address, hours, directions, and map for our fitment centre.";
 
 export const Route = createFileRoute("/locations")({
   head: () => ({
     meta: [
-      { title: "Locations — Tires Near You" },
-      { name: "description", content: "Find your nearest premium fitment centre." },
+      { title: PAGE_TITLE },
+      { name: "description", content: PAGE_DESC },
     ],
     links: [{ rel: "canonical", href: "/locations" }],
   }),
@@ -35,29 +42,49 @@ function LocationSkeleton() {
 
 function Locations() {
   const cmsReady = usePublicContentReady();
-  const { data: branches = [], isLoading } = useQuery({
+  const { contact } = useContactContent();
+  const { data: stores = [], isLoading } = useQuery({
     queryKey: ["locations", "public"],
     queryFn: () => fetchLocations(false),
     enabled: cmsReady,
   });
 
+  const store = useMemo(() => resolvePublicStore(stores, contact), [stores, contact]);
+
   return (
     <>
-      <SeoMeta title="Locations — Tires Near You" description="Find your nearest premium fitment centre." />
+      <SeoMeta title={PAGE_TITLE} description={PAGE_DESC} />
       <PageIntro
-        eyebrow="Locations"
-        title="Our branches"
-        subtitle="Find your nearest fitment centre and drive in today."
+        eyebrow="Visit us"
+        title="Our store"
+        subtitle="Drive in for fitment, alignment, and same-day service — one convenient location."
       />
       <section className="section">
         <div className="container-tny space-y-8">
-          {isLoading && Array.from({ length: 2 }).map((_, i) => <LocationSkeleton key={i} />)}
-          {!isLoading && branches.length === 0 && (
+          {isLoading && <LocationSkeleton />}
+          {!isLoading && !store && (
             <p className="rounded-sm border border-border bg-card p-10 text-center text-muted-foreground">
-              Branches coming soon — contact us for service areas.
+              Store details coming soon.{" "}
+              <Link to="/contact" className="font-semibold text-primary hover:underline">
+                Contact us
+              </Link>{" "}
+              for directions and hours.
             </p>
           )}
-          {!isLoading && branches.map((b) => <BranchCard key={b.id} branch={b} />)}
+          {!isLoading && store && <BranchCard branch={store} />}
+          {!isLoading && store && (
+            <p className="text-center text-sm text-muted-foreground">
+              Need to reach us? See{" "}
+              <Link to="/contact" className="font-semibold text-primary hover:underline">
+                contact
+              </Link>{" "}
+              or{" "}
+              <Link to="/hours" className="font-semibold text-primary hover:underline">
+                opening hours
+              </Link>
+              .
+            </p>
+          )}
         </div>
       </section>
     </>

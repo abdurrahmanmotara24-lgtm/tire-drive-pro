@@ -11,6 +11,11 @@ const FONT_STACKS: Record<string, string> = {
   system: 'ui-sans-serif, system-ui, sans-serif',
 };
 
+function clampGlow(n: unknown, fallback: number): number {
+  const v = typeof n === "number" ? n : fallback;
+  return Math.min(100, Math.max(0, v));
+}
+
 export function ThemeApplier() {
   const { mode } = useColorMode();
   const cmsReady = usePublicContentReady();
@@ -25,10 +30,17 @@ export function ThemeApplier() {
   useEffect(() => {
     const root = document.documentElement;
     const palette = resolveBrandPalette(theme, mode);
+    const glowPct =
+      mode === "light"
+        ? clampGlow(theme.glow_intensity_light, 35)
+        : clampGlow(theme.glow_intensity_dark, 50);
 
     root.style.setProperty("--primary", palette.primary);
     root.style.setProperty("--brand-red-accent", palette.brandRedAccent);
-    root.style.setProperty("--primary-glow", palette.primary);
+    root.style.setProperty(
+      "--primary-glow",
+      `color-mix(in oklch, ${palette.primary} 88%, white)`,
+    );
     root.style.setProperty("--chrome", theme.brand_red);
     root.style.setProperty("--destructive", palette.primary);
     root.style.setProperty("--ring", palette.primary);
@@ -42,7 +54,7 @@ export function ThemeApplier() {
     );
     root.style.setProperty(
       "--shadow-glow",
-      `0 0 44px -8px color-mix(in oklch, ${palette.primary} 50%, transparent)`,
+      `0 0 44px -8px color-mix(in oklch, ${palette.primary} ${glowPct}%, transparent)`,
     );
     if (theme.radius) root.style.setProperty("--radius", theme.radius);
     document.body.style.fontFamily = FONT_STACKS[theme.font] ?? FONT_STACKS["Source Sans 3"];

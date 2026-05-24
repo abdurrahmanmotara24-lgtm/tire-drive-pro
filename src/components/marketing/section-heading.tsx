@@ -14,8 +14,12 @@ export function SectionHeading({ eyebrow, title, subtitle, align = "left", class
       {eyebrow && (
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{eyebrow}</p>
       )}
-      <h2 className="font-display mt-2 text-3xl leading-tight sm:text-4xl lg:text-5xl">{title}</h2>
-      {subtitle && <p className="mt-3 text-base text-muted-foreground sm:text-lg">{subtitle}</p>}
+      <h2 className="font-display mt-2 text-3xl leading-tight tracking-tight sm:text-4xl lg:text-5xl">{title}</h2>
+      {subtitle && (
+        <p className="section-heading__subtitle mt-3 max-w-prose text-sm leading-relaxed text-muted-foreground sm:text-base">
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 }

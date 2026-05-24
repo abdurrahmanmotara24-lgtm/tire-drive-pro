@@ -64,8 +64,13 @@ function Dashboard() {
     { to: "/admin/about", title: "About & Process", desc: "About page story and process steps.", icon: FileText },
     { to: "/admin/contact", title: "Contact Info", desc: "Phone, email, WhatsApp, socials.", icon: Phone },
     { to: "/admin/leads", title: `Leads${newLeads.length ? ` (${newLeads.length} new)` : ""}`, desc: "Quote requests and contact form messages.", icon: Inbox },
-    { to: "/admin/locations", title: `Locations (${locs?.length ?? 0})`, desc: "Branches and store hours.", icon: MapPin },
-    { to: "/admin/theme", title: "Theme", desc: "Brand colors, radius, and fonts.", icon: Palette },
+    {
+      to: "/admin/locations",
+      title: locs?.length ? "Store location" : "Store location (not set)",
+      desc: "Address, map, and directions for your shop.",
+      icon: MapPin,
+    },
+    { to: "/admin/theme", title: "Theme & colors", desc: "Accent color pickers, button glows, radius, and fonts.", icon: Palette },
     { to: "/admin/seo", title: "SEO", desc: "Meta tags and Open Graph image.", icon: Search },
   ];
 

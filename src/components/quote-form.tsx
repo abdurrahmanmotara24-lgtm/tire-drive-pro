@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { z } from "zod";
 import { PublicField } from "@/components/public-field";
-import { PublicButton } from "@/components/public-button";
+import { PublicButton, PublicOutlineButton } from "@/components/public-button";
 import { submitLead } from "@/lib/site-content";
 import { useContactContent } from "@/hooks/use-contact-content";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   formatVehicleDescription,
   getQuoteCallbackMessage,
@@ -16,45 +17,60 @@ import {
   TIRE_SIZE_HINT,
   TIRE_SIZE_PLACEHOLDER,
 } from "@/lib/tire-size";
+import { cn } from "@/lib/utils";
 
 const currentYear = new Date().getFullYear();
 
-const schema = z
-  .object({
-    name: z.string().trim().min(1, "Name required").max(100),
-    phone: z.string().trim().min(7, "Valid phone required").max(20),
-    year: z
-      .string()
-      .trim()
-      .optional()
-      .refine((v) => !v || /^(19|20)\d{2}$/.test(v), "Enter a 4-digit year"),
-    make: z.string().trim().min(1, "Make required").max(60),
-    model: z.string().trim().min(1, "Model required").max(60),
-    tireSize: z.string().trim().max(20).optional().or(z.literal("")),
-  })
-  .superRefine((data, ctx) => {
-    if (data.tireSize && !isValidTireSize(data.tireSize)) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["tireSize"],
-        message: "Use format 225/45R18",
-      });
-    }
-    const y = data.year?.trim();
-    if (y) {
-      const n = Number(y);
-      if (n < 1980 || n > currentYear + 1) {
-        ctx.addIssue({ code: "custom", path: ["year"], message: `Year between 1980–${currentYear + 1}` });
-      }
-    }
-  });
+const quoteFieldsSchema = z.object({
+  name: z.string().trim().min(1, "Name required").max(100),
+  phone: z.string().trim().min(7, "Valid phone required").max(20),
+  year: z
+    .string()
+    .trim()
+    .optional()
+    .refine((v) => !v || /^(19|20)\d{2}$/.test(v), "Enter a 4-digit year"),
+  make: z.string().trim().min(1, "Make required").max(60),
+  model: z.string().trim().min(1, "Model required").max(60),
+  tireSize: z.string().trim().max(20).optional().or(z.literal("")),
+});
 
-export function QuoteForm() {
+const schema = quoteFieldsSchema.superRefine((data, ctx) => {
+  if (data.tireSize && !isValidTireSize(data.tireSize)) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["tireSize"],
+      message: "Use format 225/45R18",
+    });
+  }
+  const y = data.year?.trim();
+  if (y) {
+    const n = Number(y);
+    if (n < 1980 || n > currentYear + 1) {
+      ctx.addIssue({ code: "custom", path: ["year"], message: `Year between 1980–${currentYear + 1}` });
+    }
+  }
+});
+
+type Props = { serviceHint?: string };
+
+const step1Schema = quoteFieldsSchema.pick({ name: true, phone: true });
+const step2Schema = quoteFieldsSchema.pick({ year: true, make: true, model: true });
+
+export function QuoteForm({ serviceHint }: Props) {
   const { contact } = useContactContent();
+  const isMobile = useIsMobile();
+  const formRef = useRef<HTMLFormElement>(null);
   const callbackMessage = getQuoteCallbackMessage(normalizeHoursSchedule(contact.hours_schedule));
   const [status, setStatus] = useState<"idle" | "submitting" | "ok" | "err">("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [errorMsg, setErrorMsg] = useState("");
+  const [step, setStep] = useState(1);
+  const useSteps = isMobile;
+  const totalSteps = 3;
+
+  useEffect(() => {
+    setStep(1);
+  }, [serviceHint, useSteps]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -66,6 +82,12 @@ export function QuoteForm() {
       parsed.error.issues.forEach((i) => (errs[i.path[0] as string] = i.message));
       setErrors(errs);
       setStatus("err");
+      if (useSteps) {
+        const first = parsed.error.issues[0]?.path[0];
+        if (first === "name" || first === "phone") setStep(1);
+        else if (first === "year" || first === "make" || first === "model") setStep(2);
+        else setStep(3);
+      }
       return;
     }
     setErrors({});
@@ -78,6 +100,8 @@ export function QuoteForm() {
         parsed.data.model,
       );
       const tireSize = parsed.data.tireSize ? normalizeTireSize(parsed.data.tireSize) : undefined;
+      const interest = serviceHint?.trim();
+      const message = interest ? `Service interest: ${interest}` : undefined;
 
       await submitLead({
         type: "quote",
@@ -85,87 +109,198 @@ export function QuoteForm() {
         phone: parsed.data.phone,
         vehicle,
         tire_size: tireSize,
+        message,
       });
       setStatus("ok");
       e.currentTarget.reset();
+      setStep(1);
     } catch (err) {
       setStatus("err");
       setErrorMsg((err as Error).message || "Something went wrong. Please call us instead.");
     }
   }
 
+  function applyFieldErrors(issues: z.ZodIssue[]) {
+    const errs: Record<string, string> = {};
+    issues.forEach((i) => {
+      const key = i.path[0];
+      if (typeof key === "string") errs[key] = i.message;
+    });
+    setErrors(errs);
+    setStatus("err");
+  }
+
+  function validateCurrentStep(): boolean {
+    if (!formRef.current) return true;
+    const data = Object.fromEntries(new FormData(formRef.current)) as Record<string, string>;
+    if (step === 3) {
+      const tire = data.tireSize?.trim() ?? "";
+      if (tire && !isValidTireSize(tire)) {
+        setErrors({ tireSize: "Use format 225/45R18" });
+        setStatus("err");
+        return false;
+      }
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.tireSize;
+        return next;
+      });
+      return true;
+    }
+
+    const partial = step === 1 ? step1Schema.safeParse(data) : step2Schema.safeParse(data);
+    if (partial.success && step === 2) {
+      const y = data.year?.trim();
+      if (y) {
+        const n = Number(y);
+        if (n < 1980 || n > currentYear + 1) {
+          setErrors({ year: `Year between 1980–${currentYear + 1}` });
+          setStatus("err");
+          return false;
+        }
+      }
+    }
+    if (partial.success) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        const keys = step === 1 ? ["name", "phone"] : step === 2 ? ["year", "make", "model"] : ["tireSize"];
+        keys.forEach((k) => delete next[k]);
+        return next;
+      });
+      return true;
+    }
+    applyFieldErrors(partial.error.issues);
+    return false;
+  }
+
+  function nextStep() {
+    if (!validateCurrentStep()) return;
+    setStep((s) => Math.min(totalSteps, s + 1));
+  }
+
+  function prevStep() {
+    setStep((s) => Math.max(1, s - 1));
+  }
+
+  const contactFields = (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <PublicField id="quote-name" label="Name" name="name" error={errors.name} disabled={status === "submitting"} />
+      <PublicField
+        id="quote-phone"
+        label="Phone"
+        name="phone"
+        type="tel"
+        inputMode="tel"
+        error={errors.phone}
+        disabled={status === "submitting"}
+      />
+    </div>
+  );
+
+  const vehicleFields = (
+    <fieldset className="grid gap-3 rounded-sm border border-border/80 p-3 sm:p-4">
+      <legend className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        Your vehicle
+      </legend>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <PublicField
+          id="quote-year"
+          label="Year"
+          name="year"
+          placeholder={String(currentYear)}
+          inputMode="numeric"
+          optional
+          error={errors.year}
+          disabled={status === "submitting"}
+        />
+        <PublicField
+          id="quote-make"
+          label="Make"
+          name="make"
+          placeholder="e.g. BMW"
+          error={errors.make}
+          disabled={status === "submitting"}
+        />
+        <PublicField
+          id="quote-model"
+          label="Model"
+          name="model"
+          placeholder="e.g. M340i"
+          error={errors.model}
+          disabled={status === "submitting"}
+        />
+      </div>
+    </fieldset>
+  );
+
+  const tireFields = (
+    <div>
+      <PublicField
+        id="quote-tireSize"
+        label="Tyre size"
+        name="tireSize"
+        placeholder={TIRE_SIZE_PLACEHOLDER}
+        optional
+        error={errors.tireSize}
+        disabled={status === "submitting"}
+      />
+      <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{TIRE_SIZE_HINT}</p>
+    </div>
+  );
+
   return (
-    <form onSubmit={onSubmit} className="grid gap-4 p-5 sm:p-6">
+    <form ref={formRef} onSubmit={onSubmit} className="grid gap-4 p-5 sm:p-6">
       <div>
         <h3 className="font-display text-xl">Free quote</h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Year, make, model, and tire size help us quote faster — all fields help us fit you right.
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          Year, make, model, and tyre size help us quote faster.
         </p>
+        {serviceHint && (
+          <p className="mt-3 rounded-sm border border-primary/25 bg-primary/5 px-3 py-2 text-sm text-foreground">
+            Quoting for: <span className="font-semibold text-primary">{serviceHint}</span>
+          </p>
+        )}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <PublicField id="quote-name" label="Name" name="name" error={errors.name} disabled={status === "submitting"} />
-        <PublicField
-          id="quote-phone"
-          label="Phone"
-          name="phone"
-          type="tel"
-          inputMode="tel"
-          error={errors.phone}
-          disabled={status === "submitting"}
-        />
-      </div>
-
-      <fieldset className="grid gap-3 rounded-sm border border-border/80 p-3 sm:p-4">
-        <legend className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Your vehicle
-        </legend>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <PublicField
-            id="quote-year"
-            label="Year"
-            name="year"
-            placeholder={String(currentYear)}
-            inputMode="numeric"
-            optional
-            error={errors.year}
-            disabled={status === "submitting"}
-          />
-          <PublicField
-            id="quote-make"
-            label="Make"
-            name="make"
-            placeholder="e.g. BMW"
-            error={errors.make}
-            disabled={status === "submitting"}
-          />
-          <PublicField
-            id="quote-model"
-            label="Model"
-            name="model"
-            placeholder="e.g. M340i"
-            error={errors.model}
-            disabled={status === "submitting"}
-          />
+      {useSteps && (
+        <div className="flex items-center gap-2" aria-label={`Step ${step} of ${totalSteps}`}>
+          {[1, 2, 3].map((n) => (
+            <span
+              key={n}
+              className={cn(
+                "h-1.5 flex-1 rounded-full transition-colors",
+                n <= step ? "bg-primary" : "bg-border",
+              )}
+            />
+          ))}
         </div>
-      </fieldset>
+      )}
 
-      <div>
-        <PublicField
-          id="quote-tireSize"
-          label="Tire size"
-          name="tireSize"
-          placeholder={TIRE_SIZE_PLACEHOLDER}
-          optional
-          error={errors.tireSize}
-          disabled={status === "submitting"}
-        />
-        <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{TIRE_SIZE_HINT}</p>
+      {(!useSteps || step === 1) && contactFields}
+      {(!useSteps || step === 2) && vehicleFields}
+      {(!useSteps || step === 3) && tireFields}
+
+      <div className="flex flex-wrap gap-2">
+        {useSteps && step > 1 && (
+          <PublicOutlineButton
+            type="button"
+            className="min-h-11"
+            onClick={prevStep}
+            disabled={status === "submitting"}
+          >
+            Back
+          </PublicOutlineButton>
+        )}
+        {useSteps && step < totalSteps ? (
+          <PublicButton type="button" className="min-h-11 flex-1 sm:flex-none" onClick={nextStep}>
+            Continue
+          </PublicButton>
+        ) : (
+          <PublicButton type="submit" className="min-h-11 w-full sm:w-auto" disabled={status === "submitting"}>
+            {status === "submitting" ? "Sending…" : "Request quote"}
+          </PublicButton>
+        )}
       </div>
-
-      <PublicButton type="submit" className="w-full sm:w-auto" disabled={status === "submitting"}>
-        {status === "submitting" ? "Sending…" : "Request quote"}
-      </PublicButton>
 
       {status === "ok" && (
         <div

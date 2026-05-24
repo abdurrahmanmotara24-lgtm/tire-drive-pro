@@ -6,11 +6,12 @@ import logoWebp from "@/assets/logo.webp";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/theme-mode-toggle";
+import { OpenNowChip } from "@/components/open-now-chip";
 
 const nav = [
   { to: "/", label: "Home", exact: true },
   { to: "/about", label: "About", exact: false },
-  { to: "/locations", label: "Locations", exact: false },
+  { to: "/locations", label: "Visit us", exact: false },
   { to: "/hours", label: "Hours", exact: false },
   { to: "/contact", label: "Contact", exact: false },
 ] as const;
@@ -50,6 +51,37 @@ export function SiteHeader() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [menuOpen, closeMenu]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const panel = document.getElementById("site-header-menu");
+    if (!panel) return;
+
+    const selector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusables = () =>
+      Array.from(panel.querySelectorAll<HTMLElement>(selector)).filter(
+        (el) => !el.hasAttribute("disabled") && el.offsetParent !== null,
+      );
+
+    const focusables = getFocusables();
+    focusables[0]?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    panel.addEventListener("keydown", onKeyDown);
+    return () => panel.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -162,11 +194,12 @@ export function SiteHeader() {
             showHeaderLogo ? "lg:col-start-3" : "lg:col-start-2",
           )}
         >
+          <OpenNowChip className="hidden lg:inline-flex lg:mr-1" />
           {hasPhone && telHref && (
             <>
               <a
                 href={telHref}
-                className="site-header-call-mobile touch-target hover-btn-outline hover-icon-bump inline-flex items-center justify-center rounded-sm border border-border lg:hidden"
+                className="site-header-call-mobile site-header-action-btn touch-target hover-icon-bump lg:hidden"
                 aria-label="Call us"
               >
                 <Phone className="icon-bump h-4 w-4" />
@@ -182,7 +215,7 @@ export function SiteHeader() {
           <ThemeModeToggle />
           <button
             type="button"
-            className="site-header-menu-btn touch-target lg:hidden"
+            className="site-header-menu-btn site-header-action-btn touch-target hover-icon-bump lg:hidden"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="site-header-menu"
@@ -190,14 +223,14 @@ export function SiteHeader() {
           >
             <Menu
               className={cn(
-                "site-header-menu-btn__icon absolute h-5 w-5 transition-all duration-300",
+                "site-header-menu-btn__icon icon-bump absolute h-5 w-5 transition-all duration-300",
                 menuOpen ? "scale-75 rotate-90 opacity-0" : "scale-100 rotate-0 opacity-100",
               )}
               aria-hidden={menuOpen}
             />
             <X
               className={cn(
-                "site-header-menu-btn__icon absolute h-5 w-5 transition-all duration-300",
+                "site-header-menu-btn__icon icon-bump absolute h-5 w-5 transition-all duration-300",
                 menuOpen ? "scale-100 rotate-0 opacity-100" : "scale-75 -rotate-90 opacity-0",
               )}
               aria-hidden={!menuOpen}
