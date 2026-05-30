@@ -6,6 +6,7 @@ import { SeoMeta } from "@/components/seo-meta";
 import { CinematicHero } from "@/components/marketing/cinematic-hero";
 import { StatStrip } from "@/components/marketing/stat-strip";
 import { ServiceGrid } from "@/components/marketing/service-grid";
+import { SpecialsGrid } from "@/components/marketing/specials-grid";
 import { BrandMarquee } from "@/components/marketing/brand-marquee";
 import { ProcessSteps } from "@/components/marketing/process-steps";
 import { TestimonialCarousel } from "@/components/marketing/testimonial-carousel";
@@ -67,6 +68,12 @@ function Index() {
     enabled: cmsReady,
     placeholderData: DEFAULTS.services,
   });
+  const { data: specials = DEFAULTS.specials } = useQuery({
+    queryKey: ["content", "specials"],
+    queryFn: () => fetchContent("specials"),
+    enabled: cmsReady,
+    placeholderData: DEFAULTS.specials,
+  });
   const { data: brands = DEFAULTS.brands } = useQuery({
     queryKey: ["content", "brands"],
     queryFn: () => fetchContent("brands"),
@@ -108,6 +115,11 @@ function Index() {
         {sections.why_us_enabled && (
           <div className="section-below-fold">
             <ServiceGrid services={services} />
+          </div>
+        )}
+        {sections.specials_enabled && (
+          <div className="section-below-fold">
+            <SpecialsGrid specials={specials} />
           </div>
         )}
         {sections.why_us_enabled && (

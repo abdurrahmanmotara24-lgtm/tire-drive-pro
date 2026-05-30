@@ -5,8 +5,9 @@ import { useSyncCssVar } from "@/hooks/use-sync-css-var";
 import { cn } from "@/lib/utils";
 
 const LINKS: { key: keyof SectionsContent; hash: string; label: string }[] = [
-  { key: "why_us_enabled", hash: "services", label: "Services" },
   { key: "brands_enabled", hash: "brands", label: "Brands" },
+  { key: "why_us_enabled", hash: "services", label: "Services" },
+  { key: "specials_enabled", hash: "specials", label: "Specials" },
   { key: "process_enabled", hash: "process", label: "Process" },
   { key: "testimonials_enabled", hash: "testimonials", label: "Reviews" },
   { key: "quote_enabled", hash: "quote", label: "Quote" },

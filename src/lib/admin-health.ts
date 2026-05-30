@@ -43,6 +43,7 @@ export const CONTENT_LABELS: Record<string, string> = {
   contact: "Contact",
   sections: "Sections",
   services: "Services",
+  specials: "Specials",
   testimonials: "Reviews",
   about: "About",
   process: "Process",

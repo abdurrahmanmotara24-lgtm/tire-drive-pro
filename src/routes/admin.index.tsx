@@ -20,6 +20,7 @@ import {
   Phone,
   Sliders,
   Wrench,
+  Tag,
   MessageSquare,
   FileText,
   Palette,
@@ -60,6 +61,7 @@ function Dashboard() {
     { to: "/admin/images", title: "Site Images", desc: "Hero background, feature bands, and about photos.", icon: ImagePlus },
     { to: "/admin/sections", title: "Homepage Sections", desc: "Toggle and preview homepage blocks.", icon: Sliders },
     { to: "/admin/services", title: "Services & Brands", desc: "Service cards and brand marquee.", icon: Wrench },
+    { to: "/admin/specials", title: "Specials", desc: "Homepage deal cards and limited offers.", icon: Tag },
     { to: "/admin/testimonials", title: "Reviews", desc: "Customer testimonials carousel.", icon: MessageSquare },
     { to: "/admin/about", title: "About & Process", desc: "About page story and process steps.", icon: FileText },
     { to: "/admin/contact", title: "Contact Info", desc: "Phone, email, WhatsApp, socials.", icon: Phone },
@@ -74,7 +76,7 @@ function Dashboard() {
     { to: "/admin/seo", title: "SEO", desc: "Meta tags and Open Graph image.", icon: Search },
   ];
 
-  const contentKeys = ["hero", "homepage", "contact", "sections", "services", "testimonials", "about", "theme", "seo"] as const;
+  const contentKeys = ["hero", "homepage", "contact", "sections", "services", "specials", "testimonials", "about", "theme", "seo"] as const;
 
   return (
     <div>

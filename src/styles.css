@@ -245,6 +245,7 @@
   }
   #inventory-band,
   #services,
+  #specials,
   #process,
   #testimonials,
   #brands,
@@ -908,8 +909,44 @@
   .brand-marquee__brand {
     display: inline-flex;
     align-items: center;
-    min-height: 2.25rem;
+    justify-content: center;
+    flex-shrink: 0;
     line-height: 1.2;
+  }
+  /* Uniform square tile — ~Pirelli wordmark height (2.35rem) as the base unit */
+  .brand-marquee__logo-frame {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .brand-marquee__logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    opacity: 1;
+    transition: transform 0.3s ease;
+  }
+  @media (min-width: 640px) {
+    .brand-marquee__logo-frame {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+  @media (min-width: 768px) {
+    .brand-marquee__logo-frame {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+  .brand-marquee__name {
+    display: inline-block;
+    white-space: nowrap;
   }
   @media (max-width: 767px) {
     .marquee-track {

@@ -12,6 +12,7 @@ export const Route = createFileRoute("/admin/sections")({ component: SectionsAdm
 const labels: Record<keyof SectionsContent, string> = {
   brands_enabled: "Brand Showcase",
   why_us_enabled: "Services",
+  specials_enabled: "Specials",
   process_enabled: "How It Works",
   testimonials_enabled: "Testimonials",
   quote_enabled: "Quote / Lead Form",
@@ -21,6 +22,7 @@ const labels: Record<keyof SectionsContent, string> = {
 const previews: Record<keyof SectionsContent, string> = {
   brands_enabled: "/#brands",
   why_us_enabled: "/#services",
+  specials_enabled: "/#specials",
   process_enabled: "/#process",
   testimonials_enabled: "/#testimonials",
   quote_enabled: "/#quote",

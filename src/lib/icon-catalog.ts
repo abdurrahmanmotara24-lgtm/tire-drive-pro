@@ -9,5 +9,6 @@ export const SERVICE_ICON_OPTIONS = [
   { value: "BrakePad", label: "Brake disc — pads" },
   { value: "Phone", label: "Phone" },
   { value: "Target", label: "Target" },
-  { value: "Award", label: "Award" },
+  { value: "Award", label: "Award — deal / highlight" },
+  { value: "Tag", label: "Tag — offer / special" },
 ] as const;

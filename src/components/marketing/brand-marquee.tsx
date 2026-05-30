@@ -1,8 +1,30 @@
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
+import type { BrandItem } from "@/lib/site-content";
 import { SectionHeading } from "./section-heading";
 
-type Props = { brands: string[]; priority?: boolean };
+type Props = { brands: BrandItem[]; priority?: boolean };
+
+function BrandMark({ brand, nameClassName }: { brand: BrandItem; nameClassName?: string }) {
+  if (brand.logo) {
+    return (
+      <span className="brand-marquee__logo-frame" title={brand.name}>
+        <img
+          src={brand.logo}
+          alt={brand.name}
+          className="brand-marquee__logo"
+          loading="lazy"
+          decoding="async"
+        />
+      </span>
+    );
+  }
+  return (
+    <span className={cn("brand-marquee__name font-display tracking-[0.12em] text-muted-foreground", nameClassName)}>
+      {brand.name}
+    </span>
+  );
+}
 
 export function BrandMarquee({ brands, priority }: Props) {
   const reducedMotion = usePrefersReducedMotion();
@@ -26,10 +48,10 @@ export function BrandMarquee({ brands, priority }: Props) {
             align="center"
           />
         </div>
-        <ul className="container-tny flex flex-wrap justify-center gap-x-6 gap-y-3 sm:gap-x-8 sm:gap-y-4">
+        <ul className="container-tny flex flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-10">
           {brands.map((b) => (
-            <li key={b} className="font-display text-lg tracking-[0.12em] text-muted-foreground sm:text-xl">
-              {b}
+            <li key={b.name} className="brand-marquee__brand hover-brand shrink-0">
+              <BrandMark brand={b} nameClassName="text-lg sm:text-xl" />
             </li>
           ))}
         </ul>
@@ -47,27 +69,21 @@ export function BrandMarquee({ brands, priority }: Props) {
           align="center"
         />
       </div>
-      <div className="marquee-fade space-y-3 sm:space-y-4">
+      <div className="marquee-fade space-y-4 sm:space-y-5">
         <div className="overflow-hidden">
-          <div className="marquee-track gap-10 px-4 sm:gap-16">
+          <div className="marquee-track gap-8 px-4 sm:gap-12 md:gap-16">
             {row1.map((b, i) => (
-              <span
-                key={`a-${b}-${i}`}
-                className="brand-marquee__brand hover-brand font-display shrink-0 text-xl tracking-[0.12em] text-muted-foreground sm:text-2xl md:text-3xl"
-              >
-                {b}
+              <span key={`a-${b.name}-${i}`} className="brand-marquee__brand hover-brand shrink-0">
+                <BrandMark brand={b} nameClassName="text-xl sm:text-2xl md:text-3xl" />
               </span>
             ))}
           </div>
         </div>
         <div className="overflow-hidden">
-          <div className="marquee-track marquee-track-reverse gap-10 px-4 sm:gap-16">
+          <div className="marquee-track marquee-track-reverse gap-8 px-4 sm:gap-12 md:gap-16">
             {row2.map((b, i) => (
-              <span
-                key={`b-${b}-${i}`}
-                className="brand-marquee__brand hover-brand font-display shrink-0 text-lg tracking-[0.12em] text-muted-foreground/70 sm:text-xl md:text-2xl"
-              >
-                {b}
+              <span key={`b-${b.name}-${i}`} className="brand-marquee__brand hover-brand shrink-0">
+                <BrandMark brand={b} nameClassName="text-lg sm:text-xl md:text-2xl" />
               </span>
             ))}
           </div>

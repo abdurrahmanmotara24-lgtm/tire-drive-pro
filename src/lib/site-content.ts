@@ -92,6 +92,7 @@ export type ContactContent = {
 export type SectionsContent = {
   brands_enabled: boolean;
   why_us_enabled: boolean;
+  specials_enabled: boolean;
   process_enabled: boolean;
   testimonials_enabled: boolean;
   quote_enabled: boolean;
@@ -115,6 +116,7 @@ export function resolveSections(stored: Partial<SectionsContent> | null | undefi
   return {
     brands_enabled: toBool(stored?.brands_enabled, d.brands_enabled),
     why_us_enabled: toBool(stored?.why_us_enabled, d.why_us_enabled),
+    specials_enabled: toBool(stored?.specials_enabled, d.specials_enabled),
     process_enabled: toBool(stored?.process_enabled, d.process_enabled),
     testimonials_enabled: toBool(stored?.testimonials_enabled, d.testimonials_enabled),
     quote_enabled: toBool(stored?.quote_enabled, d.quote_enabled),
@@ -148,6 +150,67 @@ export type HomepageContent = {
 };
 
 export type ServiceItem = { icon: string; title: string; desc: string };
+
+export type BrandItem = {
+  name: string;
+  /** Logo URL from Media Library — transparent PNG/SVG recommended */
+  logo?: string;
+};
+
+export function resolveBrands(stored: unknown): BrandItem[] {
+  if (!Array.isArray(stored) || stored.length === 0) {
+    return DEFAULTS.brands;
+  }
+  return stored
+    .map((item) => {
+      if (typeof item === "string") {
+        const name = item.trim();
+        return name ? { name } : null;
+      }
+      const row = item as Partial<BrandItem>;
+      const name = row.name?.trim() ?? "";
+      if (!name) return null;
+      return {
+        name,
+        logo: row.logo?.trim() || undefined,
+      };
+    })
+    .filter((item): item is BrandItem => item !== null);
+}
+
+export type SpecialItem = {
+  icon: string;
+  title: string;
+  desc: string;
+  price: string;
+  badge?: string;
+  valid_until?: string;
+  image?: string;
+  /** Prefills the quote form when this special is clicked */
+  quote_service?: string;
+};
+
+export function resolveSpecials(stored: unknown): SpecialItem[] {
+  const arr = Array.isArray(stored) && stored.length > 0 ? (stored as SpecialItem[]) : DEFAULTS.specials;
+  return arr
+    .map((item, i) => {
+      const fallback = DEFAULTS.specials[i % DEFAULTS.specials.length]?.icon ?? "Gauge";
+      const icon =
+        item.icon?.trim() ||
+        resolveServiceIcon({ icon: fallback, title: item.title ?? "", desc: item.desc ?? "" }).icon;
+      return {
+        icon,
+        title: item.title?.trim() ?? "",
+        desc: item.desc?.trim() ?? "",
+        price: item.price?.trim() ?? "",
+        badge: item.badge?.trim() || undefined,
+        valid_until: item.valid_until?.trim() || undefined,
+        image: item.image?.trim() || undefined,
+        quote_service: item.quote_service?.trim() || undefined,
+      };
+    })
+    .filter((item) => item.title.length > 0);
+}
 
 export function resolveServiceIcon(item: ServiceItem): ServiceItem {
   const t = item.title.trim().toLowerCase();
@@ -298,6 +361,7 @@ export const DEFAULTS = {
   sections: {
     brands_enabled: true,
     why_us_enabled: true,
+    specials_enabled: true,
     process_enabled: true,
     testimonials_enabled: true,
     quote_enabled: true,
@@ -319,6 +383,32 @@ export const DEFAULTS = {
     about_story_image: "",
     about_banner_image: "",
   } as HomepageContent,
+  specials: [
+    {
+      icon: "Gauge",
+      title: "4 tyres + alignment",
+      desc: "Bundle fitment, balance, and laser alignment on one visit.",
+      price: "From R2,499",
+      badge: "Popular",
+      quote_service: "Passenger tyres",
+    },
+    {
+      icon: "BrakePad",
+      title: "Brake pads & discs",
+      desc: "Safety check included with every brake service.",
+      price: "Save 10%",
+      badge: "This month",
+      quote_service: "Brake pads & discs",
+    },
+    {
+      icon: "Truck",
+      title: "Fleet & commercial",
+      desc: "Volume pricing for vans, trucks, and fleet accounts.",
+      price: "Ask us",
+      badge: "Fleet",
+      quote_service: "Truck tyres",
+    },
+  ] as SpecialItem[],
   services: [
     { icon: "Gauge", title: "Passenger tyres", desc: "Premium brands, mount, balance, and fitment for every car." },
     { icon: "Truck", title: "Truck tyres", desc: "Commercial, fleet, and SUV — heavy-duty stock and expert fitting." },
@@ -332,7 +422,16 @@ export const DEFAULTS = {
     { name: "Elena R.", text: "Booked online, in and out in under an hour. Premium experience.", rating: 5 },
     { name: "David K.", text: "Best alignment I've had — car tracks straight at highway speed.", rating: 5 },
   ] as TestimonialItem[],
-  brands: ["Michelin", "Bridgestone", "Pirelli", "Continental", "Goodyear", "Dunlop", "Hankook", "Yokohama"],
+  brands: [
+    { name: "Michelin" },
+    { name: "Bridgestone" },
+    { name: "Pirelli" },
+    { name: "Continental" },
+    { name: "Goodyear" },
+    { name: "Dunlop" },
+    { name: "Hankook" },
+    { name: "Yokohama" },
+  ] as BrandItem[],
   about: {
     headline: "One shop. Serious fitment.",
     intro:
@@ -396,8 +495,9 @@ export type ContentMap = {
   contact: ContactContent;
   sections: SectionsContent;
   services: ServiceItem[];
+  specials: SpecialItem[];
   testimonials: TestimonialItem[];
-  brands: string[];
+  brands: BrandItem[];
   about: AboutContent;
   process: ProcessStep[];
   theme: ThemeContent;
@@ -412,6 +512,8 @@ export async function fetchContent<K extends keyof ContentMap>(
 
   if (!isSupabasePublicEnvConfigured()) {
     if (key === "services") return resolveServices(defaultVal) as ContentMap[K];
+    if (key === "specials") return resolveSpecials(defaultVal) as ContentMap[K];
+    if (key === "brands") return resolveBrands(defaultVal) as ContentMap[K];
     return defaultVal;
   }
 
@@ -432,6 +534,12 @@ export async function fetchContent<K extends keyof ContentMap>(
     if (Array.isArray(defaultVal)) {
       if (key === "services") {
         return resolveServices(stored) as ContentMap[K];
+      }
+      if (key === "specials") {
+        return resolveSpecials(stored) as ContentMap[K];
+      }
+      if (key === "brands") {
+        return resolveBrands(stored) as ContentMap[K];
       }
       const arr = Array.isArray(stored) && stored.length > 0 ? stored : defaultVal;
       return arr as ContentMap[K];
