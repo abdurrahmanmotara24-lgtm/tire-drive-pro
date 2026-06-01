@@ -1,56 +1,134 @@
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import type { BrandItem } from "@/lib/site-content";
+import { MarqueeTrack } from "./marquee-track";
 import { SectionHeading } from "./section-heading";
 
 type Props = { brands: BrandItem[]; priority?: boolean };
 
-function BrandMark({ brand, nameClassName }: { brand: BrandItem; nameClassName?: string }) {
-  if (brand.logo) {
+function BrandLogo({ brand }: { brand: BrandItem }) {
+  if (!brand.logo) return null;
+
+  if (brand.logoDark) {
     return (
-      <span className="brand-marquee__logo-frame" title={brand.name}>
+      <>
         <img
           src={brand.logo}
-          alt={brand.name}
-          className="brand-marquee__logo"
+          alt=""
+          aria-hidden
+          className="brand-marquee__logo brand-marquee__logo--on-light"
           loading="lazy"
           decoding="async"
         />
-      </span>
+        <img
+          src={brand.logoDark}
+          alt={brand.name}
+          className="brand-marquee__logo brand-marquee__logo--on-dark"
+          loading="lazy"
+          decoding="async"
+        />
+      </>
     );
   }
+
   return (
-    <span className={cn("brand-marquee__name font-display tracking-[0.12em] text-muted-foreground", nameClassName)}>
+    <img
+      src={brand.logo}
+      alt={brand.name}
+      className="brand-marquee__logo"
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
+
+function BrandMark({
+  brand,
+  nameClassName,
+  ariaHidden,
+}: {
+  brand: BrandItem;
+  nameClassName?: string;
+  ariaHidden?: boolean;
+}) {
+  const inner = brand.logo ? (
+    <span className="brand-marquee__logo-frame" title={brand.name}>
+      <BrandLogo brand={brand} />
+    </span>
+  ) : (
+    <span
+      className={cn(
+        "brand-marquee__name hover-brand font-display tracking-[0.12em] text-muted-foreground",
+        nameClassName,
+      )}
+    >
       {brand.name}
     </span>
   );
+
+  const mark = brand.href ? (
+    <a
+      href={brand.href}
+      className="brand-marquee__brand brand-marquee__link shrink-0"
+      aria-label={brand.name}
+      {...(ariaHidden ? { "aria-hidden": true as const, tabIndex: -1 } : {})}
+    >
+      {inner}
+    </a>
+  ) : (
+    <span
+      className="brand-marquee__brand shrink-0"
+      {...(ariaHidden ? { "aria-hidden": true as const } : {})}
+    >
+      {inner}
+    </span>
+  );
+
+  return mark;
 }
 
 export function BrandMarquee({ brands, priority }: Props) {
   const reducedMotion = usePrefersReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(true);
 
-  const row1 = [...brands, ...brands];
-  const row2 = [...[...brands].reverse(), ...[...brands].reverse()];
+  useEffect(() => {
+    if (reducedMotion) return;
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: "120px 0px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [reducedMotion]);
 
   const sectionClass = cn(
     "section-dark border-y border-border",
     priority ? "border-t-0 py-12" : "py-14",
   );
 
+  const heading = (
+    <div className="container-tny mb-10">
+      <SectionHeading
+        eyebrow="Partners"
+        title="Brands we stock"
+        subtitle="Trusted names — fitted with factory-spec precision."
+        align="center"
+      />
+    </div>
+  );
+
   if (reducedMotion) {
     return (
-      <section id="brands" className={sectionClass}>
-        <div className="container-tny mb-10">
-          <SectionHeading
-            eyebrow="Partners"
-            title="Brands we stock"
-            subtitle="Trusted names — fitted with factory-spec precision."
-            align="center"
-          />
-        </div>
+      <section id="brands" ref={sectionRef} className={sectionClass}>
+        {heading}
         <ul className="container-tny flex flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-10">
           {brands.map((b) => (
-            <li key={b.name} className="brand-marquee__brand hover-brand shrink-0">
+            <li key={b.name}>
               <BrandMark brand={b} nameClassName="text-lg sm:text-xl" />
             </li>
           ))}
@@ -60,34 +138,22 @@ export function BrandMarquee({ brands, priority }: Props) {
   }
 
   return (
-    <section id="brands" className={cn(sectionClass, "overflow-hidden")}>
-      <div className="container-tny mb-10">
-        <SectionHeading
-          eyebrow="Partners"
-          title="Brands we stock"
-          subtitle="Trusted names — fitted with factory-spec precision."
-          align="center"
+    <section id="brands" ref={sectionRef} className={cn(sectionClass, "overflow-hidden")}>
+      {heading}
+      <div
+        className={cn("marquee-fade", inView && "marquee-fade--in-view")}
+      >
+        <MarqueeTrack
+          items={brands}
+          getItemKey={(b) => b.name}
+          renderItem={(b, _i, { duplicate }) => (
+            <BrandMark
+              brand={b}
+              nameClassName="text-xl sm:text-2xl md:text-3xl"
+              ariaHidden={duplicate}
+            />
+          )}
         />
-      </div>
-      <div className="marquee-fade space-y-4 sm:space-y-5">
-        <div className="overflow-hidden">
-          <div className="marquee-track gap-8 px-4 sm:gap-12 md:gap-16">
-            {row1.map((b, i) => (
-              <span key={`a-${b.name}-${i}`} className="brand-marquee__brand hover-brand shrink-0">
-                <BrandMark brand={b} nameClassName="text-xl sm:text-2xl md:text-3xl" />
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="overflow-hidden">
-          <div className="marquee-track marquee-track-reverse gap-8 px-4 sm:gap-12 md:gap-16">
-            {row2.map((b, i) => (
-              <span key={`b-${b.name}-${i}`} className="brand-marquee__brand hover-brand shrink-0">
-                <BrandMark brand={b} nameClassName="text-lg sm:text-xl md:text-2xl" />
-              </span>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );

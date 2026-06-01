@@ -174,8 +174,9 @@ function ServicesAdmin() {
         <div>
           <h2 className="text-sm font-semibold">Brand marquee logos</h2>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Upload transparent PNG or SVG logos (~200–400px wide). They are auto-sized and toned to match the
-            partners band in light and dark mode. Leave logo empty to show the brand name as text.
+            Upload transparent PNG or SVG logos (~200–400px wide), cropped tight to the artwork (no extra white
+            padding). All logos display in the same square slot on the conveyor. Add a light-on-dark variant if the
+            default logo disappears in dark mode. Leave logo empty to show the brand name as text.
           </p>
         </div>
         {brands.map((brand, i) => (
@@ -207,6 +208,58 @@ function ServicesAdmin() {
                   }}
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Logo for dark background (optional)</Label>
+                <MediaPicker
+                  value={brand.logoDark ?? ""}
+                  onChange={(url) => {
+                    const next = [...brands];
+                    next[i] = { ...brand, logoDark: url || undefined };
+                    setBrands(next);
+                  }}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Link (optional)</Label>
+                <Input
+                  placeholder="https://…"
+                  value={brand.href ?? ""}
+                  onChange={(e) => {
+                    const next = [...brands];
+                    next[i] = { ...brand, href: e.target.value.trim() || undefined };
+                    setBrands(next);
+                  }}
+                />
+              </div>
+              {(brand.logo || brand.logoDark) && (
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Live slot preview</Label>
+                  <div className="flex flex-wrap gap-3">
+                    {brand.logo && (
+                      <div className="brand-marquee-preview section-dark inline-flex rounded-md border border-border p-3">
+                        <span className="brand-marquee__logo-frame">
+                          <img
+                            src={brand.logo}
+                            alt={brand.name || "Brand"}
+                            className="brand-marquee__logo"
+                          />
+                        </span>
+                      </div>
+                    )}
+                    {brand.logoDark && (
+                      <div className="brand-marquee-preview section-dark dark inline-flex rounded-md border border-border p-3">
+                        <span className="brand-marquee__logo-frame">
+                          <img
+                            src={brand.logoDark}
+                            alt={`${brand.name || "Brand"} (dark)`}
+                            className="brand-marquee__logo"
+                          />
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex flex-col gap-1">
               <Button

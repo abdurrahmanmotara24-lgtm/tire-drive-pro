@@ -155,6 +155,10 @@ export type BrandItem = {
   name: string;
   /** Logo URL from Media Library — transparent PNG/SVG recommended */
   logo?: string;
+  /** Optional light logo for dark backgrounds (#brands band in dark mode) */
+  logoDark?: string;
+  /** Optional link (manufacturer or internal page) */
+  href?: string;
 };
 
 export function resolveBrands(stored: unknown): BrandItem[] {
@@ -173,6 +177,8 @@ export function resolveBrands(stored: unknown): BrandItem[] {
       return {
         name,
         logo: row.logo?.trim() || undefined,
+        logoDark: row.logoDark?.trim() || undefined,
+        href: row.href?.trim() || undefined,
       };
     })
     .filter((item): item is BrandItem => item !== null);

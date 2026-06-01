@@ -826,9 +826,13 @@
   .stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
   .stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
   .marquee-fade {
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
   }
-  .marquee-track:hover {
+  .marquee-fade:not(.marquee-fade--in-view) .marquee-track {
+    animation-play-state: paused;
+  }
+  .marquee-track:hover,
+  .marquee-track:focus-within {
     animation-play-state: paused;
   }
   /* Visible by default; hidden only when JS enables scroll reveal */
@@ -881,7 +885,9 @@
     .hover-social:hover,
     .hover-brand:hover,
     .hover-process:hover,
-    .hover-logo:hover {
+    .hover-logo:hover,
+    .brand-marquee__brand:hover .brand-marquee__logo-frame,
+    .brand-marquee__name.hover-brand:hover {
       transform: none;
       filter: none;
       box-shadow: none;
@@ -889,22 +895,23 @@
     }
     .hover-link::after { display: none; }
   }
-  @keyframes marquee {
+  @keyframes marquee-measured {
     from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-  @keyframes marquee-reverse {
-    from { transform: translateX(-50%); }
-    to { transform: translateX(0); }
+    to { transform: translateX(calc(-1 * var(--marquee-distance, 50%))); }
   }
   .marquee-track {
     display: flex;
     width: max-content;
-    animation: marquee 45s linear infinite;
+    animation: marquee-measured var(--marquee-duration, 45s) linear infinite;
+    will-change: transform;
   }
-  .marquee-track-reverse {
-    animation-name: marquee-reverse;
-    animation-duration: 50s;
+  .marquee-track--reverse {
+    animation-direction: reverse;
+  }
+  .marquee-track__segment {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
   }
   .brand-marquee__brand {
     display: inline-flex;
@@ -913,15 +920,67 @@
     flex-shrink: 0;
     line-height: 1.2;
   }
-  /* Uniform square tile — ~Pirelli wordmark height (2.35rem) as the base unit */
+  /* Uniform square logo tiles — tune with --brand-logo-tile on #brands */
+  #brands,
+  .brand-marquee-preview {
+    --brand-logo-tile: 3.25rem;
+    --marquee-speed: 48;
+  }
+  @media (max-width: 767px) {
+    #brands {
+      --marquee-speed: 40;
+    }
+  }
+  .brand-marquee__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(var(--radius) - 2px);
+    text-decoration: none;
+    color: inherit;
+  }
+  .brand-marquee__link:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
   .brand-marquee__logo-frame {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.35rem;
-    height: 2.35rem;
+    width: var(--brand-logo-tile);
+    height: var(--brand-logo-tile);
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
+    transform-origin: center;
+    border-radius: calc(var(--radius) - 2px);
+    border: 1px solid oklch(0.2 0.01 90 / 0.1);
+    background: oklch(1 0 0 / 0.55);
+    box-shadow: 0 1px 3px oklch(0.15 0.01 90 / 0.08);
+    padding: 0.35rem;
+    transition:
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .dark #brands .brand-marquee__logo-frame,
+  .brand-marquee-preview.dark .brand-marquee__logo-frame {
+    border-color: oklch(1 0 0 / 0.12);
+    background: oklch(0.12 0 0 / 0.65);
+    box-shadow: 0 2px 12px oklch(0 0 0 / 0.35);
+  }
+  .brand-marquee__brand:hover .brand-marquee__logo-frame,
+  .brand-marquee__link:hover .brand-marquee__logo-frame {
+    border-color: color-mix(in oklch, var(--primary) 45%, transparent);
+  }
+  .brand-marquee__brand:hover .brand-marquee__logo-frame,
+  .brand-marquee__link:hover .brand-marquee__logo-frame {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 16px color-mix(in oklch, var(--primary) 38%, transparent));
+  }
+  .brand-marquee__brand.hover-brand:hover {
+    transform: none;
+    text-shadow: none;
+    color: inherit;
   }
   .brand-marquee__logo {
     display: block;
@@ -930,31 +989,35 @@
     object-fit: contain;
     object-position: center;
     opacity: 1;
-    transition: transform 0.3s ease;
+  }
+  #brands .brand-marquee__logo--on-dark {
+    display: none;
+  }
+  .dark #brands .brand-marquee__logo--on-light {
+    display: none;
+  }
+  .dark #brands .brand-marquee__logo--on-dark {
+    display: block;
   }
   @media (min-width: 640px) {
-    .brand-marquee__logo-frame {
-      width: 2.75rem;
-      height: 2.75rem;
+    #brands,
+    .brand-marquee-preview {
+      --brand-logo-tile: 3.75rem;
     }
   }
   @media (min-width: 768px) {
-    .brand-marquee__logo-frame {
-      width: 3rem;
-      height: 3rem;
+    #brands {
+      --brand-logo-tile: 4.5rem;
     }
   }
   .brand-marquee__name {
     display: inline-block;
     white-space: nowrap;
   }
-  @media (max-width: 767px) {
-    .marquee-track {
-      animation-duration: 62s;
-    }
-    .marquee-track-reverse {
-      animation-duration: 68s;
-    }
+  .brand-marquee__name.hover-brand:hover {
+    transform: scale(1.08);
+    color: var(--primary);
+    text-shadow: 0 0 24px color-mix(in oklch, var(--primary) 40%, transparent);
   }
   .scroll-pad-quote {
     scroll-margin-bottom: calc(var(--site-contact-bar-height, 4.25rem) + 1rem);
