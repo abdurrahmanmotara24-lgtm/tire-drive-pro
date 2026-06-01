@@ -37,11 +37,18 @@ export function MarqueeTrack<T>({
     if (!el) return;
 
     const measure = () => {
-      const distance = el.offsetWidth;
+      const track = el.parentElement;
+      const trackGap = track
+        ? Number.parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0
+        : 0;
+      // Include gap between duplicate segments so the loop seam matches item spacing
+      const distance = el.offsetWidth + trackGap;
       const speed = getMarqueeSpeedPxPerSec();
+      const baseDuration = distance > 0 ? distance / speed : 45;
       setMetrics({
         distance,
-        duration: distance > 0 ? distance / speed : 45,
+        // Slightly slower reverse row (matches prior 50s vs 45s feel)
+        duration: reverse ? baseDuration * (50 / 48) : baseDuration,
       });
     };
 
@@ -54,7 +61,7 @@ export function MarqueeTrack<T>({
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [items]);
+  }, [items, reverse]);
 
   const trackStyle = {
     "--marquee-distance": `${metrics.distance}px`,
@@ -67,20 +74,16 @@ export function MarqueeTrack<T>({
         className={cn("marquee-track px-4", reverse && "marquee-track--reverse", trackClassName)}
         style={trackStyle}
       >
-        <div
-          ref={segmentRef}
-          className={cn("marquee-track__segment gap-10 sm:gap-12 md:gap-14", segmentClassName)}
-        >
+        <div ref={segmentRef} className={cn("marquee-track__segment", segmentClassName)}>
           {items.map((item, index) => (
-            <div key={getItemKey(item, index)}>{renderItem(item, index, { duplicate: false })}</div>
+            <div key={getItemKey(item, index)} className="brand-marquee__cell">
+              {renderItem(item, index, { duplicate: false })}
+            </div>
           ))}
         </div>
-        <div
-          className={cn("marquee-track__segment gap-10 sm:gap-12 md:gap-14", segmentClassName)}
-          aria-hidden
-        >
+        <div className={cn("marquee-track__segment", segmentClassName)} aria-hidden>
           {items.map((item, index) => (
-            <div key={`dup-${getItemKey(item, index)}`}>
+            <div key={`dup-${getItemKey(item, index)}`} className="brand-marquee__cell">
               {renderItem(item, index, { duplicate: true })}
             </div>
           ))}

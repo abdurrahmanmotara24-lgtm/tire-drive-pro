@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { BRAND_NAME } from "@/lib/brand";
 import { DEFAULTS, fetchContent } from "@/lib/site-content";
 import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 
@@ -36,6 +37,8 @@ export function SeoMeta({ title, description }: Props) {
     setMeta("name", "description", pageDescription);
     setMeta("property", "og:title", pageTitle);
     setMeta("property", "og:description", pageDescription);
+    setMeta("property", "og:site_name", BRAND_NAME);
+    setMeta("property", "og:locale", "en_AU");
     setMeta("name", "twitter:title", pageTitle);
     setMeta("name", "twitter:description", pageDescription);
     if (seo.og_image) {

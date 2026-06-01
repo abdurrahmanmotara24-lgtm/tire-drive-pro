@@ -7,6 +7,7 @@ import { PageIntro } from "@/components/marketing/page-intro";
 import { BranchCard } from "@/components/marketing/branch-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SeoMeta } from "@/components/seo-meta";
+import { LocalBusinessJsonLd } from "@/components/local-business-json-ld";
 import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { brandPageTitle } from "@/lib/brand";
@@ -54,6 +55,7 @@ function Locations() {
   return (
     <>
       <SeoMeta title={PAGE_TITLE} description={PAGE_DESC} />
+      <LocalBusinessJsonLd />
       <PageIntro
         eyebrow="Visit us"
         title="Our store"

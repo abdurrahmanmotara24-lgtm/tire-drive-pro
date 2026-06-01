@@ -902,6 +902,7 @@
   .marquee-track {
     display: flex;
     width: max-content;
+    gap: var(--brand-marquee-gap, 2.5rem);
     animation: marquee-measured var(--marquee-duration, 45s) linear infinite;
     will-change: transform;
   }
@@ -912,6 +913,13 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    gap: var(--brand-marquee-gap, 2.5rem);
+  }
+  .brand-marquee__cell {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
   }
   .brand-marquee__brand {
     display: inline-flex;
@@ -924,6 +932,7 @@
   #brands,
   .brand-marquee-preview {
     --brand-logo-tile: 3.25rem;
+    --brand-marquee-gap: 2.5rem;
     --marquee-speed: 48;
   }
   @media (max-width: 767px) {
@@ -971,9 +980,6 @@
   .brand-marquee__brand:hover .brand-marquee__logo-frame,
   .brand-marquee__link:hover .brand-marquee__logo-frame {
     border-color: color-mix(in oklch, var(--primary) 45%, transparent);
-  }
-  .brand-marquee__brand:hover .brand-marquee__logo-frame,
-  .brand-marquee__link:hover .brand-marquee__logo-frame {
     transform: scale(1.06);
     filter: drop-shadow(0 0 16px color-mix(in oklch, var(--primary) 38%, transparent));
   }
@@ -1003,11 +1009,13 @@
     #brands,
     .brand-marquee-preview {
       --brand-logo-tile: 3.75rem;
+      --brand-marquee-gap: 3rem;
     }
   }
   @media (min-width: 768px) {
     #brands {
       --brand-logo-tile: 4.5rem;
+      --brand-marquee-gap: 3.5rem;
     }
   }
   .brand-marquee__name {

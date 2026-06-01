@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DEFAULTS, fetchContent } from "@/lib/site-content";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { SeoMeta } from "@/components/seo-meta";
+import { LocalBusinessJsonLd } from "@/components/local-business-json-ld";
 import { CinematicHero } from "@/components/marketing/cinematic-hero";
 import { StatStrip } from "@/components/marketing/stat-strip";
 import { ServiceGrid } from "@/components/marketing/service-grid";
@@ -34,7 +35,7 @@ export const Route = createFileRoute("/")({
       { title: BRAND_FULL_TITLE },
       {
         name: "description",
-        content: "Premium tyres, precision fitment, laser alignment and balancing. Performance service for drivers who expect more.",
+        content: DEFAULTS.seo.description,
       },
     ],
     links: [{ rel: "canonical", href: "/" }],
@@ -106,6 +107,7 @@ function Index() {
   return (
     <>
       <SeoMeta />
+      <LocalBusinessJsonLd />
       <CinematicHero hero={hero} callHref={callHref} bleedUnderHeader />
       <div id="content">
         <HomePageSubnav sections={sections} />

@@ -76,6 +76,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: DEFAULTS.seo.title },
       { property: "og:description", content: DEFAULTS.seo.description },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Tyres Near Me" },
+      { property: "og:locale", content: "en_AU" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: BRAND_FULL_TITLE },
       { name: "twitter:description", content: DEFAULTS.seo.description },

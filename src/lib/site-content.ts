@@ -490,7 +490,7 @@ export const DEFAULTS = {
   seo: {
     title: BRAND_FULL_TITLE,
     description:
-      "Premium tyres, precision fitment, laser alignment and balancing. Performance service for drivers who expect more.",
+      "Premium tyres, mount & balance, laser alignment, mag wheels and fleet fitment. Same-day service and honest advice — visit our fitment centre or request a free quote.",
     og_image: "",
   } as SeoContent,
 };

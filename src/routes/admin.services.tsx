@@ -174,9 +174,10 @@ function ServicesAdmin() {
         <div>
           <h2 className="text-sm font-semibold">Brand marquee logos</h2>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Upload transparent PNG or SVG logos (~200–400px wide), cropped tight to the artwork (no extra white
-            padding). All logos display in the same square slot on the conveyor. Add a light-on-dark variant if the
-            default logo disappears in dark mode. Leave logo empty to show the brand name as text.
+            Upload transparent PNG or SVG logos, cropped tight to the artwork (no extra white padding). Aim for
+            200–400px wide; keep files under ~200&nbsp;KB when possible. All logos use the same square slot on the
+            conveyor. Add a light-on-dark variant if the default logo disappears on the dark brands band. Optional
+            link opens in a new tab when it starts with https://. Leave logo empty to show the brand name as text.
           </p>
         </div>
         {brands.map((brand, i) => (
