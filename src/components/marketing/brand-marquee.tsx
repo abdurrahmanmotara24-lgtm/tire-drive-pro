@@ -3,46 +3,91 @@ import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { useReveal } from "@/hooks/use-reveal";
 import type { BrandItem } from "@/lib/site-content";
+import { getBundledBrandLogos } from "@/lib/brand-logo-defaults";
 import { MarqueeTrack } from "./marquee-track";
 import { SectionHeading } from "./section-heading";
 
 type Props = { brands: BrandItem[]; priority?: boolean };
 
+function BrandImage({
+  src,
+  brandName,
+  variant,
+  priority,
+  alt,
+  ariaHidden,
+}: {
+  src: string;
+  brandName: string;
+  variant: "light" | "dark" | "single";
+  priority?: boolean;
+  alt: string;
+  ariaHidden?: boolean;
+}) {
+  const bundled = getBundledBrandLogos(brandName);
+  const fallback =
+    variant === "dark" ? bundled?.logoDark : variant === "light" ? bundled?.logo : bundled?.logo;
+  const [currentSrc, setCurrentSrc] = useState(src);
+
+  useEffect(() => {
+    setCurrentSrc(src);
+  }, [src]);
+
+  const className =
+    variant === "light"
+      ? "brand-marquee__logo brand-marquee__logo--on-light"
+      : variant === "dark"
+        ? "brand-marquee__logo brand-marquee__logo--on-dark"
+        : "brand-marquee__logo";
+
+  return (
+    <img
+      src={currentSrc}
+      alt={alt}
+      aria-hidden={ariaHidden}
+      className={className}
+      loading={priority ? "eager" : "lazy"}
+      decoding="async"
+      {...(priority ? { fetchPriority: "high" as const } : {})}
+      onError={() => {
+        if (fallback && currentSrc !== fallback) setCurrentSrc(fallback);
+      }}
+    />
+  );
+}
+
 function BrandLogo({ brand, priority }: { brand: BrandItem; priority?: boolean }) {
   if (!brand.logo) return null;
-
-  const imgProps = {
-    loading: (priority ? "eager" : "lazy") as "eager" | "lazy",
-    decoding: "async" as const,
-    ...(priority ? { fetchPriority: "high" as const } : {}),
-  };
 
   if (brand.logoDark) {
     return (
       <>
-        <img
+        <BrandImage
           src={brand.logo}
+          brandName={brand.name}
+          variant="light"
+          priority={priority}
           alt=""
-          aria-hidden
-          className="brand-marquee__logo brand-marquee__logo--on-light"
-          {...imgProps}
+          ariaHidden
         />
-        <img
+        <BrandImage
           src={brand.logoDark}
+          brandName={brand.name}
+          variant="dark"
+          priority={priority}
           alt={brand.name}
-          className="brand-marquee__logo brand-marquee__logo--on-dark"
-          {...imgProps}
         />
       </>
     );
   }
 
   return (
-    <img
+    <BrandImage
       src={brand.logo}
+      brandName={brand.name}
+      variant="single"
+      priority={priority}
       alt={brand.name}
-      className="brand-marquee__logo"
-      {...imgProps}
     />
   );
 }

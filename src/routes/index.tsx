@@ -75,6 +75,8 @@ function Index() {
     queryKey: ["content", "brands"],
     queryFn: () => fetchContent("brands"),
     placeholderData: resolveBrands(DEFAULTS.brands),
+    staleTime: 30_000,
+    refetchOnMount: "always",
   });
   const { data: process = DEFAULTS.process } = useQuery({
     queryKey: ["content", "process"],
