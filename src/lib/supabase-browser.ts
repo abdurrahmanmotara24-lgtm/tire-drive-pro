@@ -94,9 +94,13 @@ export function resetSupabaseBrowserClient(): void {
 }
 
 function getClient(): SupabaseClient {
-  if (client !== undefined) return client ?? createStubClient();
-  client = createLiveClient();
-  return client ?? createStubClient();
+  if (client) return client;
+  const live = createLiveClient();
+  if (live) {
+    client = live;
+    return live;
+  }
+  return createStubClient();
 }
 
 export const supabase = new Proxy({} as SupabaseClient, {

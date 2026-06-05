@@ -1,5 +1,9 @@
 import { requireSupabaseConfigured, supabase } from "@/lib/supabase-browser";
-import { isSupabasePublicEnvConfigured, readSupabasePublicEnv } from "@/lib/env";
+import { applyBrandLogoDefaults } from "@/lib/brand-logo-defaults";
+import {
+  ensureCloudContentReadable,
+  getContentSupabaseClient,
+} from "@/lib/supabase-content";
 import {
   DEFAULT_HOURS_SCHEDULE,
   formatHoursSummary,
@@ -162,26 +166,30 @@ export type BrandItem = {
 };
 
 export function resolveBrands(stored: unknown): BrandItem[] {
-  if (!Array.isArray(stored) || stored.length === 0) {
-    return DEFAULTS.brands;
-  }
-  return stored
-    .map((item) => {
-      if (typeof item === "string") {
-        const name = item.trim();
-        return name ? { name } : null;
-      }
-      const row = item as Partial<BrandItem>;
-      const name = row.name?.trim() ?? "";
-      if (!name) return null;
-      return {
-        name,
-        logo: row.logo?.trim() || undefined,
-        logoDark: row.logoDark?.trim() || undefined,
-        href: row.href?.trim() || undefined,
-      };
-    })
-    .filter((item): item is BrandItem => item !== null);
+  const resolved = (() => {
+    if (!Array.isArray(stored) || stored.length === 0) {
+      return DEFAULTS.brands;
+    }
+    return stored
+      .map((item) => {
+        if (typeof item === "string") {
+          const name = item.trim();
+          return name ? { name } : null;
+        }
+        const row = item as Partial<BrandItem>;
+        const name = row.name?.trim() ?? "";
+        if (!name) return null;
+        return {
+          name,
+          logo: row.logo?.trim() || undefined,
+          logoDark: row.logoDark?.trim() || undefined,
+          href: row.href?.trim() || undefined,
+        };
+      })
+      .filter((item): item is BrandItem => item !== null);
+  })();
+
+  return applyBrandLogoDefaults(resolved);
 }
 
 export type SpecialItem = {
@@ -511,20 +519,27 @@ export type ContentMap = {
   seo: SeoContent;
 };
 
+function resolveContentDefault<K extends keyof ContentMap>(key: K, defaultVal: ContentMap[K]): ContentMap[K] {
+  if (key === "services") return resolveServices(defaultVal) as ContentMap[K];
+  if (key === "specials") return resolveSpecials(defaultVal) as ContentMap[K];
+  if (key === "brands") return resolveBrands(defaultVal) as ContentMap[K];
+  return defaultVal;
+}
+
 export async function fetchContent<K extends keyof ContentMap>(
   key: K,
 ): Promise<ContentMap[K]> {
   const defaultVal = DEFAULTS[key];
 
-  if (!isSupabasePublicEnvConfigured()) {
-    if (key === "services") return resolveServices(defaultVal) as ContentMap[K];
-    if (key === "specials") return resolveSpecials(defaultVal) as ContentMap[K];
-    if (key === "brands") return resolveBrands(defaultVal) as ContentMap[K];
-    return defaultVal;
+  const cloudReady = await ensureCloudContentReadable();
+  const client = cloudReady ? getContentSupabaseClient() : null;
+
+  if (!client) {
+    return resolveContentDefault(key, defaultVal);
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from("site_content")
       .select("value")
       .eq("key", key)
@@ -532,7 +547,7 @@ export async function fetchContent<K extends keyof ContentMap>(
 
     if (error) {
       console.warn(`[site-content] ${key}:`, error.message);
-      return defaultVal;
+      return resolveContentDefault(key, defaultVal);
     }
 
     const stored = data?.value;
@@ -580,7 +595,7 @@ export async function fetchContent<K extends keyof ContentMap>(
     return merged;
   } catch (e) {
     console.warn(`[site-content] ${key}:`, e);
-    return defaultVal;
+    return resolveContentDefault(key, defaultVal);
   }
 }
 

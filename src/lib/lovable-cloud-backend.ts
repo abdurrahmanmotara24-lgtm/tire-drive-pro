@@ -1,4 +1,5 @@
 import { isSupabasePublicEnvConfigured, resolveSupabasePublicEnv } from "@/lib/env";
+import { resetContentSupabaseClient } from "@/lib/supabase-content";
 import { resetSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 export type CloudBackendStatus = "loading" | "ready" | "unavailable";
@@ -17,6 +18,7 @@ function applyCloudCredentials(url: string, key: string): boolean {
   if (typeof window === "undefined") return false;
   window.__TNY_SUPABASE_PUBLIC__ = { url, key };
   resetSupabaseBrowserClient();
+  resetContentSupabaseClient();
   notifyCloudCredentialsReady();
   return true;
 }
