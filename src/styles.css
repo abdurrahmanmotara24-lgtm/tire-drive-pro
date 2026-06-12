@@ -256,6 +256,37 @@
     );
   }
 
+  .home-subnav__scroll-fade {
+    background: linear-gradient(
+      to left,
+      color-mix(in oklch, var(--background) 96%, transparent) 0%,
+      color-mix(in oklch, var(--background) 72%, transparent) 45%,
+      transparent 100%
+    );
+  }
+
+  .home-subnav__scroll-chevron {
+    animation: home-subnav-nudge 1.6s ease-in-out infinite;
+  }
+
+  @keyframes home-subnav-nudge {
+    0%,
+    100% {
+      transform: translateX(0);
+      opacity: 0.85;
+    }
+    50% {
+      transform: translateX(3px);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-subnav__scroll-chevron {
+      animation: none;
+    }
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
