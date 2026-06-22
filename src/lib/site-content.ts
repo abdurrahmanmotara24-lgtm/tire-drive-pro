@@ -11,6 +11,7 @@ import {
   type HoursSchedule,
 } from "@/lib/hours-schedule";
 import { BRAND_DEFAULT_EMAIL, BRAND_FULL_TITLE, BRAND_NAME } from "@/lib/brand";
+import { contactWithSocialAccounts, syncLegacySocialFields, type SocialAccount } from "@/lib/social-accounts";
 
 export type HeroOffering = {
   label: string;
@@ -90,6 +91,8 @@ export type ContactContent = {
   hours: string;
   hours_schedule?: HoursSchedule;
   lead_notify_email?: string;
+  /** Dynamic social links — preferred over legacy facebook/instagram/twitter fields */
+  social_accounts?: SocialAccount[];
   facebook: string;
   instagram: string;
   twitter: string;
@@ -370,6 +373,7 @@ export const DEFAULTS = {
     hours: formatHoursSummary(DEFAULT_HOURS_SCHEDULE),
     hours_schedule: DEFAULT_HOURS_SCHEDULE,
     lead_notify_email: "",
+    social_accounts: [],
     facebook: "",
     instagram: "",
     twitter: "",
@@ -573,11 +577,11 @@ export async function fetchContent<K extends keyof ContentMap>(
     if (key === "contact") {
       const c = merged as ContactContent;
       const schedule = normalizeHoursSchedule(c.hours_schedule);
-      return {
+      return contactWithSocialAccounts({
         ...c,
         hours_schedule: schedule,
         hours: c.hours?.trim() ? c.hours : formatHoursSummary(schedule),
-      } as ContentMap[K];
+      }) as ContentMap[K];
     }
     if (key === "hero") {
       return resolveHero(stored as Partial<HeroContent> | null) as ContentMap[K];

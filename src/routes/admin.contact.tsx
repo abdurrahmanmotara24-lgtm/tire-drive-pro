@@ -9,7 +9,9 @@ import { AdminSaveBar } from "@/components/admin/admin-save-bar";
 import { AdminPreviewLayout, AdminPreviewMobileLink } from "@/components/admin/admin-preview-layout";
 import { HoursScheduleEditor } from "@/components/admin/hours-schedule-editor";
 import { ResetDefaultsButton } from "@/components/admin/reset-defaults-button";
+import { SocialAccountsEditor } from "@/components/admin/social-accounts-editor";
 import { useAdminForm } from "@/hooks/use-admin-form";
+import { contactWithSocialAccounts, syncLegacySocialFields } from "@/lib/social-accounts";
 
 export const Route = createFileRoute("/admin/contact")({ component: ContactAdmin });
 
@@ -20,17 +22,21 @@ function ContactAdmin() {
     queryKey: ["content", "contact"],
     onSave: async (v) => {
       const schedule = normalizeHoursSchedule(v.hours_schedule);
-      await saveContent("contact", {
-        ...v,
-        hours_schedule: schedule,
-        hours: formatHoursSummary(schedule),
-      });
+      await saveContent(
+        "contact",
+        syncLegacySocialFields({
+          ...v,
+          hours_schedule: schedule,
+          hours: formatHoursSummary(schedule),
+        }),
+      );
     },
   });
 
   if (!ready || !form) return <div className="text-sm text-muted-foreground">Loading…</div>;
 
   const schedule = normalizeHoursSchedule(form.hours_schedule);
+  const socialAccounts = form.social_accounts ?? contactWithSocialAccounts(form).social_accounts ?? [];
 
   const f = (k: keyof ContactContent, label: string, placeholder?: string) => (
     <div>
@@ -71,11 +77,10 @@ function ContactAdmin() {
           onChange={(e) => setForm({ ...form, lead_notify_email: e.target.value })}
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
-        {f("facebook", "Facebook URL")}
-        {f("instagram", "Instagram URL")}
-        {f("twitter", "Twitter / X URL")}
-      </div>
+      <SocialAccountsEditor
+        value={socialAccounts}
+        onChange={(social_accounts) => setForm({ ...form, social_accounts })}
+      />
       <AdminSaveBar busy={busy} isDirty={isDirty} onSave={submit} />
     </Card>
   );

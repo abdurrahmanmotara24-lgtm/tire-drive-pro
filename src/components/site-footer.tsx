@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { useContactContent } from "@/hooks/use-contact-content";
+import { toSocialLinks } from "@/lib/social-accounts";
 import { DEFAULTS, fetchContent } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
 
@@ -13,11 +14,7 @@ export function SiteFooter({ className }: { className?: string }) {
     staleTime: 60_000,
   });
 
-  const socials = [
-    { icon: Facebook, href: contact.facebook, label: "Facebook" },
-    { icon: Instagram, href: contact.instagram, label: "Instagram" },
-    { icon: Twitter, href: contact.twitter, label: "Twitter" },
-  ].filter((s) => s.href);
+  const socials = toSocialLinks(contact);
 
   const serviceLinks = services.filter((s) => s.title.trim()).slice(0, 6);
 
@@ -114,11 +111,11 @@ export function SiteFooter({ className }: { className?: string }) {
               <div className="mt-3 flex flex-wrap gap-2">
                 {socials.map((s) => (
                   <a
-                    key={s.label}
-                    href={s.href}
+                    key={`${s.platform}-${s.url}`}
+                    href={s.url}
                     target="_blank"
                     rel="noreferrer"
-                    aria-label={s.label}
+                    aria-label={s.displayLabel}
                     className="hover-social touch-target flex h-11 w-11 items-center justify-center rounded-sm border border-border text-muted-foreground"
                   >
                     <s.icon className="h-4 w-4" />

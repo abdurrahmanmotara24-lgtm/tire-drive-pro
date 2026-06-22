@@ -51,7 +51,7 @@ function Dashboard() {
   const { data: seo } = useQuery({ queryKey: ["content", "seo"], queryFn: () => fetchContent("seo") });
 
   const health = getSiteHealthChecks({
-    contact: contact ?? { phone: "", email: "", whatsapp: "", address: "", hours: "", facebook: "", instagram: "", twitter: "" },
+    contact: contact ?? { phone: "", email: "", whatsapp: "", address: "", hours: "", social_accounts: [], facebook: "", instagram: "", twitter: "" },
     seo: seo ?? { title: "", description: "", og_image: "" },
     contentMeta: meta,
   });
