@@ -10,6 +10,7 @@ import {
   type LeadStatus,
 } from "@/lib/site-content";
 import { normalizeWhatsAppDigits } from "@/lib/phone-utils";
+import { useContactContent } from "@/hooks/use-contact-content";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +48,7 @@ function LeadsAdmin() {
   const qc = useQueryClient();
   const { waHref } = useContactContent();
   const [filter, setFilter] = useState<LeadStatus | "all">("new");
-  const { data: leads = [], isLoading } = useQuery({
+  const { data: leads = [], isLoading, error } = useQuery({
     queryKey: ["leads", filter],
     queryFn: () => fetchLeads(filter),
   });
@@ -124,6 +125,10 @@ function LeadsAdmin() {
           </button>
         ))}
       </div>
+
+      {error && (
+        <p className="mt-4 text-sm text-destructive">{(error as Error).message}</p>
+      )}
 
       {isLoading ? (
         <p className="mt-8 text-sm text-muted-foreground">Loading…</p>

@@ -148,6 +148,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_find_user_by_email: {
+        Args: { _email: string }
+        Returns: string | null
+      }
+      admin_list_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string | null
+          created_at: string
+          last_sign_in_at: string | null
+          roles: Database["public"]["Enums"]["app_role"][] | null
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
