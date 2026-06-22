@@ -1,6 +1,7 @@
 import { MapPin, Phone, Clock, MessageCircle, Navigation } from "lucide-react";
 import type { LocationRow } from "@/lib/site-content";
 import { useContactContent } from "@/hooks/use-contact-content";
+import { buildWaMeUrl, WHATSAPP_QUOTE_MESSAGE } from "@/lib/phone-utils";
 
 export function BranchCard({ branch }: { branch: LocationRow }) {
   const { contact, waHref: siteWa, telHref: siteTel } = useContactContent();
@@ -11,7 +12,7 @@ export function BranchCard({ branch }: { branch: LocationRow }) {
   const tel = phone ? `tel:${phone.replace(/[^+\d]/g, "")}` : siteTel;
   const storeWa =
     phone && siteWa
-      ? `https://wa.me/${phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent("Hi, I'd like to enquire about tyres.")}`
+      ? buildWaMeUrl(phone, WHATSAPP_QUOTE_MESSAGE)
       : siteWa;
 
   return (

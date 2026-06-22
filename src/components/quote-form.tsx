@@ -57,7 +57,7 @@ const step1Schema = quoteFieldsSchema.pick({ name: true, phone: true });
 const step2Schema = quoteFieldsSchema.pick({ year: true, make: true, model: true });
 
 export function QuoteForm({ serviceHint }: Props) {
-  const { contact } = useContactContent();
+  const { contact, waQuoteHref } = useContactContent();
   const isMobile = useIsMobile();
   const formRef = useRef<HTMLFormElement>(null);
   const callbackMessage = getQuoteCallbackMessage(normalizeHoursSchedule(contact.hours_schedule));
@@ -74,8 +74,10 @@ export function QuoteForm({ serviceHint }: Props) {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const data = Object.fromEntries(fd) as Record<string, string>;
+    const form = formRef.current;
+    if (!form) return;
+
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
     const parsed = schema.safeParse(data);
     if (!parsed.success) {
       const errs: Record<string, string> = {};
@@ -112,7 +114,7 @@ export function QuoteForm({ serviceHint }: Props) {
         message,
       });
       setStatus("ok");
-      e.currentTarget.reset();
+      form.reset();
       setStep(1);
     } catch (err) {
       setStatus("err");
@@ -313,6 +315,16 @@ export function QuoteForm({ serviceHint }: Props) {
           <div>
             <p className="text-sm font-semibold text-foreground">Quote received</p>
             <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{callbackMessage}</p>
+            {waQuoteHref && (
+              <a
+                href={waQuoteHref}
+                target="_blank"
+                rel="noreferrer"
+                className="hover-link mt-2 inline-block text-xs font-semibold text-primary"
+              >
+                Or follow up on WhatsApp →
+              </a>
+            )}
           </div>
         </div>
       )}

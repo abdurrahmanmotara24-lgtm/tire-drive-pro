@@ -29,7 +29,10 @@ export const Route = createFileRoute("/admin/images")({
 });
 
 type FormState = {
-  hero: Pick<HeroContent, "background_image" | "background_image_light" | "focal_x" | "focal_y">;
+  hero: Pick<
+    HeroContent,
+    "background_image" | "background_image_mobile" | "background_image_light" | "focal_x" | "focal_y"
+  >;
   homepage: HomepageContent;
 };
 
@@ -49,6 +52,7 @@ function ImagesAdmin() {
     const initial: FormState = {
       hero: {
         background_image: heroData.background_image,
+        background_image_mobile: heroData.background_image_mobile ?? "",
         background_image_light: heroData.background_image_light ?? "",
         focal_x: heroData.focal_x ?? DEFAULTS.hero.focal_x,
         focal_y: heroData.focal_y ?? DEFAULTS.hero.focal_y,
@@ -68,6 +72,7 @@ function ImagesAdmin() {
       await saveContent("hero", {
         ...heroData,
         background_image: form.hero.background_image,
+        background_image_mobile: form.hero.background_image_mobile,
         background_image_light: form.hero.background_image_light,
         focal_x: form.hero.focal_x,
         focal_y: form.hero.focal_y,
@@ -88,7 +93,8 @@ function ImagesAdmin() {
 
   if (!form) return <div className="text-sm text-muted-foreground">Loading…</div>;
 
-  const heroPreview = form.hero.background_image || heroWarehouse;
+  const desktopPreview = form.hero.background_image || heroWarehouse;
+  const mobilePreview = form.hero.background_image_mobile || desktopPreview;
   const fx = form.hero.focal_x ?? 36;
   const fy = form.hero.focal_y ?? 46;
 
@@ -122,17 +128,21 @@ function ImagesAdmin() {
         <Card className="space-y-4 p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 className="text-sm font-bold">Homepage hero background</h2>
-              <p className="text-xs text-muted-foreground">Full-width image behind the main headline.</p>
+              <h2 className="text-sm font-bold">Homepage hero backgrounds</h2>
+              <p className="text-xs text-muted-foreground">
+                Upload separate photos for desktop (landscape) and mobile (portrait).
+              </p>
             </div>
             <ResetDefaultsButton
-              label="Reset hero image"
+              label="Reset hero images"
               onReset={() =>
                 setForm({
                   ...form,
                   hero: {
                     ...form.hero,
                     background_image: "",
+                    background_image_mobile: "",
+                    background_image_light: "",
                     focal_x: DEFAULTS.hero.focal_x,
                     focal_y: DEFAULTS.hero.focal_y,
                   },
@@ -141,24 +151,50 @@ function ImagesAdmin() {
             />
           </div>
 
-          <div className="overflow-hidden rounded-md border border-border">
-            <img
-              src={heroPreview}
-              alt=""
-              className="aspect-[16/9] w-full object-cover"
-              style={{ objectPosition: `${fx}% ${fy}%` }}
-            />
-          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold">Desktop</h3>
+              <p className="text-xs text-muted-foreground">Shown on tablets and larger screens (768px+).</p>
+              <div className="overflow-hidden rounded-md border border-border">
+                <img
+                  src={desktopPreview}
+                  alt=""
+                  className="aspect-[16/9] w-full object-cover"
+                  style={{ objectPosition: `${fx}% ${fy}%` }}
+                />
+              </div>
+              <MediaPicker
+                value={form.hero.background_image}
+                onChange={(url) => setForm({ ...form, hero: { ...form.hero, background_image: url } })}
+              />
+            </div>
 
-          <MediaPicker
-            value={form.hero.background_image}
-            onChange={(url) => setForm({ ...form, hero: { ...form.hero, background_image: url } })}
-          />
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold">Mobile</h3>
+              <p className="text-xs text-muted-foreground">
+                Shown on phones. Falls back to the desktop image when empty.
+              </p>
+              <div className="mx-auto max-w-[220px] overflow-hidden rounded-md border border-border">
+                <img
+                  src={mobilePreview}
+                  alt=""
+                  className="aspect-[9/16] w-full object-cover"
+                  style={{ objectPosition: `${fx}% ${fy}%` }}
+                />
+              </div>
+              <MediaPicker
+                value={form.hero.background_image_mobile ?? ""}
+                onChange={(url) =>
+                  setForm({ ...form, hero: { ...form.hero, background_image_mobile: url } })
+                }
+              />
+            </div>
+          </div>
 
           <div className="border-t border-border pt-4">
             <h3 className="text-sm font-semibold">Light mode hero (optional)</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Brighter photo for showroom light theme. Falls back to the main hero image when empty.
+              Brighter photo for showroom light theme on desktop. Falls back to the desktop image when empty.
             </p>
             <div className="mt-3">
               <MediaPicker
@@ -192,6 +228,7 @@ function ImagesAdmin() {
               />
             </div>
           </div>
+          <p className="text-xs text-muted-foreground">Focus sliders apply to both desktop and mobile images.</p>
         </Card>
 
         <BandEditor

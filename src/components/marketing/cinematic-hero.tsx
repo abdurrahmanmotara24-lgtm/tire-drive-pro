@@ -21,12 +21,13 @@ type Props = {
 export function CinematicHero({ hero, callHref, fallbackImage = heroWarehouse, bleedUnderHeader }: Props) {
   const { contact } = useContactContent();
   const { isDark } = useColorMode();
-  const cmsBg = isDark
+  const themeAwareDesktop = isDark
     ? hero.background_image
     : (hero.background_image_light || hero.background_image);
-  const bg = cmsBg || fallbackImage;
+  const desktopBg = themeAwareDesktop || fallbackImage;
+  const mobileBg = hero.background_image_mobile?.trim() || desktopBg;
   const overlay = (hero.overlay_opacity ?? 62) / 100;
-  const isWarehouse = !cmsBg || bg === fallbackImage;
+  const isWarehouse = !themeAwareDesktop && !hero.background_image_mobile?.trim();
   const focal = `${hero.focal_x ?? 36}% ${hero.focal_y ?? 46}%`;
   const hoursSnippet = contact.hours?.split("\n")[0]?.trim() || contact.hours;
 
@@ -44,7 +45,12 @@ export function CinematicHero({ hero, callHref, fallbackImage = heroWarehouse, b
         } as CSSProperties
       }
     >
-      <HeroBackground src={bg} variant={isWarehouse ? "warehouse" : "default"} objectPosition={focal} />
+      <HeroBackground
+        src={desktopBg}
+        mobileSrc={mobileBg}
+        variant={isWarehouse ? "warehouse" : "default"}
+        objectPosition={focal}
+      />
       <div className="hero-grain pointer-events-none absolute inset-0 z-[1]" aria-hidden />
       <div className="hero-glow-orb pointer-events-none absolute -right-20 top-1/4 z-[1] h-96 w-96 rounded-full bg-primary/30 blur-3xl" aria-hidden />
       <div className="hero-overlay-vignette pointer-events-none absolute inset-0 z-[1]" aria-hidden />

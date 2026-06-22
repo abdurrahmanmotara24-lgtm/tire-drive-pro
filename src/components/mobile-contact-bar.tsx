@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
 
 export function MobileContactBar({ className }: { className?: string }) {
   const barRef = useRef<HTMLElement>(null);
-  const { telHref, waHref, hasPhone } = useContactContent();
+  const { telHref, waQuoteHref, hasPhone } = useContactContent();
 
   useSyncCssVar(barRef, "--site-contact-bar-height", true);
 
-  if (!hasPhone && !waHref) return null;
+  if (!hasPhone && !waQuoteHref) return null;
 
   return (
     <nav
@@ -45,9 +45,9 @@ export function MobileContactBar({ className }: { className?: string }) {
             <FileText className="h-4 w-4 shrink-0 text-primary" aria-hidden />
             <span>Quote</span>
           </Link>
-          {waHref && (
+          {waQuoteHref && (
             <a
-              href={waHref}
+              href={waQuoteHref}
               target="_blank"
               rel="noreferrer"
               className="mobile-contact-bar__action hover-btn-outline flex min-h-11 flex-1 flex-col items-center justify-center gap-1 rounded-sm border border-border bg-card px-2 py-2 text-xs font-bold uppercase tracking-wider"

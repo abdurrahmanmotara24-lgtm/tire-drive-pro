@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { z } from "zod";
 import { Phone, Mail, Clock, MessageCircle, MapPin } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -16,15 +16,16 @@ const schema = z.object({
 type Card = { icon: LucideIcon; title: string; value: string; href?: string };
 
 export function ContactPanel() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<"idle" | "submitting" | "ok" | "err">("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [errorMsg, setErrorMsg] = useState("");
-  const { contact, telHref, waHref, mailHref } = useContactContent();
+  const { contact, telHref, waHref, waQuoteHref, mailHref } = useContactContent();
 
   const cards: Card[] = [
     { icon: Phone, title: "Phone", value: contact.phone, href: telHref },
     { icon: Mail, title: "Email", value: contact.email, href: mailHref },
-    { icon: MessageCircle, title: "WhatsApp", value: "Message us", href: waHref },
+    { icon: MessageCircle, title: "WhatsApp", value: "Get a quote", href: waQuoteHref ?? waHref },
     { icon: Clock, title: "Hours", value: contact.hours },
     { icon: MapPin, title: "Address", value: contact.address },
   ];
@@ -50,7 +51,7 @@ export function ContactPanel() {
         message: parsed.data.message,
       });
       setStatus("ok");
-      e.currentTarget.reset();
+      formRef.current?.reset();
     } catch (err) {
       setStatus("err");
       setErrorMsg((err as Error).message || "Could not send. Try email or phone instead.");
@@ -86,7 +87,7 @@ export function ContactPanel() {
             );
           })}
         </div>
-        <form onSubmit={onSubmit} className="hover-glass glass-panel grid gap-3 rounded-sm p-6 lg:col-span-2">
+        <form ref={formRef} onSubmit={onSubmit} className="hover-glass glass-panel grid gap-3 rounded-sm p-6 lg:col-span-2">
           <h2 className="font-display text-xl">Send a message</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <PublicField id="contact-name" label="Name" name="name" error={errors.name} disabled={status === "submitting"} />

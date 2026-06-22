@@ -32,6 +32,8 @@ export type HeroContent = {
   cta_secondary_text: string;
   cta_secondary_link: string;
   background_image: string;
+  /** Optional portrait-oriented hero for mobile; falls back to background_image */
+  background_image_mobile?: string;
   /** Optional hero photo tuned for light mode; falls back to background_image */
   background_image_light?: string;
   overlay_opacity: number;
@@ -664,7 +666,13 @@ export type LeadInsert = {
 };
 
 export async function submitLead(payload: LeadInsert): Promise<void> {
-  const { error } = await supabase.from("leads").insert({
+  const cloudReady = await ensureCloudContentReadable();
+  const client = cloudReady ? getContentSupabaseClient() : null;
+  if (!client) {
+    throw new Error("Unable to send your request right now. Please call or WhatsApp us instead.");
+  }
+
+  const { error } = await client.from("leads").insert({
     type: payload.type,
     name: payload.name,
     phone: payload.phone ?? null,
