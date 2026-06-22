@@ -9,7 +9,7 @@ import {
   type LeadRow,
   type LeadStatus,
 } from "@/lib/site-content";
-import { useContactContent } from "@/hooks/use-contact-content";
+import { normalizeWhatsAppDigits } from "@/lib/phone-utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -165,7 +165,7 @@ function LeadCard({
   const tel = lead.phone?.replace(/[^+\d]/g, "");
   const telHref = tel ? `tel:${tel}` : undefined;
   const mailHref = lead.email ? `mailto:${lead.email}` : undefined;
-  const waDigits = lead.phone?.replace(/[^\d]/g, "");
+  const waDigits = lead.phone ? normalizeWhatsAppDigits(lead.phone) : undefined;
   const waMessage = encodeURIComponent(whatsAppTemplate(lead));
   const waHref = waBase && waDigits ? `${waBase}?text=${waMessage}` : waDigits ? `https://wa.me/${waDigits}?text=${waMessage}` : undefined;
 

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { PublicField } from "@/components/public-field";
 import { PublicButton, PublicOutlineButton } from "@/components/public-button";
 import { submitLead } from "@/lib/site-content";
+import { buildQuoteWaMeUrl, normalizeWhatsAppDigits } from "@/lib/phone-utils";
 import { useContactContent } from "@/hooks/use-contact-content";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -57,10 +58,12 @@ const step1Schema = quoteFieldsSchema.pick({ name: true, phone: true });
 const step2Schema = quoteFieldsSchema.pick({ year: true, make: true, model: true });
 
 export function QuoteForm({ serviceHint }: Props) {
-  const { contact, waQuoteHref } = useContactContent();
+  const { contact } = useContactContent();
   const isMobile = useIsMobile();
   const formRef = useRef<HTMLFormElement>(null);
   const callbackMessage = getQuoteCallbackMessage(normalizeHoursSchedule(contact.hours_schedule));
+  const waRaw = contact.whatsapp.trim() || contact.phone.trim();
+  const hasWhatsApp = Boolean(normalizeWhatsAppDigits(waRaw));
   const [status, setStatus] = useState<"idle" | "submitting" | "ok" | "err">("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [errorMsg, setErrorMsg] = useState("");
@@ -95,16 +98,26 @@ export function QuoteForm({ serviceHint }: Props) {
     setErrors({});
     setErrorMsg("");
     setStatus("submitting");
-    try {
-      const vehicle = formatVehicleDescription(
-        parsed.data.year ?? "",
-        parsed.data.make,
-        parsed.data.model,
-      );
-      const tireSize = parsed.data.tireSize ? normalizeTireSize(parsed.data.tireSize) : undefined;
-      const interest = serviceHint?.trim();
-      const message = interest ? `Service interest: ${interest}` : undefined;
 
+    const vehicle = formatVehicleDescription(
+      parsed.data.year ?? "",
+      parsed.data.make,
+      parsed.data.model,
+    );
+    const tireSize = parsed.data.tireSize ? normalizeTireSize(parsed.data.tireSize) : undefined;
+    const interest = serviceHint?.trim();
+    const message = interest ? `Service interest: ${interest}` : undefined;
+
+    const waUrl = buildQuoteWaMeUrl(waRaw, {
+      name: parsed.data.name,
+      phone: parsed.data.phone,
+      vehicle,
+      tireSize,
+      service: interest,
+    });
+
+    let leadSaved = false;
+    try {
       await submitLead({
         type: "quote",
         name: parsed.data.name,
@@ -113,13 +126,31 @@ export function QuoteForm({ serviceHint }: Props) {
         tire_size: tireSize,
         message,
       });
+      leadSaved = true;
+    } catch {
+      /* WhatsApp is the primary hand-off; lead save is best-effort */
+    }
+
+    if (waUrl) {
+      window.open(waUrl, "_blank", "noopener,noreferrer");
       setStatus("ok");
       form.reset();
       setStep(1);
-    } catch (err) {
-      setStatus("err");
-      setErrorMsg((err as Error).message || "Something went wrong. Please call us instead.");
+      if (!leadSaved) {
+        setErrorMsg("");
+      }
+      return;
     }
+
+    if (leadSaved) {
+      setStatus("ok");
+      form.reset();
+      setStep(1);
+      return;
+    }
+
+    setStatus("err");
+    setErrorMsg("Could not send your quote. Please call or WhatsApp us directly.");
   }
 
   function applyFieldErrors(issues: z.ZodIssue[]) {
@@ -299,7 +330,7 @@ export function QuoteForm({ serviceHint }: Props) {
           </PublicButton>
         ) : (
           <PublicButton type="submit" className="min-h-11 w-full sm:w-auto" disabled={status === "submitting"}>
-            {status === "submitting" ? "Sending…" : "Request quote"}
+            {status === "submitting" ? "Sending…" : hasWhatsApp ? "Request quote on WhatsApp" : "Request quote"}
           </PublicButton>
         )}
       </div>
@@ -313,18 +344,14 @@ export function QuoteForm({ serviceHint }: Props) {
             <Check className="h-4 w-4" strokeWidth={3} aria-hidden />
           </span>
           <div>
-            <p className="text-sm font-semibold text-foreground">Quote received</p>
-            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{callbackMessage}</p>
-            {waQuoteHref && (
-              <a
-                href={waQuoteHref}
-                target="_blank"
-                rel="noreferrer"
-                className="hover-link mt-2 inline-block text-xs font-semibold text-primary"
-              >
-                Or follow up on WhatsApp →
-              </a>
-            )}
+            <p className="text-sm font-semibold text-foreground">
+              {hasWhatsApp ? "Opening WhatsApp…" : "Quote received"}
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              {hasWhatsApp
+                ? `${callbackMessage} Your quote details have been pre-filled in the chat.`
+                : callbackMessage}
+            </p>
           </div>
         </div>
       )}

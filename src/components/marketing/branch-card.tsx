@@ -10,10 +10,9 @@ export function BranchCard({ branch }: { branch: LocationRow }) {
   const directions = `https://www.google.com/maps?q=${encodeURIComponent(mapQ)}`;
   const phone = branch.phone || contact.phone;
   const tel = phone ? `tel:${phone.replace(/[^+\d]/g, "")}` : siteTel;
-  const storeWa =
-    phone && siteWa
-      ? buildWaMeUrl(phone, WHATSAPP_QUOTE_MESSAGE)
-      : siteWa;
+  const storeWa = phone
+    ? buildWaMeUrl(phone, WHATSAPP_QUOTE_MESSAGE) ?? siteWa
+    : siteWa;
 
   return (
     <article className="hover-lift overflow-hidden rounded-sm border border-border bg-card shadow-soft transition-colors hover:border-primary/30">

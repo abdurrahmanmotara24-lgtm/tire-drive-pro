@@ -12,6 +12,7 @@ import { ResetDefaultsButton } from "@/components/admin/reset-defaults-button";
 import { SocialAccountsEditor } from "@/components/admin/social-accounts-editor";
 import { useAdminForm } from "@/hooks/use-admin-form";
 import { contactWithSocialAccounts, syncLegacySocialFields } from "@/lib/social-accounts";
+import { formatWhatsAppPreview } from "@/lib/phone-utils";
 
 export const Route = createFileRoute("/admin/contact")({ component: ContactAdmin });
 
@@ -37,6 +38,7 @@ function ContactAdmin() {
 
   const schedule = normalizeHoursSchedule(form.hours_schedule);
   const socialAccounts = form.social_accounts ?? contactWithSocialAccounts(form).social_accounts ?? [];
+  const waPreview = formatWhatsAppPreview(form.whatsapp.trim() || form.phone.trim());
 
   const f = (k: keyof ContactContent, label: string, placeholder?: string) => (
     <div>
@@ -49,10 +51,30 @@ function ContactAdmin() {
     <Card className="space-y-4 p-6">
       <ResetDefaultsButton onReset={() => setForm({ ...DEFAULTS.contact })} />
       <div className="grid gap-4 sm:grid-cols-2">
-        {f("phone", "Phone", "+1 (000) 000-0000")}
+        {f("phone", "Phone", "082 123 4567")}
         {f("email", "Email", "hello@example.com")}
-        {f("whatsapp", "WhatsApp number", "10000000000 (digits only)")}
         {f("address", "Address")}
+      </div>
+      <div>
+        <Label>WhatsApp number</Label>
+        <p className="mb-1 text-xs text-muted-foreground">
+          Used for quote links and the WhatsApp button. Local (082…), national (82…), or international (+27…) formats all work.
+          Leave blank to use the phone number above.
+        </p>
+        <Input
+          value={form.whatsapp ?? ""}
+          placeholder="082 123 4567 or 27821234567"
+          onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+        />
+        {waPreview ? (
+          <p className="mt-1 text-xs text-muted-foreground">
+            WhatsApp link will use: <span className="font-medium text-foreground">{waPreview}</span>
+          </p>
+        ) : (
+          (form.whatsapp.trim() || form.phone.trim()) && (
+            <p className="mt-1 text-xs text-destructive">Could not parse a valid WhatsApp number — check the format.</p>
+          )
+        )}
       </div>
       <div>
         <Label>Structured hours</Label>
