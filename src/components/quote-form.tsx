@@ -309,9 +309,9 @@ export function QuoteForm({ serviceHint }: Props) {
         </div>
       )}
 
-      {(!useSteps || step === 1) && contactFields}
-      {(!useSteps || step === 2) && vehicleFields}
-      {(!useSteps || step === 3) && tireFields}
+      <div hidden={useSteps && step !== 1}>{contactFields}</div>
+      <div hidden={useSteps && step !== 2}>{vehicleFields}</div>
+      <div hidden={useSteps && step !== 3}>{tireFields}</div>
 
       <div className="flex flex-wrap gap-2">
         {useSteps && step > 1 && (
