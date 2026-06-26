@@ -27,6 +27,7 @@ export function getContentSupabaseClient(): ContentClient | null {
 
   cachedClient = createClient<Database>(url, key, {
     auth: {
+      storageKey: "tny-public-content-no-auth",
       persistSession: false,
       autoRefreshToken: false,
       detectSessionInUrl: false,
