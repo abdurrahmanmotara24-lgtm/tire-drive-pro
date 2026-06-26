@@ -15,6 +15,8 @@ type PublicFieldProps = {
   as?: "input" | "textarea";
   rows?: number;
   disabled?: boolean;
+  value?: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 };
 
 export function PublicField({
@@ -29,6 +31,8 @@ export function PublicField({
   as = "input",
   rows = 4,
   disabled,
+  value,
+  onChange,
 }: PublicFieldProps) {
   const describedBy = error ? `${id}-error` : undefined;
   const fieldClass = cn(
@@ -49,6 +53,8 @@ export function PublicField({
           rows={rows}
           placeholder={placeholder}
           disabled={disabled}
+          value={value}
+          onChange={onChange as React.ChangeEventHandler<HTMLTextAreaElement> | undefined}
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={fieldClass}
@@ -61,6 +67,8 @@ export function PublicField({
           inputMode={inputMode}
           placeholder={placeholder}
           disabled={disabled}
+          value={value}
+          onChange={onChange as React.ChangeEventHandler<HTMLInputElement> | undefined}
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={fieldClass}
