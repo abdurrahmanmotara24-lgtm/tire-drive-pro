@@ -218,6 +218,13 @@ export function QuoteForm({ serviceHint }: Props) {
     setStep((s) => Math.min(totalSteps, s + 1));
   }
 
+  function handleNextClick(e: React.MouseEvent<HTMLButtonElement>) {
+    // Prevent the same click from becoming a submit if React reuses the
+    // button element when switching from "Continue" to the final submit CTA.
+    e.preventDefault();
+    nextStep();
+  }
+
   function prevStep() {
     setStep((s) => Math.max(1, s - 1));
   }
@@ -332,7 +339,7 @@ export function QuoteForm({ serviceHint }: Props) {
           </PublicOutlineButton>
         )}
         {useSteps && step < totalSteps ? (
-          <PublicButton type="button" className="min-h-11 flex-1 sm:flex-none" onClick={nextStep}>
+          <PublicButton type="button" className="min-h-11 flex-1 sm:flex-none" onClick={handleNextClick}>
             Continue
           </PublicButton>
         ) : (
