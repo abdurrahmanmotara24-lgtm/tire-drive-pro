@@ -80,6 +80,13 @@ export function QuoteForm({ serviceHint }: Props) {
     const form = formRef.current;
     if (!form) return;
 
+    // On mobile multi-step, an implicit submit (e.g. keyboard "Go") should
+    // advance to the next step instead of submitting early.
+    if (useSteps && step < totalSteps) {
+      nextStep();
+      return;
+    }
+
     const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
     const parsed = schema.safeParse(data);
     if (!parsed.success) {
