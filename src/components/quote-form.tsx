@@ -56,6 +56,19 @@ type Props = { serviceHint?: string };
 
 const step1Schema = quoteFieldsSchema.pick({ name: true, phone: true });
 const step2Schema = quoteFieldsSchema.pick({ year: true, make: true, model: true });
+const quoteFieldNames = ["name", "phone", "year", "make", "model", "tireSize"] as const;
+
+type QuoteFieldName = (typeof quoteFieldNames)[number];
+type QuoteFormState = Record<QuoteFieldName, string>;
+
+const emptyQuoteValues: QuoteFormState = {
+  name: "",
+  phone: "",
+  year: "",
+  make: "",
+  model: "",
+  tireSize: "",
+};
 
 export function QuoteForm({ serviceHint }: Props) {
   const { contact } = useContactContent();
@@ -68,6 +81,7 @@ export function QuoteForm({ serviceHint }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [errorMsg, setErrorMsg] = useState("");
   const [step, setStep] = useState(1);
+  const [values, setValues] = useState<QuoteFormState>(() => ({ ...emptyQuoteValues }));
   const useSteps = isMobile;
   const totalSteps = 3;
 
@@ -87,8 +101,7 @@ export function QuoteForm({ serviceHint }: Props) {
       return;
     }
 
-    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
-    const parsed = schema.safeParse(data);
+    const parsed = schema.safeParse(values);
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       parsed.error.issues.forEach((i) => (errs[i.path[0] as string] = i.message));
@@ -141,7 +154,7 @@ export function QuoteForm({ serviceHint }: Props) {
     if (waUrl) {
       window.open(waUrl, "_blank", "noopener,noreferrer");
       setStatus("ok");
-      form.reset();
+      setValues({ ...emptyQuoteValues });
       setStep(1);
       if (!leadSaved) {
         setErrorMsg("");
@@ -151,7 +164,7 @@ export function QuoteForm({ serviceHint }: Props) {
 
     if (leadSaved) {
       setStatus("ok");
-      form.reset();
+      setValues({ ...emptyQuoteValues });
       setStep(1);
       return;
     }
@@ -172,7 +185,7 @@ export function QuoteForm({ serviceHint }: Props) {
 
   function validateCurrentStep(): boolean {
     if (!formRef.current) return true;
-    const data = Object.fromEntries(new FormData(formRef.current)) as Record<string, string>;
+    const data = values;
     if (step === 3) {
       const tire = data.tireSize?.trim() ?? "";
       if (tire && !isValidTireSize(tire)) {
@@ -222,15 +235,44 @@ export function QuoteForm({ serviceHint }: Props) {
     setStep((s) => Math.max(1, s - 1));
   }
 
+  function updateField(name: QuoteFieldName, value: string) {
+    setValues((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+    setErrorMsg("");
+    if (status === "err") setStatus("idle");
+  }
+
+  function handleFieldChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const name = e.currentTarget.name;
+    if (quoteFieldNames.includes(name as QuoteFieldName)) {
+      updateField(name as QuoteFieldName, e.currentTarget.value);
+    }
+  }
+
   const contactFields = (
     <div className="grid gap-3 sm:grid-cols-2">
-      <PublicField id="quote-name" label="Name" name="name" error={errors.name} disabled={status === "submitting"} />
+      <PublicField
+        id="quote-name"
+        label="Name"
+        name="name"
+        value={values.name}
+        onChange={handleFieldChange}
+        error={errors.name}
+        disabled={status === "submitting"}
+      />
       <PublicField
         id="quote-phone"
         label="Phone"
         name="phone"
         type="tel"
         inputMode="tel"
+        value={values.phone}
+        onChange={handleFieldChange}
         error={errors.phone}
         disabled={status === "submitting"}
       />
@@ -250,6 +292,8 @@ export function QuoteForm({ serviceHint }: Props) {
           placeholder={String(currentYear)}
           inputMode="numeric"
           optional
+          value={values.year}
+          onChange={handleFieldChange}
           error={errors.year}
           disabled={status === "submitting"}
         />
@@ -258,6 +302,8 @@ export function QuoteForm({ serviceHint }: Props) {
           label="Make"
           name="make"
           placeholder="e.g. BMW"
+          value={values.make}
+          onChange={handleFieldChange}
           error={errors.make}
           disabled={status === "submitting"}
         />
@@ -266,6 +312,8 @@ export function QuoteForm({ serviceHint }: Props) {
           label="Model"
           name="model"
           placeholder="e.g. M340i"
+          value={values.model}
+          onChange={handleFieldChange}
           error={errors.model}
           disabled={status === "submitting"}
         />
@@ -281,6 +329,8 @@ export function QuoteForm({ serviceHint }: Props) {
         name="tireSize"
         placeholder={TIRE_SIZE_PLACEHOLDER}
         optional
+        value={values.tireSize}
+        onChange={handleFieldChange}
         error={errors.tireSize}
         disabled={status === "submitting"}
       />
@@ -332,11 +382,22 @@ export function QuoteForm({ serviceHint }: Props) {
           </PublicOutlineButton>
         )}
         {useSteps && step < totalSteps ? (
-          <PublicButton type="button" className="min-h-11 flex-1 sm:flex-none" onClick={nextStep}>
+          <PublicButton
+            key={`continue-${step}`}
+            type="button"
+            className="min-h-11 flex-1 sm:flex-none"
+            onClick={nextStep}
+            disabled={status === "submitting"}
+          >
             Continue
           </PublicButton>
         ) : (
-          <PublicButton type="submit" className="min-h-11 w-full sm:w-auto" disabled={status === "submitting"}>
+          <PublicButton
+            key="final-submit"
+            type="submit"
+            className="min-h-11 w-full sm:w-auto"
+            disabled={status === "submitting"}
+          >
             {status === "submitting" ? "Sending…" : hasWhatsApp ? "Request quote on WhatsApp" : "Request quote"}
           </PublicButton>
         )}

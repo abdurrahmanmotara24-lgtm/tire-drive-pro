@@ -7,7 +7,7 @@ import { CLOUD_CREDENTIALS_READY_EVENT } from "@/lib/lovable-cloud-backend";
  * Public pages should not fetch CMS data before this (or they cache built-in defaults).
  */
 export function usePublicContentReady(): boolean {
-  const [ready, setReady] = useState(() => isSupabasePublicEnvConfigured());
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const sync = () => setReady(isSupabasePublicEnvConfigured());

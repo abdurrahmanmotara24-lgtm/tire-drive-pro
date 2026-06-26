@@ -16,7 +16,6 @@ import { FinalCta } from "@/components/marketing/final-cta";
 import { TrustBar } from "@/components/marketing/trust-bar";
 import { ImageBand } from "@/components/marketing/image-band";
 import { useBrandSlideshow } from "@/hooks/use-brand-slideshow";
-import { prefetchHomeContent } from "@/lib/prefetch-public-content";
 import { FALLBACK_IMAGES, resolveSiteImage } from "@/lib/site-images";
 import { HomePageSubnav } from "@/components/marketing/home-page-subnav";
 import { BRAND_FULL_TITLE } from "@/lib/brand";
@@ -41,7 +40,6 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "canonical", href: "/" }],
   }),
   component: Index,
-  loader: ({ context: { queryClient } }) => prefetchHomeContent(queryClient),
 });
 
 function Index() {
