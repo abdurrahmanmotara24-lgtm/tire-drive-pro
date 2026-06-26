@@ -27,9 +27,9 @@ export function getContentSupabaseClient(): ContentClient | null {
 
   cachedClient = createClient<Database>(url, key, {
     auth: {
-      persistSession: typeof window !== "undefined",
-      autoRefreshToken: typeof window !== "undefined",
-      storage: typeof window !== "undefined" ? localStorage : undefined,
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
     },
   });
   return cachedClient;

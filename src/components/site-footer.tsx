@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
 export function SiteFooter({ className }: { className?: string }) {
   const { contact, telHref, mailHref, waHref, hasPhone } = useContactContent();
   const cmsReady = usePublicContentReady();
+  const [mounted, setMounted] = useState(false);
   const { data: services = DEFAULTS.services } = useQuery({
     queryKey: ["content", "services"],
     queryFn: () => fetchContent("services"),
@@ -18,9 +20,13 @@ export function SiteFooter({ className }: { className?: string }) {
     staleTime: 60_000,
   });
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const socials = toSocialLinks(contact);
 
-  const serviceLinks = services.filter((s) => s.title.trim()).slice(0, 6);
+  const serviceLinks = (mounted ? services : DEFAULTS.services).filter((s) => s.title.trim()).slice(0, 6);
 
   return (
     <footer className={cn("border-t border-border bg-card", className)}>
