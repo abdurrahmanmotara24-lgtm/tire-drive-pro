@@ -11,7 +11,6 @@ import {
 import appCss from "../styles.css?url";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { MobileContactBar } from "@/components/mobile-contact-bar";
 import { ScrollToTopButton } from "@/components/scroll-to-top-button";
 import { ThemeApplier } from "@/components/theme-applier";
 import { MessageCircle } from "lucide-react";
@@ -163,14 +162,12 @@ function RootComponent() {
           className={cn(
             "flex-1",
             isChrome && !isHome && "has-mobile-top-nav",
-            isChrome && "has-mobile-bottom-bar",
           )}
           tabIndex={-1}
         >
           <Outlet />
         </main>
         {isChrome && <SiteFooter />}
-        {isChrome && <MobileContactBar />}
         {isChrome && <WhatsAppFab />}
         {isChrome && <ScrollToTopButton />}
         <Toaster />
