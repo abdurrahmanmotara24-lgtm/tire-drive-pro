@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { buildLocalBusinessSchema } from "@/lib/local-business-schema";
 import { resolvePublicStore } from "@/lib/store";
@@ -9,6 +9,7 @@ import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 type Props = { siteUrl?: string };
 
 export function LocalBusinessJsonLd({ siteUrl }: Props) {
+  const [mounted, setMounted] = useState(false);
   const cmsReady = usePublicContentReady();
   const { contact } = useContactContent();
   const { data: seo = DEFAULTS.seo } = useQuery({
@@ -43,7 +44,11 @@ export function LocalBusinessJsonLd({ siteUrl }: Props) {
     [origin, contact, store, seo.description, seo.og_image],
   );
 
-  if (!schema) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || !schema) return null;
 
   return (
     <script
