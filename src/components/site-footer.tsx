@@ -2,15 +2,19 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { useContactContent } from "@/hooks/use-contact-content";
+import { usePublicContentReady } from "@/hooks/use-public-content-ready";
 import { toSocialLinks } from "@/lib/social-accounts";
 import { DEFAULTS, fetchContent } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
 
 export function SiteFooter({ className }: { className?: string }) {
   const { contact, telHref, mailHref, waHref, hasPhone } = useContactContent();
+  const cmsReady = usePublicContentReady();
   const { data: services = DEFAULTS.services } = useQuery({
     queryKey: ["content", "services"],
     queryFn: () => fetchContent("services"),
+    enabled: cmsReady,
+    placeholderData: DEFAULTS.services,
     staleTime: 60_000,
   });
 
