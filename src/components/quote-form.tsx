@@ -33,6 +33,12 @@ const quoteFieldsSchema = z.object({
   make: z.string().trim().min(1, "Make required").max(60),
   model: z.string().trim().min(1, "Model required").max(60),
   tireSize: z.string().trim().max(20).optional().or(z.literal("")),
+  quantity: z
+    .string()
+    .trim()
+    .optional()
+    .refine((v) => !v || (/^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= 20), "1–20 tyres"),
+
 });
 
 const schema = quoteFieldsSchema.superRefine((data, ctx) => {
