@@ -62,7 +62,7 @@ type Props = { serviceHint?: string };
 
 const step1Schema = quoteFieldsSchema.pick({ name: true, phone: true });
 const step2Schema = quoteFieldsSchema.pick({ year: true, make: true, model: true });
-const quoteFieldNames = ["name", "phone", "year", "make", "model", "tireSize"] as const;
+const quoteFieldNames = ["name", "phone", "year", "make", "model", "tireSize", "quantity"] as const;
 
 type QuoteFieldName = (typeof quoteFieldNames)[number];
 type QuoteFormState = Record<QuoteFieldName, string>;
@@ -74,6 +74,7 @@ const emptyQuoteValues: QuoteFormState = {
   make: "",
   model: "",
   tireSize: "",
+  quantity: "4",
 };
 
 export function QuoteForm({ serviceHint }: Props) {
