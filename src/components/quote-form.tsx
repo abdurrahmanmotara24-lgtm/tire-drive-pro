@@ -33,6 +33,12 @@ const quoteFieldsSchema = z.object({
   make: z.string().trim().min(1, "Make required").max(60),
   model: z.string().trim().min(1, "Model required").max(60),
   tireSize: z.string().trim().max(20).optional().or(z.literal("")),
+  quantity: z
+    .string()
+    .trim()
+    .optional()
+    .refine((v) => !v || (/^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= 20), "1–20 tyres"),
+
 });
 
 const schema = quoteFieldsSchema.superRefine((data, ctx) => {
@@ -56,7 +62,7 @@ type Props = { serviceHint?: string };
 
 const step1Schema = quoteFieldsSchema.pick({ name: true, phone: true });
 const step2Schema = quoteFieldsSchema.pick({ year: true, make: true, model: true });
-const quoteFieldNames = ["name", "phone", "year", "make", "model", "tireSize"] as const;
+const quoteFieldNames = ["name", "phone", "year", "make", "model", "tireSize", "quantity"] as const;
 
 type QuoteFieldName = (typeof quoteFieldNames)[number];
 type QuoteFormState = Record<QuoteFieldName, string>;
@@ -68,6 +74,7 @@ const emptyQuoteValues: QuoteFormState = {
   make: "",
   model: "",
   tireSize: "",
+  quantity: "4",
 };
 
 export function QuoteForm({ serviceHint }: Props) {
@@ -125,14 +132,19 @@ export function QuoteForm({ serviceHint }: Props) {
       parsed.data.model,
     );
     const tireSize = parsed.data.tireSize ? normalizeTireSize(parsed.data.tireSize) : undefined;
+    const quantity = parsed.data.quantity ? Number(parsed.data.quantity) : undefined;
     const interest = serviceHint?.trim();
-    const message = interest ? `Service interest: ${interest}` : undefined;
+    const messageParts: string[] = [];
+    if (interest) messageParts.push(`Service interest: ${interest}`);
+    if (quantity) messageParts.push(`Quantity: ${quantity} ${quantity === 1 ? "tyre" : "tyres"}`);
+    const message = messageParts.length ? messageParts.join(" | ") : undefined;
 
     const waUrl = buildQuoteWaMeUrl(waRaw, {
       name: parsed.data.name,
       phone: parsed.data.phone,
       vehicle,
       tireSize,
+      quantity,
       service: interest,
     });
 
@@ -188,14 +200,21 @@ export function QuoteForm({ serviceHint }: Props) {
     const data = values;
     if (step === 3) {
       const tire = data.tireSize?.trim() ?? "";
-      if (tire && !isValidTireSize(tire)) {
-        setErrors({ tireSize: "Use format 225/45R18" });
+      const qty = data.quantity?.trim() ?? "";
+      const nextErrs: Record<string, string> = {};
+      if (tire && !isValidTireSize(tire)) nextErrs.tireSize = "Use format 225/45R18";
+      if (qty && !(/^\d+$/.test(qty) && Number(qty) >= 1 && Number(qty) <= 20)) {
+        nextErrs.quantity = "1–20 tyres";
+      }
+      if (Object.keys(nextErrs).length) {
+        setErrors(nextErrs);
         setStatus("err");
         return false;
       }
       setErrors((prev) => {
         const next = { ...prev };
         delete next.tireSize;
+        delete next.quantity;
         return next;
       });
       return true;
@@ -322,19 +341,33 @@ export function QuoteForm({ serviceHint }: Props) {
   );
 
   const tireFields = (
-    <div>
+    <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+      <div>
+        <PublicField
+          id="quote-tireSize"
+          label="Tyre size"
+          name="tireSize"
+          placeholder={TIRE_SIZE_PLACEHOLDER}
+          optional
+          value={values.tireSize}
+          onChange={handleFieldChange}
+          error={errors.tireSize}
+          disabled={status === "submitting"}
+        />
+        <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{TIRE_SIZE_HINT}</p>
+      </div>
       <PublicField
-        id="quote-tireSize"
-        label="Tyre size"
-        name="tireSize"
-        placeholder={TIRE_SIZE_PLACEHOLDER}
-        optional
-        value={values.tireSize}
+        id="quote-quantity"
+        label="Quantity"
+        name="quantity"
+        type="number"
+        inputMode="numeric"
+        placeholder="4"
+        value={values.quantity}
         onChange={handleFieldChange}
-        error={errors.tireSize}
+        error={errors.quantity}
         disabled={status === "submitting"}
       />
-      <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{TIRE_SIZE_HINT}</p>
     </div>
   );
 
