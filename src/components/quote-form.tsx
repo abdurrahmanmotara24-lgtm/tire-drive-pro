@@ -362,9 +362,7 @@ export function QuoteForm({ serviceHint }: Props) {
         name="quantity"
         type="number"
         inputMode="numeric"
-        min={1}
-        max={20}
-        className="sm:w-24"
+        placeholder="4"
         value={values.quantity}
         onChange={handleFieldChange}
         error={errors.quantity}
