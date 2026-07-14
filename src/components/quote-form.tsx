@@ -132,14 +132,19 @@ export function QuoteForm({ serviceHint }: Props) {
       parsed.data.model,
     );
     const tireSize = parsed.data.tireSize ? normalizeTireSize(parsed.data.tireSize) : undefined;
+    const quantity = parsed.data.quantity ? Number(parsed.data.quantity) : undefined;
     const interest = serviceHint?.trim();
-    const message = interest ? `Service interest: ${interest}` : undefined;
+    const messageParts: string[] = [];
+    if (interest) messageParts.push(`Service interest: ${interest}`);
+    if (quantity) messageParts.push(`Quantity: ${quantity} ${quantity === 1 ? "tyre" : "tyres"}`);
+    const message = messageParts.length ? messageParts.join(" | ") : undefined;
 
     const waUrl = buildQuoteWaMeUrl(waRaw, {
       name: parsed.data.name,
       phone: parsed.data.phone,
       vehicle,
       tireSize,
+      quantity,
       service: interest,
     });
 
