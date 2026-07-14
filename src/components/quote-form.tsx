@@ -341,19 +341,35 @@ export function QuoteForm({ serviceHint }: Props) {
   );
 
   const tireFields = (
-    <div>
+    <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+      <div>
+        <PublicField
+          id="quote-tireSize"
+          label="Tyre size"
+          name="tireSize"
+          placeholder={TIRE_SIZE_PLACEHOLDER}
+          optional
+          value={values.tireSize}
+          onChange={handleFieldChange}
+          error={errors.tireSize}
+          disabled={status === "submitting"}
+        />
+        <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{TIRE_SIZE_HINT}</p>
+      </div>
       <PublicField
-        id="quote-tireSize"
-        label="Tyre size"
-        name="tireSize"
-        placeholder={TIRE_SIZE_PLACEHOLDER}
-        optional
-        value={values.tireSize}
+        id="quote-quantity"
+        label="Quantity"
+        name="quantity"
+        type="number"
+        inputMode="numeric"
+        min={1}
+        max={20}
+        className="sm:w-24"
+        value={values.quantity}
         onChange={handleFieldChange}
-        error={errors.tireSize}
+        error={errors.quantity}
         disabled={status === "submitting"}
       />
-      <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{TIRE_SIZE_HINT}</p>
     </div>
   );
 
