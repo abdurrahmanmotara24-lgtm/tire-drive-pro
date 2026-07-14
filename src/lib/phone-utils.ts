@@ -60,6 +60,7 @@ export type QuoteWhatsAppDetails = {
   phone: string;
   vehicle?: string;
   tireSize?: string;
+  quantity?: number;
   service?: string;
 };
 
@@ -73,6 +74,8 @@ export function buildQuoteWhatsAppMessage(details: QuoteWhatsAppDetails): string
   ];
   if (details.vehicle?.trim()) lines.push(`Vehicle: ${details.vehicle.trim()}`);
   if (details.tireSize?.trim()) lines.push(`Tyre size: ${details.tireSize.trim()}`);
+  if (details.quantity && details.quantity > 0)
+    lines.push(`Quantity: ${details.quantity} ${details.quantity === 1 ? "tyre" : "tyres"}`);
   if (details.service?.trim()) lines.push(`Service: ${details.service.trim()}`);
   return lines.join("\n");
 }
