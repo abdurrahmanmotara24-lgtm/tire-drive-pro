@@ -200,14 +200,21 @@ export function QuoteForm({ serviceHint }: Props) {
     const data = values;
     if (step === 3) {
       const tire = data.tireSize?.trim() ?? "";
-      if (tire && !isValidTireSize(tire)) {
-        setErrors({ tireSize: "Use format 225/45R18" });
+      const qty = data.quantity?.trim() ?? "";
+      const nextErrs: Record<string, string> = {};
+      if (tire && !isValidTireSize(tire)) nextErrs.tireSize = "Use format 225/45R18";
+      if (qty && !(/^\d+$/.test(qty) && Number(qty) >= 1 && Number(qty) <= 20)) {
+        nextErrs.quantity = "1–20 tyres";
+      }
+      if (Object.keys(nextErrs).length) {
+        setErrors(nextErrs);
         setStatus("err");
         return false;
       }
       setErrors((prev) => {
         const next = { ...prev };
         delete next.tireSize;
+        delete next.quantity;
         return next;
       });
       return true;
